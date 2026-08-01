@@ -971,13 +971,12 @@ Mohon segera diproses admin. Terima Kasih.`;
             const encodedText = encodeURIComponent(txt);
             const waUrl = `https://wa.me/${APP_CONFIG.whatsappAdmin}?text=${encodedText}`;
             
-            // Optional: Jika Anda ingin men-trigger request POST ke Google Apps Script (Webhook)
-            // Lakukan Fetch disini sebelum membuka WA (Diabaikan di UI ini agar fokus pada interaksi WA sesuai prompt)
-            /*
-            fetch('YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL', {
-                method: 'POST', body: JSON.stringify({ action: 'saveOrder', payload: data })
-            });
-            */
+            // Menyimpan data pesanan otomatis ke Database Google Spreadsheet
+   fetch('https://script.google.com/macros/s/AKfycbwKjrewkUM8lS4dt6Vts4ZceQ7Bg4R5Ynw6IoYjnZnC4gcTFJwRmD7X6rGRjMerMpG1QQ/exec
+', {
+       method: 'POST',
+       body: JSON.stringify({ action: 'saveOrder', payload: data })
+   }).catch(error => console.error('Error Database:', error));
             
             Swal.fire({
                 title: 'Mengarahkan ke WhatsApp',
