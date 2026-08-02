@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
-                        <p class="text-sm text-blue-800"><b>Cara Isi:</b> Ketik nama kota/area lalu <b>PILIH</b> dari daftar. (Anda bisa menggeser PIN di peta untuk titik akurat).</p>
+                        <p class="text-sm text-blue-800"><b>Cara Isi:</b> Ketik nama kota/area lalu <b>PILIH</b> dari daftar. (Atau geser PIN di peta).</p>
                     </div>
 
                     <div class="relative">
@@ -105,10 +105,10 @@
                         <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Tgi (cm)</label><input type="number" id="tinggi" value="0" class="w-full px-2 py-2 rounded-lg border-2 text-center font-bold"></div>
                     </div>
 
-                    <!-- FITUR BARU: UPLOAD FOTO -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Foto Barang (Agar admin mudah menaksir biaya)</label>
-                        <input type="file" id="fotoBarang" accept="image/*" class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Foto Barang (Buka Kamera)</label>
+                        <!-- FITUR CAPTURE=ENVIRONMENT AGAR OTOMATIS BUKA KAMERA BELAKANG -->
+                        <input type="file" id="fotoBarang" accept="image/*" capture="environment" class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     </div>
 
                     <div>
@@ -165,9 +165,10 @@
     <script>
         AOS.init();
 
+        // INI ADALAH URL BARU ANDA YANG SUDAH SAYA MASUKKAN
         const APP_CONFIG = {
             whatsappAdmin: '6288990007383',
-            gasUrl: 'https://script.google.com/macros/s/AKfycbwKjrewkUM8lS4dt6Vts4ZceQ7Bg4R5Ynw6IoYjnZnC4gcTFJwRmD7X6rGRjMerMpG1QQ/exec'
+            gasUrl: 'https://script.google.com/macros/s/AKfycbz694XrZsdyK-IyLoiu5_j3JHnpAClyCB2llFW1nRm0T29tQqFVPngFHC20MGMkxN8F/exec'
         };
 
         let map, markerA, markerB, routeLine;
@@ -238,7 +239,7 @@
         document.getElementById('btnHitung').addEventListener('click', () => {
             const form = document.getElementById('orderForm');
             if(!form.checkValidity()) { form.reportValidity(); return; }
-            if(!coords.jemput || !coords.tujuan) { Swal.fire('Error', 'Pilih lokasi di peta atau daftar!', 'warning'); return; }
+            if(!coords.jemput || !coords.tujuan) { Swal.fire('Error', 'Pilih lokasi di peta atau ketik minimal 3 huruf di kolom pencarian!', 'warning'); return; }
 
             Swal.fire({ title: 'Menghitung...', didOpen: () => Swal.showLoading() });
 
@@ -264,17 +265,14 @@
                 document.getElementById('resGrandTotal').textContent = 'Rp ' + tarifJarak.toLocaleString('id-ID');
                 document.getElementById('rincianBiaya').classList.remove('hidden');
 
-                // PERBAIKAN: VARIABEL SINKRON 100% DENGAN DATABASE
                 const fileInput = document.getElementById('fotoBarang');
-                const fotoTeks = fileInput.files.length > 0 ? "Ada (Akan dikirim via WA)" : "Tidak dilampirkan";
+                const fotoTeks = fileInput.files.length > 0 ? "Ada (Akan dikirim via WA)" : "Tidak Ada";
 
                 currentOrderData = {
                     nama: document.getElementById('nama').value,
                     whatsapp: document.getElementById('whatsapp').value,
                     alamatJemput: document.getElementById('alamatJemput').value,
-                    latJemput: coords.jemput.lat, lngJemput: coords.jemput.lng,
                     alamatTujuan: document.getElementById('alamatTujuan').value,
-                    latTujuan: coords.tujuan.lat, lngTujuan: coords.tujuan.lng,
                     jarak: jarakKm,
                     estimasiWaktu: waktuStr,
                     berat: document.getElementById('berat').value || 0,
@@ -293,26 +291,26 @@
 
         document.getElementById('btnPesanWhatsapp').addEventListener('click', () => {
             if(!currentOrderData) return;
-            Swal.fire({ title: 'Menyimpan ke Database...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Memproses Pesanan...', text: 'Mohon tunggu sebentar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
             fetch(APP_CONFIG.gasUrl, {
                 method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'saveOrder', payload: currentOrderData })
             }).then(() => {
                 Swal.fire({
-                    icon: 'success', title: 'Pesanan Masuk!',
-                    text: 'TERIMA KASIH ATAS KEPERCAYAAN JASA ANGKUT MAZAYA, KAMI SEGERA MENGHUBUNGI ANDA SEBENTAR LAGI.',
-                    confirmButtonText: 'Buka WhatsApp', confirmButtonColor: '#10b981'
+                    icon: 'success', title: 'Pesanan Berhasil Dicatat!',
+                    text: 'TERIMA KASIH ATAS KEPERCAYAAN JASA ANGKUT MAZAYA, KAMI SEGERA MENGHUBUNGI ANDA SEBENTAR LAGI. Silakan kirim detailnya via WhatsApp sekarang.',
+                    confirmButtonText: 'Kirim ke WhatsApp', confirmButtonColor: '#10b981'
                 }).then(() => {
                     const d = currentOrderData;
-                    const map1 = `https://www.google.com/maps?q=${d.latJemput},${d.lngJemput}`;
-                    const map2 = `https://www.google.com/maps?q=${d.latTujuan},${d.lngTujuan}`;
-                    const lampiran = d.fotoStatus.includes("Ada") ? "\n(FOTO BARANG SAYA LAMPIRKAN DI BAWAH)" : "";
-                    
-                    const txt = `*PESANAN BARU MAZAYA* 🚚\n\n*Pelanggan:* ${d.nama}\n*WA:* ${d.whatsapp}\n\n📍 *Jemput:* ${d.alamatJemput}\n🗺️ Link Jemput: ${map1}\n\n🏁 *Tujuan:* ${d.alamatTujuan}\n🗺️ Link Tujuan: ${map2}\n\n*Jarak:* ${d.jarak} Km\n*Estimasi Waktu:* ${d.estimasiWaktu}\n\n*Barang:* ${d.keterangan}\n*Dimensi:* ${d.panjang}x${d.lebar}x${d.tinggi} cm\n*Berat:* ${d.berat} Kg\n\n*Estimasi Biaya: Rp ${d.grandTotal.toLocaleString('id-ID')}*${lampiran}`;
+                    const lampiran = d.fotoStatus.includes("Ada") ? "\n\n*(SAYA AKAN MENGIRIMKAN FOTO BARANG SETELAH PESAN INI)*" : "";
+                    const txt = `*PESANAN BARU MAZAYA* 🚚\n\n*Pelanggan:* ${d.nama}\n*WA:* ${d.whatsapp}\n\n📍 *Jemput:* ${d.alamatJemput}\n🏁 *Tujuan:* ${d.alamatTujuan}\n\n*Jarak:* ${d.jarak} Km\n*Waktu:* ${d.estimasiWaktu}\n\n*Barang:* ${d.keterangan}\n*Dimensi:* ${d.panjang}x${d.lebar}x${d.tinggi} cm\n*Berat:* ${d.berat} Kg\n\n*Estimasi Biaya: Rp ${d.grandTotal.toLocaleString('id-ID')}*${lampiran}`;
                     window.open(`https://wa.me/${APP_CONFIG.whatsappAdmin}?text=${encodeURIComponent(txt)}`, '_blank');
+                    // Reset form setelah sukses
+                    document.getElementById('orderForm').reset();
+                    document.getElementById('rincianBiaya').classList.add('hidden');
                 });
-            }).catch(() => { Swal.fire('Gagal', 'Terjadi kesalahan koneksi internet.', 'error'); });
+            }).catch(() => { Swal.fire('Gagal', 'Pastikan koneksi internet Anda stabil.', 'error'); });
         });
     </script>
 </body>
