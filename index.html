@@ -105,10 +105,11 @@
                         <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Tgi (cm)</label><input type="number" id="tinggi" value="0" class="w-full px-2 py-2 rounded-lg border-2 text-center font-bold"></div>
                     </div>
 
+                    <!-- -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">Foto Barang (Buka Kamera)</label>
-                        <!-- FITUR CAPTURE=ENVIRONMENT AGAR OTOMATIS BUKA KAMERA BELAKANG -->
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Foto Barang (Otomatis Buka Kamera)</label>
                         <input type="file" id="fotoBarang" accept="image/*" capture="environment" class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <p class="text-[10px] text-slate-400 mt-1">*Maksimal ukuran foto 5MB. Foto akan tersimpan di database.</p>
                     </div>
 
                     <div>
@@ -120,6 +121,7 @@
                 </form>
             </div>
 
+            <!-- -->
             <div class="lg:col-span-7 space-y-6" data-aos="fade-left">
                 <div class="bg-white p-2 rounded-3xl shadow-xl border border-slate-200">
                     <div id="map" class="w-full bg-slate-100"></div>
@@ -142,7 +144,7 @@
                     </div>
 
                     <button type="button" id="btnPesanWhatsapp" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-4 rounded-xl shadow-lg mt-6 flex justify-center items-center gap-2 text-lg">
-                        <i class="bi bi-whatsapp"></i> PESAN SEKARANG (WA)
+                        <i class="bi bi-whatsapp"></i> PESAN SEKARANG
                     </button>
                 </div>
             </div>
@@ -155,17 +157,16 @@
             <p class="text-sm max-w-md mx-auto text-slate-500">Jl. Brigjen Katamso, Perum No. 32, Badean, Bondowoso, Jawa Timur, Indonesia</p>
             <div class="flex items-center justify-center gap-6 pt-2">
                 <p class="text-sm font-medium"><i class="bi bi-telephone-fill text-mazaya-orange mr-2"></i> 0889-9000-7383</p>
-                <p class="text-sm font-medium"><i class="bi bi-envelope-fill text-mazaya-orange mr-2"></i> tsamarahvidi29@gmail.com</p>
             </div>
             <p class="text-xs pt-8 opacity-50">&copy; 2026 Jasa Angkut Mazaya.</p>
         </div>
     </footer>
 
+    <!-- -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         AOS.init();
 
-        // INI ADALAH URL BARU ANDA YANG SUDAH SAYA MASUKKAN
         const APP_CONFIG = {
             whatsappAdmin: '6288990007383',
             gasUrl: 'https://script.google.com/macros/s/AKfycbz694XrZsdyK-IyLoiu5_j3JHnpAClyCB2llFW1nRm0T29tQqFVPngFHC20MGMkxN8F/exec'
@@ -265,9 +266,6 @@
                 document.getElementById('resGrandTotal').textContent = 'Rp ' + tarifJarak.toLocaleString('id-ID');
                 document.getElementById('rincianBiaya').classList.remove('hidden');
 
-                const fileInput = document.getElementById('fotoBarang');
-                const fotoTeks = fileInput.files.length > 0 ? "Ada (Akan dikirim via WA)" : "Tidak Ada";
-
                 currentOrderData = {
                     nama: document.getElementById('nama').value,
                     whatsapp: document.getElementById('whatsapp').value,
@@ -280,7 +278,6 @@
                     lebar: document.getElementById('lebar').value || 0,
                     tinggi: document.getElementById('tinggi').value || 0,
                     keterangan: document.getElementById('keterangan').value || "-",
-                    fotoStatus: fotoTeks,
                     grandTotal: tarifJarak
                 };
 
@@ -289,28 +286,72 @@
             }, 500);
         });
 
-        document.getElementById('btnPesanWhatsapp').addEventListener('click', () => {
+        // Fungsi khusus pengubah gambar menjadi kode Base64 agar muat dikirim
+        function getBase64(file) {
+           return new Promise((resolve, reject) => {
+             const reader = new FileReader();
+             reader.readAsDataURL(file);
+             reader.onload = () => resolve(reader.result.split(',')[1]);
+             reader.onerror = error => reject(error);
+           });
+        }
+
+        document.getElementById('btnPesanWhatsapp').addEventListener('click', async () => {
             if(!currentOrderData) return;
-            Swal.fire({ title: 'Memproses Pesanan...', text: 'Mohon tunggu sebentar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const fileInput = document.getElementById('fotoBarang');
+            let base64Data = null;
+            let mimeType = null;
+            let fileName = null;
+
+            // Jika pelanggan melampirkan foto
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                
+                // Mencegah file terlalu besar (Maks 5MB)
+                if (file.size > 5 * 1024 * 1024) { 
+                    Swal.fire('Ukuran Terlalu Besar', 'Maksimal ukuran foto adalah 5MB. Silakan pilih foto lain.', 'warning');
+                    return;
+                }
+
+                Swal.fire({ title: 'Menyiapkan Foto...', text: 'Tunggu sebentar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                try {
+                    mimeType = file.type;
+                    fileName = file.name;
+                    base64Data = await getBase64(file);
+                } catch(e) {
+                    Swal.fire('Error', 'Gagal memproses foto dari HP Anda', 'error');
+                    return;
+                }
+            }
+
+            // Memasukkan data foto ke dalam paket pesanan
+            currentOrderData.fotoBase64 = base64Data;
+            currentOrderData.fotoMime = mimeType;
+            currentOrderData.fotoName = fileName;
+
+            Swal.fire({ title: 'Memproses Pesanan...', text: 'Menyimpan data dan foto ke sistem (Membutuhkan 5-15 detik)...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
+            // Mengirim ke Google Apps Script (Code.gs)
             fetch(APP_CONFIG.gasUrl, {
                 method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'saveOrder', payload: currentOrderData })
             }).then(() => {
                 Swal.fire({
-                    icon: 'success', title: 'Pesanan Berhasil Dicatat!',
-                    text: 'TERIMA KASIH ATAS KEPERCAYAAN JASA ANGKUT MAZAYA, KAMI SEGERA MENGHUBUNGI ANDA SEBENTAR LAGI. Silakan kirim detailnya via WhatsApp sekarang.',
-                    confirmButtonText: 'Kirim ke WhatsApp', confirmButtonColor: '#10b981'
+                    icon: 'success', title: 'Pesanan Diterima!',
+                    text: 'TERIMA KASIH ATAS KEPERCAYAAN JASA ANGKUT MAZAYA, KAMI SEGERA MENGHUBUNGI ANDA SEBENTAR LAGI. Silakan klik tombol di bawah untuk konfirmasi ke WhatsApp kami.',
+                    confirmButtonText: 'Konfirmasi WhatsApp', confirmButtonColor: '#10b981'
                 }).then(() => {
                     const d = currentOrderData;
-                    const lampiran = d.fotoStatus.includes("Ada") ? "\n\n*(SAYA AKAN MENGIRIMKAN FOTO BARANG SETELAH PESAN INI)*" : "";
-                    const txt = `*PESANAN BARU MAZAYA* 🚚\n\n*Pelanggan:* ${d.nama}\n*WA:* ${d.whatsapp}\n\n📍 *Jemput:* ${d.alamatJemput}\n🏁 *Tujuan:* ${d.alamatTujuan}\n\n*Jarak:* ${d.jarak} Km\n*Waktu:* ${d.estimasiWaktu}\n\n*Barang:* ${d.keterangan}\n*Dimensi:* ${d.panjang}x${d.lebar}x${d.tinggi} cm\n*Berat:* ${d.berat} Kg\n\n*Estimasi Biaya: Rp ${d.grandTotal.toLocaleString('id-ID')}*${lampiran}`;
+                    const txt = `*PESANAN BARU MAZAYA* 🚚\n\n*Pelanggan:* ${d.nama}\n*WA:* ${d.whatsapp}\n\n📍 *Jemput:* ${d.alamatJemput}\n🏁 *Tujuan:* ${d.alamatTujuan}\n\n*Jarak:* ${d.jarak} Km\n*Waktu:* ${d.estimasiWaktu}\n\n*Barang:* ${d.keterangan}\n*Dimensi:* ${d.panjang}x${d.lebar}x${d.tinggi} cm\n*Berat:* ${d.berat} Kg\n\n*Estimasi Biaya: Rp ${d.grandTotal.toLocaleString('id-ID')}*`;
                     window.open(`https://wa.me/${APP_CONFIG.whatsappAdmin}?text=${encodeURIComponent(txt)}`, '_blank');
-                    // Reset form setelah sukses
+                    
                     document.getElementById('orderForm').reset();
                     document.getElementById('rincianBiaya').classList.add('hidden');
                 });
-            }).catch(() => { Swal.fire('Gagal', 'Pastikan koneksi internet Anda stabil.', 'error'); });
+            }).catch(() => { 
+                Swal.fire('Gagal', 'Pastikan koneksi internet Anda stabil.', 'error'); 
+            });
         });
     </script>
 </body>
