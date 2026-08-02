@@ -3,115 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner Dashboard | Jasa Angkut Mazaya</title>
-    
+    <title>Admin Dashboard - Jasa Angkut Mazaya</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Google Fonts (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        mazaya: {
-                            blue: '#1E3A8A',
-                            orange: '#F97316',
-                            dark: '#0F172A',
-                            gray: '#F8FAFC'
-                        }
-                    }
+                    colors: { 'mazaya-blue': '#1e3a8a', 'mazaya-orange': '#f97316' }
                 }
             }
         }
     </script>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        body { background-color: #F8FAFC; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="text-slate-800 antialiased h-screen overflow-hidden flex bg-slate-50">
+<body class="text-slate-800 antialiased h-screen overflow-hidden flex">
 
-    <!-- LAYAR LOGIN (Aktif secara default) -->
-    <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4 transition-opacity duration-500">
-        <div class="bg-white rounded-3xl shadow-2xl p-8 md:p-10 w-full max-w-md relative overflow-hidden">
-            <!-- Dekorasi -->
-            <div class="absolute -top-20 -right-20 w-40 h-40 bg-mazaya-blue rounded-full opacity-10"></div>
-            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-mazaya-orange rounded-full opacity-10"></div>
-
-            <div class="text-center mb-8 relative z-10">
-                <div class="w-16 h-16 bg-mazaya-blue rounded-2xl flex items-center justify-center text-white text-3xl mx-auto mb-4 shadow-lg">
-                    <i class="bi bi-shield-lock-fill"></i>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-gradient-to-br from-slate-900 to-mazaya-blue transition-opacity duration-500">
+        <div class="glass-panel p-10 rounded-3xl shadow-2xl w-[90%] max-w-md border border-white/20 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-mazaya-orange"></div>
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-50 text-mazaya-blue mb-4 shadow-inner">
+                    <i class="bi bi-shield-lock-fill text-3xl"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-slate-800">Owner Portal</h1>
+                <h2 class="text-2xl font-bold text-slate-800">Ruang Kontrol Owner</h2>
                 <p class="text-slate-500 text-sm mt-1">Jasa Angkut Mazaya</p>
             </div>
-
-            <form id="loginForm" class="space-y-5 relative z-10">
+            
+            <form id="loginForm" class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
                     <div class="relative">
-                        <i class="bi bi-person absolute left-4 top-3 text-slate-400"></i>
-                        <input type="text" id="username" required class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-mazaya-blue outline-none transition" placeholder="Masukkan username">
+                        <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="username" class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50" placeholder="Masukkan username">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
                     <div class="relative">
-                        <i class="bi bi-key absolute left-4 top-3 text-slate-400"></i>
-                        <input type="password" id="password" required class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-mazaya-blue outline-none transition" placeholder="••••••••">
+                        <i class="bi bi-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="password" id="password" class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50" placeholder="••••••••">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-mazaya-blue hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl transition shadow-lg mt-4">
-                    Masuk ke Dashboard
+                <button type="submit" class="w-full bg-mazaya-blue hover:bg-blue-800 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-blue-900/20 transition-all mt-4">
+                    Masuk ke Sistem
                 </button>
             </form>
+            <div class="mt-6 text-center">
+                <a href="index.html" class="text-sm text-slate-500 hover:text-mazaya-blue transition"><i class="bi bi-arrow-left mr-1"></i> Kembali ke Web Utama</a>
+            </div>
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD APP (Tersembunyi sampai login sukses) -->
+    <!-- APP CONTAINER (Hidden by default) -->
     <div id="appContainer" class="flex w-full h-full hidden opacity-0 transition-opacity duration-500">
         
-        <!-- Sidebar Navigation -->
-        <aside class="w-64 bg-mazaya-dark text-slate-300 flex-shrink-0 flex flex-col transition-all hidden md:flex">
-            <div class="h-20 flex items-center justify-center border-b border-slate-800">
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 z-20 shrink-0">
+            <div class="h-20 flex items-center px-6 border-b border-slate-800">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-mazaya-orange rounded-lg flex items-center justify-center text-white">
-                        <i class="bi bi-truck"></i>
+                    <div class="bg-mazaya-orange text-white p-1.5 rounded-lg">
+                        <i class="bi bi-truck text-lg"></i>
                     </div>
-                    <span class="font-bold text-xl tracking-wide text-white">MAZAYA</span>
+                    <span class="font-bold text-white tracking-wide">MAZAYA PRO</span>
                 </div>
             </div>
-
-            <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
+            
+            <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1 flex flex-col">
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2">Menu Utama</p>
                 
-                <a href="#" onclick="switchMenu('view-dashboard')" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition active-nav" data-target="view-dashboard">
-                    <i class="bi bi-grid-1x2-fill"></i> Ringkasan
+                <a href="#" onclick="switchMenu('view-dashboard')" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl bg-mazaya-blue text-white transition" data-target="view-dashboard">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
                 </a>
                 
                 <a href="#" onclick="switchMenu('view-pesanan')" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition" data-target="view-pesanan">
-                    <i class="bi bi-journal-check"></i> Data Pesanan
+                    <i class="bi bi-receipt"></i> Data Pesanan
                 </a>
                 
                 <a href="#" onclick="switchMenu('view-armada')" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition" data-target="view-armada">
-                    <i class="bi bi-truck-front-fill"></i> Armada & Kru
+                    <i class="bi bi-truck-front"></i> Armada & Kru
                 </a>
-                
+
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-6 mb-2 px-2">Sistem</p>
                 
-                <a href="#" onclick="showDevAlert()" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition">
+                <a href="#" onclick="switchMenu('view-pengaturan')" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition" data-target="view-pengaturan">
                     <i class="bi bi-gear-fill"></i> Pengaturan Tarif
                 </a>
                 
@@ -121,186 +110,117 @@
             </nav>
         </aside>
 
-        <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 flex flex-col bg-slate-50 h-full overflow-hidden relative">
             
-            <!-- Top Header -->
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:px-10 flex-shrink-0">
+            <!-- Header -->
+            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 z-10">
+                <h1 id="headerTitle" class="text-xl font-bold text-slate-800">Ringkasan Dashboard</h1>
                 <div class="flex items-center gap-4">
-                    <button class="md:hidden text-slate-500 hover:text-mazaya-blue"><i class="bi bi-list text-2xl"></i></button>
-                    <h2 class="text-xl font-bold text-slate-800" id="headerTitle">Ringkasan Dashboard</h2>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="hidden sm:block text-right">
-                        <p class="text-sm font-bold text-slate-800">Owner Mazaya</p>
-                        <p class="text-xs text-slate-500">Administrator</p>
+                    <div class="relative">
+                        <i class="bi bi-bell text-xl text-slate-500 hover:text-slate-700 cursor-pointer"></i>
+                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-mazaya-blue/10 flex items-center justify-center text-mazaya-blue border border-mazaya-blue/20">
-                        <i class="bi bi-person-fill text-lg"></i>
+                    <div class="h-8 w-px bg-slate-200"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-right hidden md:block">
+                            <p class="text-sm font-bold text-slate-700">Owner Mazaya</p>
+                            <p class="text-xs text-slate-500">Administrator</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-mazaya-blue font-bold border-2 border-white shadow-sm">
+                            OM
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Scrollable Content -->
-            <div class="flex-1 overflow-y-auto p-6 lg:p-10">
+            <!-- Scrollable Content Area -->
+            <div class="flex-1 overflow-y-auto p-8 relative">
                 
-                <!-- VIEW: DASHBOARD / RINGKASAN -->
+                <!-- VIEW: DASHBOARD -->
                 <div id="view-dashboard" class="view-section animate-fade-in">
-                    <!-- Widget Stats -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-                        <!-- Stat 1 -->
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl"><i class="bi bi-receipt"></i></div>
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
                             <div>
-                                <p class="text-sm text-slate-500 font-medium">Total Order Bulan Ini</p>
-                                <p class="text-2xl font-bold text-slate-800">128</p>
+                                <p class="text-slate-500 text-sm font-medium">Total Pesanan</p>
+                                <p class="text-2xl font-bold text-slate-800">142</p>
                             </div>
                         </div>
-                        <!-- Stat 2 -->
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-2xl"><i class="bi bi-cash-coin"></i></div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
+                                <i class="bi bi-wallet2"></i>
+                            </div>
                             <div>
-                                <p class="text-sm text-slate-500 font-medium">Pendapatan Estimasi</p>
-                                <p class="text-2xl font-bold text-slate-800">Rp 45.2M</p>
+                                <p class="text-slate-500 text-sm font-medium">Pendapatan Bulan Ini</p>
+                                <p class="text-xl font-bold text-slate-800">Rp 12.4M</p>
                             </div>
                         </div>
-                        <!-- Stat 3 -->
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-2xl"><i class="bi bi-truck"></i></div>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-2xl">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
                             <div>
-                                <p class="text-sm text-slate-500 font-medium">Armada Aktif/Jalan</p>
-                                <p class="text-2xl font-bold text-slate-800">4 <span class="text-sm font-normal text-slate-400">/ 6 Unit</span></p>
+                                <p class="text-slate-500 text-sm font-medium">Pesanan Aktif</p>
+                                <p class="text-2xl font-bold text-slate-800">3</p>
                             </div>
                         </div>
-                        <!-- Stat 4 -->
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl"><i class="bi bi-people"></i></div>
-                            <div>
-                                <p class="text-sm text-slate-500 font-medium">Kru Siaga</p>
-                                <p class="text-2xl font-bold text-slate-800">12 <span class="text-sm font-normal text-slate-400">Orang</span></p>
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl">
+                                <i class="bi bi-people"></i>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Mini Tabel Pesanan Terbaru -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="font-bold text-slate-800">Pesanan Sedang Berjalan (Hari Ini)</h3>
-                            <button onclick="switchMenu('view-pesanan')" class="text-sm text-mazaya-blue font-semibold hover:underline">Lihat Semua</button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-                                        <th class="p-4 font-semibold">Tgl Order</th>
-                                        <th class="p-4 font-semibold">Pelanggan</th>
-                                        <th class="p-4 font-semibold">Tujuan</th>
-                                        <th class="p-4 font-semibold">Sopir / Kendaraan</th>
-                                        <th class="p-4 font-semibold">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-sm divide-y divide-slate-100">
-                                    <tr class="hover:bg-slate-50 transition">
-                                        <td class="p-4 whitespace-nowrap">01/08/2026<br><span class="text-xs text-slate-400">10:30 WIB</span></td>
-                                        <td class="p-4 font-medium">Bpk. Agus<br><span class="text-xs text-slate-500 font-normal">0812345678</span></td>
-                                        <td class="p-4 text-slate-600">Surabaya</td>
-                                        <td class="p-4">Haryanto<br><span class="text-xs font-bold text-slate-500">L300 Box (P 1234 AB)</span></td>
-                                        <td class="p-4"><span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">Menuju Lokasi</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-slate-50 transition">
-                                        <td class="p-4 whitespace-nowrap">01/08/2026<br><span class="text-xs text-slate-400">08:15 WIB</span></td>
-                                        <td class="p-4 font-medium">Ibu Siti<br><span class="text-xs text-slate-500 font-normal">0899776655</span></td>
-                                        <td class="p-4 text-slate-600">Bondowoso</td>
-                                        <td class="p-4">Rudi<br><span class="text-xs font-bold text-slate-500">Engkel Box (P 9988 CD)</span></td>
-                                        <td class="p-4"><span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold">Muat Barang</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div>
+                                <p class="text-slate-500 text-sm font-medium">Pelanggan Terdaftar</p>
+                                <p class="text-2xl font-bold text-slate-800">89</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- VIEW: DATA PESANAN -->
                 <div id="view-pesanan" class="view-section hidden animate-fade-in">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full">
-                        <div class="px-6 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-slate-50/50">
-                            <h3 class="font-bold text-slate-800 text-lg">Histori & Master Data Pesanan</h3>
-                            <div class="flex gap-2">
-                                <input type="text" placeholder="Cari Resi / Nama..." class="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-mazaya-blue">
-                                <button class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-900"><i class="bi bi-funnel"></i> Filter</button>
-                            </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="font-bold text-slate-800"><i class="bi bi-receipt mr-2 text-mazaya-blue"></i>Manajemen Data Pesanan (Dummy)</h3>
+                            <button class="text-sm bg-slate-800 text-white px-3 py-1.5 rounded-lg hover:bg-slate-700"><i class="bi bi-download mr-1"></i> Export</button>
                         </div>
-                        <div class="overflow-x-auto p-0">
+                        <div class="p-6 overflow-x-auto">
                             <table class="w-full text-left border-collapse min-w-[1000px]">
                                 <thead>
-                                    <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
-                                        <th class="p-4 font-bold">No. Order & Tgl</th>
-                                        <th class="p-4 font-bold">Pelanggan</th>
-                                        <th class="p-4 font-bold">Rute (A ➔ B)</th>
-                                        <th class="p-4 font-bold">Kendaraan & Kru</th>
-                                        <th class="p-4 font-bold text-right">Grand Total</th>
-                                        <th class="p-4 font-bold text-center">Status</th>
-                                        <th class="p-4 font-bold text-center">Aksi</th>
+                                    <tr class="text-slate-500 text-sm border-b border-slate-200">
+                                        <th class="pb-3 font-semibold">No. Order</th>
+                                        <th class="pb-3 font-semibold">Pelanggan</th>
+                                        <th class="pb-3 font-semibold">Detail Barang</th>
+                                        <th class="pb-3 font-semibold">Foto</th>
+                                        <th class="pb-3 font-semibold">Rute & Jarak</th>
+                                        <th class="pb-3 font-semibold">Total Tarif</th>
+                                        <th class="pb-3 font-semibold">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody class="text-sm divide-y divide-slate-100">
-                                    <!-- Baris 1 -->
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="p-4">
-                                            <span class="font-bold text-mazaya-blue">ORD-260801-1</span><br>
-                                            <span class="text-xs text-slate-500">01 Ags 2026, 10:30</span>
+                                <tbody class="text-sm">
+                                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                                        <td class="py-4 font-medium text-mazaya-blue">ORD-20260802-1234<br><span class="text-xs text-slate-400 font-normal">02/08/2026</span></td>
+                                        <td class="py-4 font-bold text-slate-800">Budi Santoso<br><span class="text-xs font-normal text-slate-500">0812-3333-4444</span></td>
+                                        
+                                        <!-- Kolom: Barang Bawaan -->
+                                        <td class="py-4">
+                                            <p class="text-slate-700 font-medium">Pindahan Kost (Kasur, Lemari)</p>
+                                            <p class="text-xs text-slate-500 mt-1">Berat: 120 Kg | P:200, L:100, T:80</p>
                                         </td>
-                                        <td class="p-4 font-medium text-slate-800">
-                                            Bpk. Agus<br>
-                                            <span class="text-xs text-slate-500 font-normal"><i class="bi bi-whatsapp text-green-500"></i> 0812345678</span>
+                                        
+                                        <!-- Kolom: Foto Barang -->
+                                        <td class="py-4">
+                                            <button onclick="Swal.fire({imageUrl: 'https://placehold.co/400x300/e2e8f0/475569?text=Belum+Ada+Foto', imageAlt: 'Foto Barang'})" class="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-100 hover:bg-blue-100 transition flex items-center gap-1">
+                                                <i class="bi bi-image"></i> Lihat
+                                            </button>
                                         </td>
-                                        <td class="p-4 text-slate-600 text-xs">
-                                            <span class="font-semibold text-slate-800">Jemput:</span> Jember<br>
-                                            <span class="font-semibold text-slate-800">Tujuan:</span> Surabaya (180 Km)
-                                        </td>
-                                        <td class="p-4 text-xs">
-                                            <span class="font-bold bg-slate-200 px-2 py-0.5 rounded text-slate-700">L300 Box</span><br>
-                                            <span class="text-slate-500 mt-1 block">Sopir: Haryanto</span>
-                                            <span class="text-slate-500">Kernet: Supri</span>
-                                        </td>
-                                        <td class="p-4 text-right font-bold text-slate-800">
-                                            Rp 1.450.000
-                                        </td>
-                                        <td class="p-4 text-center">
-                                            <span class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-md text-xs font-bold border border-blue-200">Dalam Perjalanan</span>
-                                        </td>
-                                        <td class="p-4 text-center">
-                                            <button class="text-slate-400 hover:text-mazaya-blue" title="Detail"><i class="bi bi-pencil-square text-lg"></i></button>
-                                        </td>
-                                    </tr>
-                                    <!-- Baris 2 -->
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="p-4">
-                                            <span class="font-bold text-mazaya-blue">ORD-260731-2</span><br>
-                                            <span class="text-xs text-slate-500">31 Jul 2026, 14:15</span>
-                                        </td>
-                                        <td class="p-4 font-medium text-slate-800">
-                                            Ibu Siti<br>
-                                            <span class="text-xs text-slate-500 font-normal"><i class="bi bi-whatsapp text-green-500"></i> 0899776655</span>
-                                        </td>
-                                        <td class="p-4 text-slate-600 text-xs">
-                                            <span class="font-semibold text-slate-800">Jemput:</span> Jember<br>
-                                            <span class="font-semibold text-slate-800">Tujuan:</span> Bondowoso (35 Km)
-                                        </td>
-                                        <td class="p-4 text-xs">
-                                            <span class="font-bold bg-slate-200 px-2 py-0.5 rounded text-slate-700">Engkel Box</span><br>
-                                            <span class="text-slate-500 mt-1 block">Sopir: Rudi</span>
-                                            <span class="text-slate-500">Kernet: -</span>
-                                        </td>
-                                        <td class="p-4 text-right font-bold text-slate-800">
-                                            Rp 450.000
-                                        </td>
-                                        <td class="p-4 text-center">
-                                            <span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-md text-xs font-bold border border-emerald-200">Selesai</span>
-                                        </td>
-                                        <td class="p-4 text-center">
-                                            <button class="text-slate-400 hover:text-mazaya-blue" title="Detail"><i class="bi bi-pencil-square text-lg"></i></button>
-                                        </td>
+
+                                        <td class="py-4 text-slate-600">Jember - Bondowoso<br><span class="text-xs font-semibold text-mazaya-orange">32.5 Km</span></td>
+                                        <td class="py-4 font-bold text-slate-800">Rp 487.500</td>
+                                        <td class="py-4"><span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">Menunggu</span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -316,68 +236,59 @@
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                             <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                                 <h3 class="font-bold text-slate-800"><i class="bi bi-truck mr-2 text-mazaya-orange"></i>Data Kendaraan</h3>
-                                <button class="text-sm bg-mazaya-blue text-white px-3 py-1.5 rounded-lg hover:bg-blue-800">+ Tambah</button>
+                                <button onclick="tambahKendaraan()" class="text-sm bg-mazaya-blue text-white px-3 py-1.5 rounded-lg hover:bg-blue-800">+ Tambah</button>
                             </div>
                             <div class="p-4 space-y-3">
-                                <!-- Card Armada -->
-                                <div class="border border-slate-200 rounded-xl p-4 flex justify-between items-center hover:border-mazaya-blue/50 transition">
-                                    <div>
-                                        <h4 class="font-bold text-slate-800">P 1234 AB</h4>
-                                        <p class="text-sm text-slate-500">Mitsubishi L300 Box (Kapasitas: 1.5 Ton)</p>
+                                <!-- Item Kendaraan -->
+                                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center"><i class="bi bi-truck"></i></div>
+                                        <div>
+                                            <p class="font-bold text-slate-800">P 8921 QA</p>
+                                            <p class="text-xs text-slate-500">L300 Box Standar</p>
+                                        </div>
                                     </div>
-                                    <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded font-bold">Siaga</span>
+                                    <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">Tersedia</span>
                                 </div>
-                                <div class="border border-slate-200 rounded-xl p-4 flex justify-between items-center hover:border-mazaya-blue/50 transition">
-                                    <div>
-                                        <h4 class="font-bold text-slate-800">P 9988 CD</h4>
-                                        <p class="text-sm text-slate-500">Isuzu Elf Engkel Box (Kapasitas: 2.5 Ton)</p>
+                                <!-- Item Kendaraan -->
+                                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center"><i class="bi bi-truck"></i></div>
+                                        <div>
+                                            <p class="font-bold text-slate-800">P 1120 XZ</p>
+                                            <p class="text-xs text-slate-500">GrandMax Box</p>
+                                        </div>
                                     </div>
-                                    <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded font-bold">Jalan / Dinas</span>
-                                </div>
-                                <div class="border border-slate-200 rounded-xl p-4 flex justify-between items-center hover:border-mazaya-blue/50 transition">
-                                    <div>
-                                        <h4 class="font-bold text-slate-800">N 5678 XX</h4>
-                                        <p class="text-sm text-slate-500">GranMax Pickup (Kapasitas: 1 Ton)</p>
-                                    </div>
-                                    <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded font-bold">Masuk Bengkel</span>
+                                    <span class="px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">Sedang Jalan</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Panel Kru (Sopir & Kernet) -->
+                        <!-- Panel Kru -->
                         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                             <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                                 <h3 class="font-bold text-slate-800"><i class="bi bi-person-badge mr-2 text-mazaya-blue"></i>Data Sopir & Kernet</h3>
-                                <button class="text-sm bg-mazaya-blue text-white px-3 py-1.5 rounded-lg hover:bg-blue-800">+ Tambah</button>
+                                <button onclick="tambahKru()" class="text-sm bg-mazaya-blue text-white px-3 py-1.5 rounded-lg hover:bg-blue-800">+ Tambah</button>
                             </div>
                             <div class="p-4 space-y-3">
-                                <!-- Card Kru -->
-                                <div class="border border-slate-200 rounded-xl p-4 flex justify-between items-center hover:border-mazaya-blue/50 transition">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="bi bi-person-fill"></i></div>
+                                <!-- Item Kru -->
+                                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500"><i class="bi bi-person-fill"></i></div>
                                         <div>
-                                            <h4 class="font-bold text-slate-800">Haryanto</h4>
-                                            <p class="text-xs font-bold text-mazaya-blue bg-blue-50 inline-block px-2 rounded mt-1">Sopir Utama</p>
+                                            <p class="font-bold text-slate-800">Samsul Arifin</p>
+                                            <p class="text-xs text-mazaya-blue font-semibold">Sopir Utama</p>
                                         </div>
                                     </div>
                                     <p class="text-sm font-medium text-slate-600"><i class="bi bi-telephone text-xs"></i> 0812-333-444</p>
                                 </div>
-                                <div class="border border-slate-200 rounded-xl p-4 flex justify-between items-center hover:border-mazaya-blue/50 transition">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="bi bi-person-fill"></i></div>
+                                <!-- Item Kru -->
+                                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500"><i class="bi bi-person-fill"></i></div>
                                         <div>
-                                            <h4 class="font-bold text-slate-800">Rudi</h4>
-                                            <p class="text-xs font-bold text-mazaya-blue bg-blue-50 inline-block px-2 rounded mt-1">Sopir Utama</p>
-                                        </div>
-                                    </div>
-                                    <p class="text-sm font-medium text-slate-600"><i class="bi bi-telephone text-xs"></i> 0855-666-777</p>
-                                </div>
-                                <div class="border border-slate-200 rounded-xl p-4 flex justify-between items-center hover:border-mazaya-blue/50 transition">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500"><i class="bi bi-person-fill"></i></div>
-                                        <div>
-                                            <h4 class="font-bold text-slate-800">Supri</h4>
-                                            <p class="text-xs font-bold text-mazaya-orange bg-orange-50 inline-block px-2 rounded mt-1">Kernet</p>
+                                            <p class="font-bold text-slate-800">Hadi M.</p>
+                                            <p class="text-xs text-orange-600 font-semibold">Kernet</p>
                                         </div>
                                     </div>
                                     <p class="text-sm font-medium text-slate-600"><i class="bi bi-telephone text-xs"></i> 0899-111-222</p>
@@ -388,115 +299,205 @@
                     </div>
                 </div>
 
+                <!-- VIEW: PENGATURAN TARIF -->
+                <div id="view-pengaturan" class="view-section hidden animate-fade-in">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="font-bold text-slate-800"><i class="bi bi-gear mr-2 text-mazaya-blue"></i>Pengaturan Tarif & Biaya Tambahan</h3>
+                            <button onclick="simpanPengaturan()" class="bg-mazaya-blue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-800"><i class="bi bi-save mr-2"></i>Simpan Perubahan</button>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Kelompok Jarak -->
+                            <div class="space-y-4 col-span-1 md:col-span-2 lg:col-span-3 border-b border-slate-100 pb-4">
+                                <h4 class="font-bold text-slate-700">Tarif Berdasarkan Jarak</h4>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Tarif 0 - 5 Km (Rp/Km)</label>
+                                <input type="number" value="10000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Tarif 6 - 15 Km (Rp/Km)</label>
+                                <input type="number" value="12000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Tarif 16 - 40 Km (Rp/Km)</label>
+                                <input type="number" value="14000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
+                            </div>
+
+                            <!-- Kelompok Minimal -->
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Minimal 0 - 5 Km (Rp)</label>
+                                <input type="number" value="50000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Minimal 6 - 15 Km (Rp)</label>
+                                <input type="number" value="150000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Minimal 16 - 40 Km (Rp)</label>
+                                <input type="number" value="300000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
+                            </div>
+                            
+                            <!-- Kelompok Tambahan -->
+                            <div class="space-y-4 col-span-1 md:col-span-2 lg:col-span-3 border-b border-slate-100 pb-4 mt-4">
+                                <h4 class="font-bold text-slate-700">Biaya Tambahan Berat & Oversize</h4>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Tambahan Berat 101 - 200 Kg</label>
+                                <input type="number" value="100000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Tambahan Berat 201 - 300 Kg</label>
+                                <input type="number" value="200000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Biaya Oversize Dimensi</label>
+                                <input type="number" value="50000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
 
-    <style>
-        .animate-fade-in {
-            animation: fadeIn 0.4s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .active-nav {
-            background-color: #1e293b; /* slate-800 */
-            color: white;
-        }
-    </style>
-
+    <!-- LOGIC SCRIPT -->
     <script>
-        // Logika Login
+        // Logika Form Login
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
 
-            // Validasi Kredensial (Berdasarkan Prompt)
-            if(user === "Mazaya" && pass === "Sukses@01") {
-                // Tampilkan sukses
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Login Berhasil',
-                    text: 'Selamat datang, Owner!',
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    // Transisi UI
-                    document.getElementById('loginScreen').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('loginScreen').classList.add('hidden');
-                        const app = document.getElementById('appContainer');
-                        app.classList.remove('hidden');
-                        // Trigger reflow untuk transisi CSS
-                        void app.offsetWidth; 
-                        app.style.opacity = '1';
-                    }, 500);
-                });
+            if(u === 'Mazaya' && p === 'Sukses@01') {
+                document.getElementById('loginScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    const app = document.getElementById('appContainer');
+                    app.classList.remove('hidden');
+                    void app.offsetWidth; 
+                    app.style.opacity = '1';
+                }, 500);
             } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Akses Ditolak',
-                    text: 'Username atau Password salah!'
+                    text: 'Username atau Password salah!',
+                    confirmButtonColor: '#1e3a8a'
                 });
             }
         });
 
         // Logika Navigasi Sidebar
         function switchMenu(targetId) {
-            // Ubah Header Title berdasarkan menu
             const titles = {
                 'view-dashboard': 'Ringkasan Dashboard',
                 'view-pesanan': 'Manajemen Data Pesanan',
-                'view-armada': 'Manajemen Armada & Kru'
+                'view-armada': 'Manajemen Armada & Kru',
+                'view-pengaturan': 'Pengaturan Sistem & Tarif'
             };
-            document.getElementById('headerTitle').textContent = titles[targetId];
-
-            // Sembunyikan semua section
+            document.getElementById('headerTitle').textContent = titles[targetId] || 'Dashboard';
+            
+            // Sembunyikan semua view
             document.querySelectorAll('.view-section').forEach(el => {
                 el.classList.add('hidden');
             });
-            // Tampilkan target
-            document.getElementById(targetId).classList.remove('hidden');
+            
+            // Tampilkan yang dituju
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                targetEl.classList.remove('hidden');
+            }
 
-            // Update state sidebar (highlight)
+            // Update state tombol aktif di sidebar
             document.querySelectorAll('.nav-link').forEach(el => {
-                if (el.getAttribute('data-target')) {
-                    el.classList.remove('active-nav');
+                if(el.dataset.target === targetId) {
+                    el.classList.add('bg-mazaya-blue', 'text-white');
+                    el.classList.remove('hover:bg-slate-800', 'hover:text-white');
+                } else if (el.dataset.target) {
+                    el.classList.remove('bg-mazaya-blue', 'text-white');
+                    el.classList.add('hover:bg-slate-800', 'hover:text-white');
                 }
             });
-            event.currentTarget.classList.add('active-nav');
         }
 
-        // Logika Logout
+        // Logika Logout (Diperbarui aman)
         function logout() {
             Swal.fire({
-                title: 'Yakin ingin keluar?',
-                icon: 'question',
+                title: 'Keluar dari Sistem?',
+                text: "Anda akan dikembalikan ke halaman depan pelanggan.",
+                icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, Keluar!'
+                confirmButtonColor: '#1e3a8a',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'Ya, Keluar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('username').value = '';
-                    document.getElementById('password').value = '';
-                    
-                    document.getElementById('appContainer').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('appContainer').classList.add('hidden');
-                        const login = document.getElementById('loginScreen');
-                        login.classList.remove('hidden');
-                        void login.offsetWidth;
-                        login.style.opacity = '1';
-                    }, 500);
+                    window.location.href = 'index.html';
                 }
             });
         }
 
-        function showDevAlert() {
-            Swal.fire('Fitur Pengaturan', 'Fitur terhubung ke Google Spreadsheet (Sheet Pengaturan) melalui Google Apps Script.', 'info');
+        // Modals Tambah Data
+        function tambahKendaraan() {
+            Swal.fire({
+                title: 'Tambah Kendaraan',
+                html: `
+                    <input id="plat" class="swal2-input" placeholder="Plat Nomor (Contoh: P 1234 AB)">
+                    <input id="jenis" class="swal2-input" placeholder="Jenis Kendaraan (Contoh: L300 Box)">
+                `,
+                confirmButtonText: 'Simpan Data',
+                showCancelButton: true,
+                cancelButtonText: 'Batal',
+                preConfirm: () => {
+                    const plat = document.getElementById('plat').value;
+                    if (!plat) Swal.showValidationMessage('Plat Nomor wajib diisi');
+                    return { plat }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('Berhasil!', 'Data kendaraan ditambahkan.', 'success');
+                }
+            });
+        }
+
+        function tambahKru() {
+            Swal.fire({
+                title: 'Tambah Kru',
+                html: `
+                    <input id="namaKru" class="swal2-input" placeholder="Nama Lengkap">
+                    <select id="posisiKru" class="swal2-input" style="width: 70%; max-width: 100%;">
+                        <option value="Sopir">Sopir Utama</option>
+                        <option value="Kernet">Kernet</option>
+                    </select>
+                    <input id="noHpKru" class="swal2-input" placeholder="No. HP">
+                `,
+                confirmButtonText: 'Simpan Data',
+                showCancelButton: true,
+                cancelButtonText: 'Batal',
+                preConfirm: () => {
+                    const nama = document.getElementById('namaKru').value;
+                    if (!nama) Swal.showValidationMessage('Nama wajib diisi');
+                    return { nama }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('Berhasil!', 'Data kru ditambahkan.', 'success');
+                }
+            });
+        }
+
+        function simpanPengaturan() {
+            Swal.fire({
+                title: 'Menyimpan Pengaturan...',
+                text: 'Mengupdate database sistem.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading() }
+            });
+            setTimeout(() => {
+                Swal.fire('Tersimpan!', 'Pengaturan tarif baru telah berhasil diperbarui.', 'success');
+            }, 1000);
         }
     </script>
 </body>
