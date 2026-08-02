@@ -3,501 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Jasa Angkut Mazaya</title>
-    <!-- Tailwind CSS -->
+    <title>Admin Dashboard - Mazaya</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: { 'mazaya-blue': '#1e3a8a', 'mazaya-orange': '#f97316' }
-                }
-            }
-        }
-    </script>
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { background-color: #f8fafc; font-family: sans-serif; }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="text-slate-800 antialiased h-screen overflow-hidden flex">
+<body class="h-screen overflow-hidden flex">
 
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-gradient-to-br from-slate-900 to-mazaya-blue transition-opacity duration-500">
-        <div class="glass-panel p-10 rounded-3xl shadow-2xl w-[90%] max-w-md border border-white/20 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-mazaya-orange"></div>
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-50 text-mazaya-blue mb-4 shadow-inner">
-                    <i class="bi bi-shield-lock-fill text-3xl"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-800">Ruang Kontrol Owner</h2>
-                <p class="text-slate-500 text-sm mt-1">Jasa Angkut Mazaya</p>
-            </div>
-            
-            <form id="loginForm" class="space-y-5">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
-                    <div class="relative">
-                        <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="username" class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50" placeholder="Masukkan username">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                    <div class="relative">
-                        <i class="bi bi-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="password" id="password" class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50" placeholder="••••••••">
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-mazaya-blue hover:bg-blue-800 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-blue-900/20 transition-all mt-4">
-                    Masuk ke Sistem
-                </button>
-            </form>
-            <div class="mt-6 text-center">
-                <a href="index.html" class="text-sm text-slate-500 hover:text-mazaya-blue transition"><i class="bi bi-arrow-left mr-1"></i> Kembali ke Web Utama</a>
-            </div>
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 transition-opacity">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
+            <h2 class="text-2xl font-bold mb-6">Login Owner</h2>
+            <input type="text" id="username" class="w-full px-4 py-2 border rounded-lg mb-4" placeholder="Username">
+            <input type="password" id="password" class="w-full px-4 py-2 border rounded-lg mb-6" placeholder="Password">
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold">Masuk</button>
+            <a href="index.html" class="block mt-4 text-sm text-slate-500">Kembali ke Web</a>
         </div>
     </div>
 
-    <!-- APP CONTAINER (Hidden by default) -->
-    <div id="appContainer" class="flex w-full h-full hidden opacity-0 transition-opacity duration-500">
-        
-        <!-- SIDEBAR -->
-        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col transition-all duration-300 z-20 shrink-0">
-            <div class="h-20 flex items-center px-6 border-b border-slate-800">
-                <div class="flex items-center gap-3">
-                    <div class="bg-mazaya-orange text-white p-1.5 rounded-lg">
-                        <i class="bi bi-truck text-lg"></i>
-                    </div>
-                    <span class="font-bold text-white tracking-wide">MAZAYA PRO</span>
-                </div>
+    <!-- APP -->
+    <div id="appContainer" class="flex w-full h-full hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col">
+            <div class="h-20 flex items-center px-6 border-b border-slate-700">
+                <span class="font-bold text-white text-lg tracking-widest">MAZAYA PRO</span>
             </div>
-            
-            <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1 flex flex-col">
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2">Menu Utama</p>
-                
-                <a href="#" onclick="switchMenu('view-dashboard')" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl bg-mazaya-blue text-white transition" data-target="view-dashboard">
-                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
-                </a>
-                
-                <a href="#" onclick="switchMenu('view-pesanan')" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition" data-target="view-pesanan">
-                    <i class="bi bi-receipt"></i> Data Pesanan
-                </a>
-                
-                <a href="#" onclick="switchMenu('view-armada')" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition" data-target="view-armada">
-                    <i class="bi bi-truck-front"></i> Armada & Kru
-                </a>
-
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-6 mb-2 px-2">Sistem</p>
-                
-                <a href="#" onclick="switchMenu('view-pengaturan')" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-slate-800 hover:text-white transition" data-target="view-pengaturan">
-                    <i class="bi bi-gear-fill"></i> Pengaturan Tarif
-                </a>
-                
-                <a href="#" onclick="logout()" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-red-500/20 text-red-400 hover:text-red-300 transition mt-auto">
-                    <i class="bi bi-box-arrow-left"></i> Keluar
-                </a>
+            <nav class="flex-1 py-4 space-y-2 px-3">
+                <button onclick="switchMenu('dashboard')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition"><i class="bi bi-grid mr-2"></i> Dashboard</button>
+                <button onclick="switchMenu('pesanan')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition"><i class="bi bi-receipt mr-2"></i> Data Pesanan</button>
+                <button onclick="switchMenu('armada')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition"><i class="bi bi-truck mr-2"></i> Armada & Kru</button>
+                <button onclick="switchMenu('tarif')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition"><i class="bi bi-gear mr-2"></i> Pengaturan Tarif</button>
+                <button onclick="logout()" class="w-full text-left px-4 py-3 rounded-lg text-red-400 mt-10 hover:bg-red-900/30"><i class="bi bi-box-arrow-left mr-2"></i> Keluar</button>
             </nav>
         </aside>
 
-        <!-- MAIN CONTENT -->
-        <main class="flex-1 flex flex-col bg-slate-50 h-full overflow-hidden relative">
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
             
-            <!-- Header -->
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 z-10">
-                <h1 id="headerTitle" class="text-xl font-bold text-slate-800">Ringkasan Dashboard</h1>
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <i class="bi bi-bell text-xl text-slate-500 hover:text-slate-700 cursor-pointer"></i>
-                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
-                    </div>
-                    <div class="h-8 w-px bg-slate-200"></div>
-                    <div class="flex items-center gap-3">
-                        <div class="text-right hidden md:block">
-                            <p class="text-sm font-bold text-slate-700">Owner Mazaya</p>
-                            <p class="text-xs text-slate-500">Administrator</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-mazaya-blue font-bold border-2 border-white shadow-sm">
-                            OM
-                        </div>
+            <div id="dashboard" class="view-section active">
+                <h1 class="text-2xl font-bold mb-6">Ringkasan Sistem</h1>
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <p class="text-slate-500 text-sm">Pesanan Bulan Ini</p>
+                        <p class="text-3xl font-bold text-blue-600">42</p>
                     </div>
                 </div>
-            </header>
-
-            <!-- Scrollable Content Area -->
-            <div class="flex-1 overflow-y-auto p-8 relative">
-                
-                <!-- VIEW: DASHBOARD -->
-                <div id="view-dashboard" class="view-section animate-fade-in">
-                    <!-- Stats Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl">
-                                <i class="bi bi-box-seam"></i>
-                            </div>
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Total Pesanan</p>
-                                <p class="text-2xl font-bold text-slate-800">142</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
-                                <i class="bi bi-wallet2"></i>
-                            </div>
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Pendapatan Bulan Ini</p>
-                                <p class="text-xl font-bold text-slate-800">Rp 12.4M</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-2xl">
-                                <i class="bi bi-clock-history"></i>
-                            </div>
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Pesanan Aktif</p>
-                                <p class="text-2xl font-bold text-slate-800">3</p>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl">
-                                <i class="bi bi-people"></i>
-                            </div>
-                            <div>
-                                <p class="text-slate-500 text-sm font-medium">Pelanggan Terdaftar</p>
-                                <p class="text-2xl font-bold text-slate-800">89</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: DATA PESANAN -->
-                <div id="view-pesanan" class="view-section hidden animate-fade-in">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="font-bold text-slate-800"><i class="bi bi-receipt mr-2 text-mazaya-blue"></i>Manajemen Data Pesanan (Dummy)</h3>
-                            <button class="text-sm bg-slate-800 text-white px-3 py-1.5 rounded-lg hover:bg-slate-700"><i class="bi bi-download mr-1"></i> Export</button>
-                        </div>
-                        <div class="p-6 overflow-x-auto">
-                            <table class="w-full text-left border-collapse min-w-[1000px]">
-                                <thead>
-                                    <tr class="text-slate-500 text-sm border-b border-slate-200">
-                                        <th class="pb-3 font-semibold">No. Order</th>
-                                        <th class="pb-3 font-semibold">Pelanggan</th>
-                                        <th class="pb-3 font-semibold">Detail Barang</th>
-                                        <th class="pb-3 font-semibold">Foto</th>
-                                        <th class="pb-3 font-semibold">Rute & Jarak</th>
-                                        <th class="pb-3 font-semibold">Total Tarif</th>
-                                        <th class="pb-3 font-semibold">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-sm">
-                                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-                                        <td class="py-4 font-medium text-mazaya-blue">ORD-20260802-1234<br><span class="text-xs text-slate-400 font-normal">02/08/2026</span></td>
-                                        <td class="py-4 font-bold text-slate-800">Budi Santoso<br><span class="text-xs font-normal text-slate-500">0812-3333-4444</span></td>
-                                        
-                                        <!-- Kolom: Barang Bawaan -->
-                                        <td class="py-4">
-                                            <p class="text-slate-700 font-medium">Pindahan Kost (Kasur, Lemari)</p>
-                                            <p class="text-xs text-slate-500 mt-1">Berat: 120 Kg | P:200, L:100, T:80</p>
-                                        </td>
-                                        
-                                        <!-- Kolom: Foto Barang -->
-                                        <td class="py-4">
-                                            <button onclick="Swal.fire({imageUrl: 'https://placehold.co/400x300/e2e8f0/475569?text=Belum+Ada+Foto', imageAlt: 'Foto Barang'})" class="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-100 hover:bg-blue-100 transition flex items-center gap-1">
-                                                <i class="bi bi-image"></i> Lihat
-                                            </button>
-                                        </td>
-
-                                        <td class="py-4 text-slate-600">Jember - Bondowoso<br><span class="text-xs font-semibold text-mazaya-orange">32.5 Km</span></td>
-                                        <td class="py-4 font-bold text-slate-800">Rp 487.500</td>
-                                        <td class="py-4"><span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">Menunggu</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIEW: ARMADA & KRU -->
-                <div id="view-armada" class="view-section hidden animate-fade-in">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        
-                        <!-- Panel Kendaraan -->
-                        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                            <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                                <h3 class="font-bold text-slate-800"><i class="bi bi-truck mr-2 text-mazaya-orange"></i>Data Kendaraan</h3>
-                                <button onclick="tambahKendaraan()" class="text-sm bg-mazaya-blue text-white px-3 py-1.5 rounded-lg hover:bg-blue-800">+ Tambah</button>
-                            </div>
-                            <div class="p-4 space-y-3">
-                                <!-- Item Kendaraan -->
-                                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center"><i class="bi bi-truck"></i></div>
-                                        <div>
-                                            <p class="font-bold text-slate-800">P 8921 QA</p>
-                                            <p class="text-xs text-slate-500">L300 Box Standar</p>
-                                        </div>
-                                    </div>
-                                    <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">Tersedia</span>
-                                </div>
-                                <!-- Item Kendaraan -->
-                                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center"><i class="bi bi-truck"></i></div>
-                                        <div>
-                                            <p class="font-bold text-slate-800">P 1120 XZ</p>
-                                            <p class="text-xs text-slate-500">GrandMax Box</p>
-                                        </div>
-                                    </div>
-                                    <span class="px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">Sedang Jalan</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Panel Kru -->
-                        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                            <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                                <h3 class="font-bold text-slate-800"><i class="bi bi-person-badge mr-2 text-mazaya-blue"></i>Data Sopir & Kernet</h3>
-                                <button onclick="tambahKru()" class="text-sm bg-mazaya-blue text-white px-3 py-1.5 rounded-lg hover:bg-blue-800">+ Tambah</button>
-                            </div>
-                            <div class="p-4 space-y-3">
-                                <!-- Item Kru -->
-                                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500"><i class="bi bi-person-fill"></i></div>
-                                        <div>
-                                            <p class="font-bold text-slate-800">Samsul Arifin</p>
-                                            <p class="text-xs text-mazaya-blue font-semibold">Sopir Utama</p>
-                                        </div>
-                                    </div>
-                                    <p class="text-sm font-medium text-slate-600"><i class="bi bi-telephone text-xs"></i> 0812-333-444</p>
-                                </div>
-                                <!-- Item Kru -->
-                                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500"><i class="bi bi-person-fill"></i></div>
-                                        <div>
-                                            <p class="font-bold text-slate-800">Hadi M.</p>
-                                            <p class="text-xs text-orange-600 font-semibold">Kernet</p>
-                                        </div>
-                                    </div>
-                                    <p class="text-sm font-medium text-slate-600"><i class="bi bi-telephone text-xs"></i> 0899-111-222</p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- VIEW: PENGATURAN TARIF -->
-                <div id="view-pengaturan" class="view-section hidden animate-fade-in">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="font-bold text-slate-800"><i class="bi bi-gear mr-2 text-mazaya-blue"></i>Pengaturan Tarif & Biaya Tambahan</h3>
-                            <button onclick="simpanPengaturan()" class="bg-mazaya-blue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-800"><i class="bi bi-save mr-2"></i>Simpan Perubahan</button>
-                        </div>
-                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Kelompok Jarak -->
-                            <div class="space-y-4 col-span-1 md:col-span-2 lg:col-span-3 border-b border-slate-100 pb-4">
-                                <h4 class="font-bold text-slate-700">Tarif Berdasarkan Jarak</h4>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Tarif 0 - 5 Km (Rp/Km)</label>
-                                <input type="number" value="10000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Tarif 6 - 15 Km (Rp/Km)</label>
-                                <input type="number" value="12000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Tarif 16 - 40 Km (Rp/Km)</label>
-                                <input type="number" value="14000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
-                            </div>
-
-                            <!-- Kelompok Minimal -->
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Minimal 0 - 5 Km (Rp)</label>
-                                <input type="number" value="50000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Minimal 6 - 15 Km (Rp)</label>
-                                <input type="number" value="150000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Minimal 16 - 40 Km (Rp)</label>
-                                <input type="number" value="300000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
-                            </div>
-                            
-                            <!-- Kelompok Tambahan -->
-                            <div class="space-y-4 col-span-1 md:col-span-2 lg:col-span-3 border-b border-slate-100 pb-4 mt-4">
-                                <h4 class="font-bold text-slate-700">Biaya Tambahan Berat & Oversize</h4>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Tambahan Berat 101 - 200 Kg</label>
-                                <input type="number" value="100000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Tambahan Berat 201 - 300 Kg</label>
-                                <input type="number" value="200000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Biaya Oversize Dimensi</label>
-                                <input type="number" value="50000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-mazaya-blue outline-none bg-slate-50">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+
+            <div id="pesanan" class="view-section">
+                <h1 class="text-2xl font-bold mb-6">Data Pesanan Terakhir</h1>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-6">
+                    <p class="text-slate-500">Data pesanan asli dari pelanggan akan masuk ke Google Spreadsheet Anda. (Tabel integrasi real-time sedang dalam tahap pengembangan berikutnya).</p>
+                    <a href="https://docs.google.com/spreadsheets" target="_blank" class="inline-block mt-4 bg-emerald-600 text-white px-4 py-2 rounded-lg"><i class="bi bi-file-earmark-excel"></i> Buka Google Spreadsheet</a>
+                </div>
+            </div>
+
+            <div id="armada" class="view-section">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold">Manajemen Armada & Kru</h1>
+                    <button onclick="tambahKru()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">+ Tambah Driver</button>
+                </div>
+                <div class="bg-white p-6 rounded-xl border shadow-sm">
+                    <p class="text-slate-500 mb-4">Tambahkan Driver baru. Data akan langsung terkirim ke Tab 'Driver' di Spreadsheet Anda.</p>
+                </div>
+            </div>
+
+            <div id="tarif" class="view-section">
+                <h1 class="text-2xl font-bold mb-6">Pengaturan Tarif Default</h1>
+                <div class="bg-white p-6 rounded-xl border shadow-sm grid grid-cols-2 gap-4 max-w-2xl">
+                    <div><label class="text-sm font-bold text-slate-600">Tarif 0 - 5 Km</label><input type="text" value="10000" class="w-full border p-2 rounded mt-1"></div>
+                    <div><label class="text-sm font-bold text-slate-600">Tarif > 15 Km</label><input type="text" value="14000" class="w-full border p-2 rounded mt-1"></div>
+                    <button onclick="simpanTarif()" class="col-span-2 bg-slate-800 text-white py-3 rounded-lg mt-4 font-bold">Simpan ke Database</button>
+                </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- LOGIC SCRIPT -->
     <script>
-        // Logika Form Login
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
+        const gasUrl = 'https://script.google.com/macros/s/AKfycbxJqJ4SDkb1GG-bP5_rlN4ToRibw-H7xCsYd24jCI1iKe9CWL1SyASMJGx6qEMn6uC5/exec';
 
-            if(u === 'Mazaya' && p === 'Sukses@01') {
-                document.getElementById('loginScreen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    const app = document.getElementById('appContainer');
-                    app.classList.remove('hidden');
-                    void app.offsetWidth; 
-                    app.style.opacity = '1';
-                }, 500);
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Akses Ditolak',
-                    text: 'Username atau Password salah!',
-                    confirmButtonColor: '#1e3a8a'
-                });
-            }
-        });
-
-        // Logika Navigasi Sidebar
-        function switchMenu(targetId) {
-            const titles = {
-                'view-dashboard': 'Ringkasan Dashboard',
-                'view-pesanan': 'Manajemen Data Pesanan',
-                'view-armada': 'Manajemen Armada & Kru',
-                'view-pengaturan': 'Pengaturan Sistem & Tarif'
-            };
-            document.getElementById('headerTitle').textContent = titles[targetId] || 'Dashboard';
-            
-            // Sembunyikan semua view
-            document.querySelectorAll('.view-section').forEach(el => {
-                el.classList.add('hidden');
-            });
-            
-            // Tampilkan yang dituju
-            const targetEl = document.getElementById(targetId);
-            if (targetEl) {
-                targetEl.classList.remove('hidden');
-            }
-
-            // Update state tombol aktif di sidebar
-            document.querySelectorAll('.nav-link').forEach(el => {
-                if(el.dataset.target === targetId) {
-                    el.classList.add('bg-mazaya-blue', 'text-white');
-                    el.classList.remove('hover:bg-slate-800', 'hover:text-white');
-                } else if (el.dataset.target) {
-                    el.classList.remove('bg-mazaya-blue', 'text-white');
-                    el.classList.add('hover:bg-slate-800', 'hover:text-white');
-                }
-            });
+        function login() {
+            if(document.getElementById('username').value === 'Mazaya' && document.getElementById('password').value === 'Sukses@01') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appContainer').classList.remove('hidden');
+            } else { Swal.fire('Error', 'Username / Password Salah', 'error'); }
         }
 
-        // Logika Logout (Diperbarui aman)
-        function logout() {
-            Swal.fire({
-                title: 'Keluar dari Sistem?',
-                text: "Anda akan dikembalikan ke halaman depan pelanggan.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#1e3a8a',
-                cancelButtonColor: '#ef4444',
-                confirmButtonText: 'Ya, Keluar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'index.html';
-                }
-            });
+        function switchMenu(id) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
 
-        // Modals Tambah Data
-        function tambahKendaraan() {
-            Swal.fire({
-                title: 'Tambah Kendaraan',
-                html: `
-                    <input id="plat" class="swal2-input" placeholder="Plat Nomor (Contoh: P 1234 AB)">
-                    <input id="jenis" class="swal2-input" placeholder="Jenis Kendaraan (Contoh: L300 Box)">
-                `,
-                confirmButtonText: 'Simpan Data',
-                showCancelButton: true,
-                cancelButtonText: 'Batal',
-                preConfirm: () => {
-                    const plat = document.getElementById('plat').value;
-                    if (!plat) Swal.showValidationMessage('Plat Nomor wajib diisi');
-                    return { plat }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('Berhasil!', 'Data kendaraan ditambahkan.', 'success');
-                }
-            });
-        }
+        function logout() { window.location.href = 'index.html'; }
 
+        // MENGIRIM DATA DRIVER KE DATABASE SPREADSHEET
         function tambahKru() {
             Swal.fire({
-                title: 'Tambah Kru',
-                html: `
-                    <input id="namaKru" class="swal2-input" placeholder="Nama Lengkap">
-                    <select id="posisiKru" class="swal2-input" style="width: 70%; max-width: 100%;">
-                        <option value="Sopir">Sopir Utama</option>
-                        <option value="Kernet">Kernet</option>
-                    </select>
-                    <input id="noHpKru" class="swal2-input" placeholder="No. HP">
-                `,
-                confirmButtonText: 'Simpan Data',
-                showCancelButton: true,
-                cancelButtonText: 'Batal',
-                preConfirm: () => {
-                    const nama = document.getElementById('namaKru').value;
-                    if (!nama) Swal.showValidationMessage('Nama wajib diisi');
-                    return { nama }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('Berhasil!', 'Data kru ditambahkan.', 'success');
+                title: 'Tambah Driver',
+                html: `<input id="dNama" class="swal2-input" placeholder="Nama Driver"><input id="dHp" class="swal2-input" placeholder="No HP"><input id="dPlat" class="swal2-input" placeholder="Plat Nomor Kendaraan">`,
+                showCancelButton: true, confirmButtonText: 'Simpan ke Database',
+                preConfirm: () => { return { id: 'DRV-'+Math.floor(Math.random()*1000), nama: document.getElementById('dNama').value, posisi: 'Sopir', hp: document.getElementById('dHp').value, plat: document.getElementById('dPlat').value } }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    Swal.fire({title: 'Menyimpan...', didOpen: ()=>Swal.showLoading()});
+                    fetch(gasUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'addDriver', payload: res.value }) })
+                    .then(() => Swal.fire('Sukses', 'Driver tersimpan di Spreadsheet!', 'success'));
                 }
             });
         }
 
-        function simpanPengaturan() {
-            Swal.fire({
-                title: 'Menyimpan Pengaturan...',
-                text: 'Mengupdate database sistem.',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading() }
-            });
-            setTimeout(() => {
-                Swal.fire('Tersimpan!', 'Pengaturan tarif baru telah berhasil diperbarui.', 'success');
-            }, 1000);
+        function simpanTarif() {
+            Swal.fire({title: 'Menyimpan...', didOpen: ()=>Swal.showLoading()});
+            fetch(gasUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveSettings' }) })
+            .then(() => Swal.fire('Tersimpan', 'Pengaturan berhasil diupdate', 'success'));
         }
     </script>
 </body>
