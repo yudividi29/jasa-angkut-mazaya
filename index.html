@@ -8,9 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            theme: {
-                extend: { colors: { 'mazaya-blue': '#0f172a', 'mazaya-orange': '#f97316' } }
-            }
+            theme: { extend: { colors: { 'mazaya-blue': '#0f172a', 'mazaya-orange': '#f97316' } } }
         }
     </script>
     
@@ -31,7 +29,6 @@
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden">
 
-    <!-- Navbar -->
     <header class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -41,12 +38,11 @@
                 <span class="text-xl font-extrabold tracking-wide text-mazaya-blue">MAZAYA</span>
             </div>
             <a href="admin.html" class="text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg transition flex items-center gap-2">
-                <i class="bi bi-shield-lock"></i> Login Admin
+                <i class="bi bi-shield-lock"></i> Admin
             </a>
         </div>
     </header>
 
-    <!-- Hero Banner Premium (Dikembalikan sesuai permintaan) -->
     <section class="pt-32 pb-20 bg-mazaya-blue text-white relative overflow-hidden">
         <div class="absolute top-0 right-0 w-96 h-96 bg-mazaya-orange rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center relative z-10">
@@ -68,131 +64,76 @@
         </div>
     </section>
 
-    <!-- Form & Peta -->
     <section id="pemesanan" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Info Skema Tarif -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10" data-aos="fade-up">
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-2xl border border-blue-200 shadow-sm transition hover:-translate-y-1">
-                <p class="font-extrabold text-blue-900">0 - 5 Km (Rp 10rb/Km)</p>
-                <p class="text-xs text-blue-700 mt-1">Min. Bayar Rp 50.000</p>
-                <p class="text-[10px] bg-white px-2 py-1 rounded text-slate-600 mt-2 font-medium">Cth: 2 Km = Rp20rb → Jadi Rp50rb</p>
-            </div>
-            <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-2xl border border-orange-200 shadow-sm transition hover:-translate-y-1">
-                <p class="font-extrabold text-orange-900">6 - 15 Km (Rp 12rb/Km)</p>
-                <p class="text-xs text-orange-700 mt-1">Min. Bayar Rp 150.000</p>
-                <p class="text-[10px] bg-white px-2 py-1 rounded text-slate-600 mt-2 font-medium">Cth: 10 Km = Rp120rb → Jadi Rp150rb</p>
-            </div>
-            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 p-5 rounded-2xl border border-emerald-200 shadow-sm transition hover:-translate-y-1">
-                <p class="font-extrabold text-emerald-900">16 - 40 Km (Rp 14rb/Km)</p>
-                <p class="text-xs text-emerald-700 mt-1">Min. Bayar Rp 300.000</p>
-                <p class="text-[10px] bg-white px-2 py-1 rounded text-slate-600 mt-2 font-medium">Cth: 20 Km = Rp280rb → Jadi Rp300rb</p>
-            </div>
-            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-2xl border border-purple-200 shadow-sm transition hover:-translate-y-1">
-                <p class="font-extrabold text-purple-900">> 40 Km (Jarak Jauh)</p>
-                <p class="text-xs text-purple-700 mt-1">Rp 15.000 / Km</p>
-                <p class="text-[10px] bg-white px-2 py-1 rounded text-slate-600 mt-2 font-medium">Tarif fleksibel, admin dapat sesuaikan.</p>
-            </div>
-        </div>
-
         <div class="grid lg:grid-cols-12 gap-10 items-start">
             
-            <!-- KIRI: Form Input -->
-            <div class="lg:col-span-6 glass-card rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 relative z-20" data-aos="fade-right">
-                <h2 class="text-2xl font-bold text-slate-900 mb-6 border-b pb-4">Form Kalkulator Rute</h2>
+            <div class="lg:col-span-5 glass-card rounded-3xl shadow-xl border border-slate-200 p-6 relative z-20" data-aos="fade-right">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6 border-b pb-4">Kalkulator Rute</h2>
                 
-                <form id="orderForm" class="space-y-6">
+                <form id="orderForm" class="space-y-5">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-1">Nama Lengkap</label>
-                            <input type="text" id="nama" required class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-mazaya-blue outline-none bg-slate-50 transition" placeholder="Budi Santoso">
+                            <input type="text" id="nama" required class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 outline-none" placeholder="Budi Santoso">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-1">Nomor WhatsApp</label>
-                            <input type="tel" id="whatsapp" required class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-mazaya-blue outline-none bg-slate-50 transition" placeholder="08xxxxxxxxxx">
+                            <input type="tel" id="whatsapp" required class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 outline-none" placeholder="08xxxxxxxx">
                         </div>
                     </div>
 
-                    <!-- KOTAK CATATAN UNTUK KONSUMEN -->
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl shadow-sm my-4">
-                        <p class="text-sm text-blue-800 font-medium leading-relaxed">
-                            <i class="bi bi-info-circle-fill mr-2 text-blue-600"></i>
-                            <b>Cara Isi Alamat:</b> Ketik nama kota/kecamatan, lalu <b>PILIH</b> dari daftar yang muncul. <br>
-                            <i>(Setelah itu, Anda bisa menggeser PIN di peta untuk titik yang lebih akurat).</i>
-                        </p>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
+                        <p class="text-sm text-blue-800"><b>Cara Isi:</b> Ketik nama kota/area lalu <b>PILIH</b> dari daftar. (Anda bisa menggeser PIN di peta untuk titik akurat).</p>
                     </div>
 
-                    <div class="space-y-4">
-                        <div class="relative">
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Alamat Penjemputan</label>
-                            <div class="relative">
-                                <i class="bi bi-geo-alt-fill absolute left-4 top-1/2 -translate-y-1/2 text-blue-500"></i>
-                                <input type="text" id="alamatJemput" required autocomplete="off" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-mazaya-blue outline-none bg-slate-50 font-medium" placeholder="Ketik area penjemputan...">
-                            </div>
-                            <ul id="sugestiJemput" class="dropdown-sugesti absolute w-full bg-white border border-slate-200 shadow-2xl rounded-xl mt-1 max-h-48 overflow-y-auto hidden"></ul>
-                        </div>
-                        
-                        <div class="relative">
-                            <label class="block text-xs font-bold text-slate-600 mb-1">Alamat Tujuan</label>
-                            <div class="relative">
-                                <i class="bi bi-flag-fill absolute left-4 top-1/2 -translate-y-1/2 text-orange-500"></i>
-                                <input type="text" id="alamatTujuan" required autocomplete="off" class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-mazaya-blue outline-none bg-slate-50 font-medium" placeholder="Ketik area tujuan...">
-                            </div>
-                            <ul id="sugestiTujuan" class="dropdown-sugesti absolute w-full bg-white border border-slate-200 shadow-2xl rounded-xl mt-1 max-h-48 overflow-y-auto hidden"></ul>
-                        </div>
+                    <div class="relative">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Alamat Penjemputan</label>
+                        <input type="text" id="alamatJemput" required autocomplete="off" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 font-medium" placeholder="Ketik area penjemputan...">
+                        <ul id="sugestiJemput" class="dropdown-sugesti absolute w-full bg-white border border-slate-200 shadow-2xl rounded-xl mt-1 max-h-48 overflow-y-auto hidden"></ul>
+                    </div>
+                    
+                    <div class="relative">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Alamat Tujuan</label>
+                        <input type="text" id="alamatTujuan" required autocomplete="off" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 font-medium" placeholder="Ketik area tujuan...">
+                        <ul id="sugestiTujuan" class="dropdown-sugesti absolute w-full bg-white border border-slate-200 shadow-2xl rounded-xl mt-1 max-h-48 overflow-y-auto hidden"></ul>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t border-slate-100">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Berat (Kg)</label>
-                            <input type="number" id="berat" value="0" class="w-full px-3 py-2.5 rounded-lg border-2 border-slate-200 focus:border-mazaya-blue outline-none bg-slate-50 text-center font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">P. Maks (cm)</label>
-                            <input type="number" id="panjang" value="0" class="w-full px-3 py-2.5 rounded-lg border-2 border-slate-200 focus:border-mazaya-blue outline-none bg-slate-50 text-center font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">L. Maks (cm)</label>
-                            <input type="number" id="lebar" value="0" class="w-full px-3 py-2.5 rounded-lg border-2 border-slate-200 focus:border-mazaya-blue outline-none bg-slate-50 text-center font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">T. Maks (cm)</label>
-                            <input type="number" id="tinggi" value="0" class="w-full px-3 py-2.5 rounded-lg border-2 border-slate-200 focus:border-mazaya-blue outline-none bg-slate-50 text-center font-bold">
-                        </div>
+                    <div class="grid grid-cols-4 gap-2 pt-4 border-t border-slate-100">
+                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Berat (Kg)</label><input type="number" id="berat" value="0" class="w-full px-2 py-2 rounded-lg border-2 text-center font-bold"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Pjg (cm)</label><input type="number" id="panjang" value="0" class="w-full px-2 py-2 rounded-lg border-2 text-center font-bold"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Lbr (cm)</label><input type="number" id="lebar" value="0" class="w-full px-2 py-2 rounded-lg border-2 text-center font-bold"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Tgi (cm)</label><input type="number" id="tinggi" value="0" class="w-full px-2 py-2 rounded-lg border-2 text-center font-bold"></div>
                     </div>
+
+                    <!-- FITUR BARU: UPLOAD FOTO -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">Foto Barang (Agar admin mudah menaksir biaya)</label>
+                        <input type="file" id="fotoBarang" accept="image/*" class="w-full px-4 py-2 rounded-xl border-2 border-slate-200 bg-slate-50 text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    </div>
+
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">Keterangan Barang</label>
-                        <textarea id="keterangan" rows="2" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-mazaya-blue outline-none bg-slate-50" placeholder="Cth: 2 Koper, 1 Lemari, Kardus..."></textarea>
+                        <textarea id="keterangan" rows="2" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50" placeholder="Cth: Pindahan 2 koper, meja rias..."></textarea>
                     </div>
 
-                    <button type="button" id="btnHitung" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-extrabold py-4 rounded-xl shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2">
-                        <i class="bi bi-calculator"></i> HITUNG RUTE & TARIF
-                    </button>
+                    <button type="button" id="btnHitung" class="w-full bg-slate-900 text-white font-extrabold py-4 rounded-xl shadow-xl transition-all active:scale-95">HITUNG RUTE & TARIF</button>
                 </form>
             </div>
 
-            <!-- KANAN: Peta Besar & Hasil -->
-            <div class="lg:col-span-6 space-y-6" data-aos="fade-left">
-                <!-- Peta Lebar (Tinggi 500px) -->
+            <div class="lg:col-span-7 space-y-6" data-aos="fade-left">
                 <div class="bg-white p-2 rounded-3xl shadow-xl border border-slate-200">
                     <div id="map" class="w-full bg-slate-100"></div>
                 </div>
 
-                <!-- Kwitansi -->
                 <div id="rincianBiaya" class="receipt-card hidden">
                     <div class="text-center mb-4 border-b border-slate-200 pb-4">
                         <p class="font-extrabold text-slate-800 text-xl tracking-wide">ESTIMASI BIAYA</p>
-                        <p class="text-xs text-slate-500">Jasa Angkut Mazaya</p>
                     </div>
                     
-                    <div class="bg-amber-50 border-l-4 border-amber-500 p-3 mb-5">
-                        <p class="text-xs text-amber-800 font-medium leading-relaxed"><b>Catatan:</b> Ini adalah tarif estimasi. Tarif final ditentukan setelah petugas memverifikasi dimensi/berat asli dan tingkat kesulitan bongkar muat.</p>
-                    </div>
-
                     <div class="space-y-3 text-sm text-slate-600 font-medium">
                         <div class="flex justify-between items-center"><span class="flex items-center gap-2"><i class="bi bi-geo-alt text-blue-500"></i> Jarak Rute:</span> <span id="resJarak" class="font-bold text-slate-800 bg-slate-100 px-2 py-1 rounded"></span></div>
                         <div class="flex justify-between items-center"><span class="flex items-center gap-2"><i class="bi bi-stopwatch text-orange-500"></i> Waktu Tempuh:</span> <span id="resWaktu" class="font-bold text-slate-800"></span></div>
-                        <div class="flex justify-between border-t border-dashed border-slate-200 pt-2"><span class="text-slate-500">Biaya Jarak (Dasar):</span> <span id="resTarifJarak" class="font-bold text-slate-800"></span></div>
-                        <div class="flex justify-between"><span class="text-slate-500">Tambahan Berat:</span> <span id="resTambahBerat" class="font-bold text-slate-800"></span></div>
+                        <div class="flex justify-between border-t border-dashed border-slate-200 pt-2"><span class="text-slate-500">Biaya Jarak:</span> <span id="resTarifJarak" class="font-bold text-slate-800"></span></div>
                     </div>
                     
                     <div class="mt-5 pt-4 border-t-2 border-slate-800 flex justify-between items-end">
@@ -200,16 +141,14 @@
                         <span id="resGrandTotal" class="text-2xl font-black text-mazaya-orange"></span>
                     </div>
 
-                    <button type="button" id="btnPesanWhatsapp" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-4 rounded-xl shadow-lg shadow-emerald-500/30 transition-all active:scale-95 mt-6 flex justify-center items-center gap-2 text-lg">
+                    <button type="button" id="btnPesanWhatsapp" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-4 rounded-xl shadow-lg mt-6 flex justify-center items-center gap-2 text-lg">
                         <i class="bi bi-whatsapp"></i> PESAN SEKARANG (WA)
                     </button>
                 </div>
             </div>
-            
         </div>
     </section>
 
-    <!-- Footer yang Diperbarui -->
     <footer class="bg-slate-900 text-slate-400 py-12 border-t-4 border-mazaya-orange">
         <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
             <h3 class="text-white text-2xl font-bold tracking-wider">JASA ANGKUT MAZAYA</h3>
@@ -218,16 +157,14 @@
                 <p class="text-sm font-medium"><i class="bi bi-telephone-fill text-mazaya-orange mr-2"></i> 0889-9000-7383</p>
                 <p class="text-sm font-medium"><i class="bi bi-envelope-fill text-mazaya-orange mr-2"></i> tsamarahvidi29@gmail.com</p>
             </div>
-            <p class="text-xs pt-8 opacity-50">&copy; 2026 Jasa Angkut Mazaya. All Rights Reserved.</p>
+            <p class="text-xs pt-8 opacity-50">&copy; 2026 Jasa Angkut Mazaya.</p>
         </div>
     </footer>
 
-    <!-- Script Leaflet & Logic -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         AOS.init();
 
-        // 🟢 URL DATABASE TERBARU ANDA ADA DI SINI
         const APP_CONFIG = {
             whatsappAdmin: '6288990007383',
             gasUrl: 'https://script.google.com/macros/s/AKfycbwKjrewkUM8lS4dt6Vts4ZceQ7Bg4R5Ynw6IoYjnZnC4gcTFJwRmD7X6rGRjMerMpG1QQ/exec'
@@ -239,7 +176,7 @@
 
         window.onload = function() {
             map = L.map('map').setView([-7.9135, 113.8222], 12);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }).addTo(map);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
             const iconA = L.divIcon({ className: 'bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shadow-lg border-2 border-white', html: 'A', iconSize: [32,32], iconAnchor: [16,32] });
             const iconB = L.divIcon({ className: 'bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shadow-lg border-2 border-white', html: 'B', iconSize: [32,32], iconAnchor: [16,32] });
@@ -247,14 +184,8 @@
             markerA = L.marker([-7.9135, 113.8222], {icon: iconA, draggable: true});
             markerB = L.marker([-7.9135, 113.8222], {icon: iconB, draggable: true});
 
-            markerA.on('dragend', function(e) { 
-                coords.jemput = e.target.getLatLng(); 
-                document.getElementById('alamatJemput').value = "📍 Presisi Manual (Titik A Digeser)";
-            });
-            markerB.on('dragend', function(e) { 
-                coords.tujuan = e.target.getLatLng(); 
-                document.getElementById('alamatTujuan').value = "📍 Presisi Manual (Titik B Digeser)";
-            });
+            markerA.on('dragend', function(e) { coords.jemput = e.target.getLatLng(); document.getElementById('alamatJemput').value = "📍 Pin Peta (Manual)"; });
+            markerB.on('dragend', function(e) { coords.tujuan = e.target.getLatLng(); document.getElementById('alamatTujuan').value = "📍 Pin Peta (Manual)"; });
 
             setupAutocomplete('alamatJemput', 'sugestiJemput', 'jemput');
             setupAutocomplete('alamatTujuan', 'sugestiTujuan', 'tujuan');
@@ -267,12 +198,10 @@
                 clearTimeout(searchTimeout);
                 const query = this.value;
                 const listEl = document.getElementById(dropdownId);
-                if(!listEl) return;
-                
                 if (query.length < 3) { listEl.classList.add('hidden'); return; }
 
                 searchTimeout = setTimeout(() => {
-                    fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5&lat=-7.91&lon=113.82`)
+                    fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`)
                     .then(res => res.json())
                     .then(data => {
                         listEl.innerHTML = '';
@@ -281,17 +210,14 @@
                             data.features.forEach(f => {
                                 const prop = f.properties;
                                 const namaLengkap = `${prop.name || ''}, ${prop.city || prop.county || ''}`.replace(/^, | ,/g, '').trim();
-                                
                                 const li = document.createElement('li');
-                                li.className = 'px-4 py-3 hover:bg-blue-50 cursor-pointer text-sm border-b border-slate-100 font-medium';
+                                li.className = 'px-4 py-3 hover:bg-blue-50 cursor-pointer text-sm border-b font-medium';
                                 li.innerHTML = `<i class="bi bi-geo-alt text-slate-400 mr-2"></i> ${namaLengkap}`;
                                 li.onclick = () => {
                                     inputEl.value = namaLengkap;
                                     listEl.classList.add('hidden');
-                                    
                                     const latlng = L.latLng(f.geometry.coordinates[1], f.geometry.coordinates[0]);
                                     coords[type] = latlng;
-                                    
                                     if(type === 'jemput') { markerA.setLatLng(latlng).addTo(map); map.setView(latlng, 14); } 
                                     else { markerB.setLatLng(latlng).addTo(map); map.setView(latlng, 14); }
                                 };
@@ -301,10 +227,6 @@
                     });
                 }, 400);
             });
-            document.addEventListener('click', e => {
-                const listEl = document.getElementById(dropdownId);
-                if (listEl && e.target !== inputEl && !listEl.contains(e.target)) listEl.classList.add('hidden');
-            });
         }
 
         function getDistance(latlng1, latlng2) {
@@ -312,110 +234,86 @@
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(latlng1.lat * Math.PI / 180) * Math.cos(latlng2.lat * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
         }
-        function formatRp(angka) { return 'Rp ' + angka.toLocaleString('id-ID'); }
 
         document.getElementById('btnHitung').addEventListener('click', () => {
             const form = document.getElementById('orderForm');
             if(!form.checkValidity()) { form.reportValidity(); return; }
-            if(!coords.jemput || !coords.tujuan) {
-                Swal.fire('Pilih Lokasi', 'Harap pilih alamat dari daftar saran atau ketik manual jika tidak ada.', 'warning');
-                return;
-            }
+            if(!coords.jemput || !coords.tujuan) { Swal.fire('Error', 'Pilih lokasi di peta atau daftar!', 'warning'); return; }
 
-            Swal.fire({ title: 'Menghitung Rute...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Menghitung...', didOpen: () => Swal.showLoading() });
 
             setTimeout(() => {
                 let jarakKm = parseFloat((getDistance(coords.jemput, coords.tujuan) * 1.25).toFixed(1)); 
                 if (jarakKm < 1) jarakKm = 1;
 
                 if(routeLine) map.removeLayer(routeLine);
-                routeLine = L.polyline([coords.jemput, coords.tujuan], {color: '#0f172a', weight: 5, dashArray: '10, 10'}).addTo(map);
+                routeLine = L.polyline([coords.jemput, coords.tujuan], {color: '#0f172a', weight: 5}).addTo(map);
                 map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
 
                 const waktuMenit = Math.round((jarakKm / 35) * 60);
                 const waktuStr = waktuMenit > 60 ? `${Math.floor(waktuMenit/60)} Jam ${waktuMenit%60} Mnt` : `${waktuMenit} Menit`;
 
-                let tarifJarak = 0; let isMin = false; let isJauh = false;
-                if (jarakKm <= 5) { tarifJarak = jarakKm * 10000; if(tarifJarak < 50000) { tarifJarak = 50000; isMin = true; } } 
-                else if (jarakKm <= 15) { tarifJarak = jarakKm * 12000; if(tarifJarak < 150000) { tarifJarak = 150000; isMin = true; } } 
-                else if (jarakKm <= 40) { tarifJarak = jarakKm * 14000; if(tarifJarak < 300000) { tarifJarak = 300000; isMin = true; } } 
-                else { tarifJarak = jarakKm * 15000; isJauh = true; }
+                let tarifJarak = 0;
+                if (jarakKm <= 5) { tarifJarak = Math.max(jarakKm * 10000, 50000); } 
+                else if (jarakKm <= 15) { tarifJarak = Math.max(jarakKm * 12000, 150000); } 
+                else { tarifJarak = Math.max(jarakKm * 14000, 300000); }
 
-                const berat = parseFloat(document.getElementById('berat').value) || 0;
-                let biayaBerat = 0;
-                if(berat > 100 && berat <= 200) biayaBerat = 100000;
-                else if(berat > 200 && berat <= 300) biayaBerat = 200000;
-                else if(berat > 300) biayaBerat = 300000;
-
-                const grandTotal = tarifJarak + biayaBerat;
-
-                document.getElementById('resJarak').innerHTML = jarakKm + ' Km ' + (isJauh ? '<span class="text-[10px] text-red-500 ml-2">(Jarak Jauh)</span>' : '');
+                document.getElementById('resJarak').textContent = jarakKm + ' Km';
                 document.getElementById('resWaktu').textContent = waktuStr;
-                document.getElementById('resTarifJarak').textContent = formatRp(tarifJarak) + (isMin ? ' (Tarif Min)' : '');
-                document.getElementById('resTambahBerat').textContent = formatRp(biayaBerat);
-                document.getElementById('resGrandTotal').textContent = formatRp(grandTotal);
+                document.getElementById('resTarifJarak').textContent = 'Rp ' + tarifJarak.toLocaleString('id-ID');
+                document.getElementById('resGrandTotal').textContent = 'Rp ' + tarifJarak.toLocaleString('id-ID');
                 document.getElementById('rincianBiaya').classList.remove('hidden');
 
-                // Simpan koordinat akurat
+                // PERBAIKAN: VARIABEL SINKRON 100% DENGAN DATABASE
+                const fileInput = document.getElementById('fotoBarang');
+                const fotoTeks = fileInput.files.length > 0 ? "Ada (Akan dikirim via WA)" : "Tidak dilampirkan";
+
                 currentOrderData = {
                     nama: document.getElementById('nama').value,
                     whatsapp: document.getElementById('whatsapp').value,
-                    jemput: document.getElementById('alamatJemput').value,
+                    alamatJemput: document.getElementById('alamatJemput').value,
                     latJemput: coords.jemput.lat, lngJemput: coords.jemput.lng,
-                    tujuan: document.getElementById('alamatTujuan').value,
+                    alamatTujuan: document.getElementById('alamatTujuan').value,
                     latTujuan: coords.tujuan.lat, lngTujuan: coords.tujuan.lng,
-                    keterangan: document.getElementById('keterangan').value,
-                    berat, panjang: document.getElementById('panjang').value || 0,
-                    lebar: document.getElementById('lebar').value || 0, tinggi: document.getElementById('tinggi').value || 0,
-                    jarakKm, waktuStr, tarifDasar: tarifJarak, biayaBerat, grandTotal
+                    jarak: jarakKm,
+                    estimasiWaktu: waktuStr,
+                    berat: document.getElementById('berat').value || 0,
+                    panjang: document.getElementById('panjang').value || 0,
+                    lebar: document.getElementById('lebar').value || 0,
+                    tinggi: document.getElementById('tinggi').value || 0,
+                    keterangan: document.getElementById('keterangan').value || "-",
+                    fotoStatus: fotoTeks,
+                    grandTotal: tarifJarak
                 };
 
-                document.getElementById('rincianBiaya').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 Swal.close();
-            }, 800);
+                document.getElementById('rincianBiaya').scrollIntoView({ behavior: 'smooth' });
+            }, 500);
         });
 
-        // 🟢 PROSES PENGIRIMAN DATA KE GOOGLE SHEET & WHATSAPP
         document.getElementById('btnPesanWhatsapp').addEventListener('click', () => {
             if(!currentOrderData) return;
-            const data = currentOrderData;
-
-            Swal.fire({ title: 'Meneruskan Pesanan...', text: 'Menyimpan data ke server...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'Menyimpan ke Database...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
-            // Bypass CORS agar dijamin terkirim (mode: 'no-cors')
             fetch(APP_CONFIG.gasUrl, {
-                method: 'POST',
-                mode: 'no-cors', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'saveOrder', payload: data })
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'saveOrder', payload: currentOrderData })
             }).then(() => {
-                
-                // 🟢 FITUR BALASAN OTOMATIS (Pop-Up di Website sebelum buka WA)
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Pesanan Terkirim!',
+                    icon: 'success', title: 'Pesanan Masuk!',
                     text: 'TERIMA KASIH ATAS KEPERCAYAAN JASA ANGKUT MAZAYA, KAMI SEGERA MENGHUBUNGI ANDA SEBENTAR LAGI.',
-                    confirmButtonText: 'Lanjutkan ke WhatsApp',
-                    confirmButtonColor: '#10b981',
-                    allowOutsideClick: false
+                    confirmButtonText: 'Buka WhatsApp', confirmButtonColor: '#10b981'
                 }).then(() => {
-                    bukaWhatsApp(data);
+                    const d = currentOrderData;
+                    const map1 = `https://www.google.com/maps?q=${d.latJemput},${d.lngJemput}`;
+                    const map2 = `https://www.google.com/maps?q=${d.latTujuan},${d.lngTujuan}`;
+                    const lampiran = d.fotoStatus.includes("Ada") ? "\n(FOTO BARANG SAYA LAMPIRKAN DI BAWAH)" : "";
+                    
+                    const txt = `*PESANAN BARU MAZAYA* 🚚\n\n*Pelanggan:* ${d.nama}\n*WA:* ${d.whatsapp}\n\n📍 *Jemput:* ${d.alamatJemput}\n🗺️ Link Jemput: ${map1}\n\n🏁 *Tujuan:* ${d.alamatTujuan}\n🗺️ Link Tujuan: ${map2}\n\n*Jarak:* ${d.jarak} Km\n*Estimasi Waktu:* ${d.estimasiWaktu}\n\n*Barang:* ${d.keterangan}\n*Dimensi:* ${d.panjang}x${d.lebar}x${d.tinggi} cm\n*Berat:* ${d.berat} Kg\n\n*Estimasi Biaya: Rp ${d.grandTotal.toLocaleString('id-ID')}*${lampiran}`;
+                    window.open(`https://wa.me/${APP_CONFIG.whatsappAdmin}?text=${encodeURIComponent(txt)}`, '_blank');
                 });
-
-            }).catch(error => {
-                console.error(error); 
-                bukaWhatsApp(data);
-            });
+            }).catch(() => { Swal.fire('Gagal', 'Terjadi kesalahan koneksi internet.', 'error'); });
         });
-
-        function bukaWhatsApp(data) {
-            // Membuat link Google Maps untuk Admin
-            const mapJemput = `https://www.google.com/maps/search/?api=1&query=${data.latJemput},${data.lngJemput}`;
-            const mapTujuan = `https://www.google.com/maps/search/?api=1&query=${data.latTujuan},${data.lngTujuan}`;
-
-            const txt = `*PESANAN BARU MAZAYA* 🚚\n\n*DATA PELANGGAN*\nNama: ${data.nama}\nNo WA: ${data.whatsapp}\n\n*LOKASI (KLIK LINK PETA)*\n📍 Jemput: ${data.jemput}\n🔗 Link Jemput: ${mapJemput}\n\n🏁 Tujuan: ${data.tujuan}\n🔗 Link Tujuan: ${mapTujuan}\n\n🛣️ Jarak: ${data.jarakKm} Km\n\n*DETAIL BARANG*\nKet: ${data.keterangan || '-'}\nBerat: ${data.berat} Kg\nDimensi: ${data.panjang}x${data.lebar}x${data.tinggi} cm\n\n*TOTAL ESTIMASI: ${formatRp(data.grandTotal)}*\n_(Belum termasuk tol/parkir)_`;
-            window.open(`https://wa.me/${APP_CONFIG.whatsappAdmin}?text=${encodeURIComponent(txt)}`, '_blank');
-        }
     </script>
 </body>
 </html>
