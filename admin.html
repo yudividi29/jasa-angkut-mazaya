@@ -1,223 +1,95 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruang Kontrol - Mazaya Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .view-section { display: none; opacity: 0; transition: opacity 0.3s ease; }
-        .view-section.active { display: block; opacity: 1; animation: slideUp 0.4s ease forwards; }
-        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    </style>
-</head>
-<body class="h-screen overflow-hidden flex">
+// --- Backend Jasa Angkut Mazaya (Versi Pro V.5 - Full Control) ---
 
-    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 transition-opacity duration-500">
-        <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-sm text-center">
-            <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg"><i class="bi bi-shield-lock text-3xl"></i></div>
-            <h2 class="text-2xl font-extrabold text-slate-800 mb-2">Mazaya Pro</h2>
-            <p class="text-slate-500 text-sm mb-8">Masuk ke Ruang Kontrol Admin</p>
-            <div class="space-y-4">
-                <input type="text" id="username" class="w-full px-4 py-3 bg-slate-50 border rounded-xl" placeholder="Username">
-                <input type="password" id="password" class="w-full px-4 py-3 bg-slate-50 border rounded-xl" placeholder="Password">
-                <button onclick="login()" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold mt-2">Masuk</button>
-            </div>
-            <a href="index.html" class="inline-block mt-6 text-sm text-slate-500">← Web Utama</a>
-        </div>
-    </div>
+function doGet(e) {
+  if (e.parameter.action === 'getData') {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheetPesanan = ss.getSheetByName('Pesanan');
+    var sheetDriver = ss.getSheetByName('Driver');
+    var sheetPelanggan = ss.getSheetByName('Pelanggan'); 
+    
+    var dataPesanan = sheetPesanan ? sheetPesanan.getDataRange().getDisplayValues() : [];
+    var dataDriver = sheetDriver ? sheetDriver.getDataRange().getDisplayValues() : [];
+    var dataPelanggan = sheetPelanggan ? sheetPelanggan.getDataRange().getDisplayValues() : [];
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'success', pesanan: dataPesanan, driver: dataDriver, pelanggan: dataPelanggan
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput("Sistem Database Jasa Angkut Mazaya ONLINE.");
+}
 
-    <div id="appContainer" class="flex w-full h-full hidden">
-        <aside class="w-64 bg-[#0f172a] text-slate-400 flex flex-col relative z-20 shadow-2xl">
-            <div class="h-20 flex items-center px-8 border-b border-white/5">
-                <i class="bi bi-truck text-blue-500 text-2xl mr-3"></i><span class="font-extrabold text-white text-lg">MAZAYA PRO</span>
-            </div>
-            <div class="px-6 py-6">
-                <nav class="space-y-1.5">
-                    <button onclick="switchMenu('dashboard', this)" class="nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 bg-blue-600/10 text-blue-400 font-semibold"><i class="bi bi-grid-1x2-fill"></i> Dashboard</button>
-                    <button onclick="switchMenu('pesanan', this)" class="nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-white/5 hover:text-white"><i class="bi bi-receipt"></i> Data Pesanan</button>
-                    <button onclick="switchMenu('armada', this)" class="nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-white/5 hover:text-white"><i class="bi bi-people"></i> Armada & Kru</button>
-                </nav>
-            </div>
-            <div class="mt-auto p-6 border-t border-white/5">
-                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-400 py-3 rounded-xl font-bold"><i class="bi bi-box-arrow-left"></i> Keluar</button>
-            </div>
-        </aside>
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var action = data.action;
 
-        <main class="flex-1 overflow-y-auto bg-slate-50 p-8">
-            
-            <div id="dashboard" class="view-section active">
-                <h3 class="font-bold text-lg text-slate-800 mb-6">Ringkasan Sistem</h3>
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 mb-6">
-                    <p class="text-slate-600 mb-4">Untuk edit total, menghapus, atau merubah status Lunas/Sopir, silakan buka Excel Database Induk Anda.</p>
-                    <a href="https://docs.google.com/spreadsheets" target="_blank" class="bg-emerald-100 text-emerald-700 px-5 py-2.5 rounded-xl font-bold"><i class="bi bi-file-earmark-excel"></i> Buka Database Excel</a>
-                    <button onclick="fetchDataDariSpreadsheet()" class="bg-blue-100 text-blue-700 px-5 py-2.5 rounded-xl font-bold ml-3"><i class="bi bi-arrow-clockwise"></i> Refresh Data</button>
-                </div>
-            </div>
+    if (action === 'saveOrder') return saveOrderData(data.payload);
+    else if (action === 'addDriver') return addSheetData('Driver', [data.payload.id, data.payload.nama, data.payload.posisi, data.payload.hp, data.payload.plat, 'Aktif']);
+    else if (action === 'updateOrder') return updateOrderData(data.payload); // FITUR BARU
+    
+    return createJsonResponse({ status: 'error', message: 'Action tidak dikenal.' });
+  } catch (error) {
+    return createJsonResponse({ status: 'error', message: error.toString() });
+  }
+}
 
-            <div id="pesanan" class="view-section">
-                <h3 class="font-bold text-lg text-slate-800 mb-6">Tabel Data Pesanan</h3>
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
-                        <thead class="bg-slate-50 text-slate-500">
-                            <tr>
-                                <th class="p-5 font-bold">Pelanggan & Rute</th>
-                                <th class="p-5 font-bold">Detail Muatan</th>
-                                <th class="p-5 font-bold">Operasional & Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelPesanan" class="divide-y divide-slate-100">
-                            <tr><td colspan="3" class="text-center p-5 text-slate-500">Klik 'Refresh Data' di Dashboard untuk memuat data.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+// FUNGSI BARU: UPDATE PESANAN LANGSUNG DARI DASHBOARD
+function updateOrderData(payload) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Pesanan');
+  if (!sheet) return createJsonResponse({ status: 'error', message: 'Sheet tidak ditemukan' });
+  
+  var data = sheet.getDataRange().getValues();
+  var orderId = payload.orderId;
 
-            <div id="armada" class="view-section">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-bold text-lg text-slate-800">Daftar Kru & Sopir</h3>
-                    <button onclick="tambahKru()" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg"><i class="bi bi-plus-lg"></i> Tambah Kru</button>
-                </div>
-                <div id="gridArmada" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="col-span-full text-center p-5 text-slate-500">Belum ada data dimuat.</div>
-                </div>
-            </div>
-        </main>
-    </div>
+  // Cari baris yang sesuai dengan ID Pesanan
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0] === orderId) {
+      var rowNum = i + 1; // Baris keberapa di excel
+      sheet.getRange(rowNum, 14).setValue(payload.statusOrder); // Kolom 14: Status Perjalanan
+      sheet.getRange(rowNum, 15).setValue(payload.statusBayar); // Kolom 15: Pembayaran
+      sheet.getRange(rowNum, 16).setValue(payload.sopir);       // Kolom 16: Sopir
+      sheet.getRange(rowNum, 17).setValue(payload.kernet);      // Kolom 17: Kernet
+      sheet.getRange(rowNum, 18).setValue(payload.armada);      // Kolom 18: Armada
+      return createJsonResponse({ status: 'success' });
+    }
+  }
+  return createJsonResponse({ status: 'error', message: 'Order tidak ditemukan' });
+}
 
-    <script>
-        const gasUrl = 'https://script.google.com/macros/s/AKfycbwKjrewkUM8lS4dt6Vts4ZceQ7Bg4R5Ynw6IoYjnZnC4gcTFJwRmD7X6rGRjMerMpG1QQ/exec';
+function saveOrderData(payload) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheetPesanan = ss.getSheetByName('Pesanan');
+  var date = new Date();
+  var dateStr = Utilities.formatDate(date, "GMT+7", "yyyyMMdd");
+  var jamStr = Utilities.formatDate(date, "GMT+7", "dd/MM/yyyy HH:mm:ss");
+  var noOrder = "ORD-" + dateStr + "-" + Math.floor(1000 + Math.random() * 9000);
+  var dimensiStr = (payload.panjang || 0) + "x" + (payload.lebar || 0) + "x" + (payload.tinggi || 0) + " cm";
 
-        function login() {
-            if(document.getElementById('username').value === 'Mazaya' && document.getElementById('password').value === 'Sukses@01') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appContainer').classList.remove('hidden');
-                fetchDataDariSpreadsheet(); // Otomatis Tarik data setelah login
-            } else { Swal.fire('Error', 'Akses Ditolak', 'error'); }
-        }
-        function logout() { location.reload(); }
+  var rowPesanan = [
+    noOrder, jamStr, payload.nama || "", payload.whatsapp || "", payload.alamatJemput || "", payload.alamatTujuan || "", 
+    payload.jarak || "", payload.estimasiWaktu || "", payload.berat || 0, dimensiStr, payload.keterangan || "-", 
+    payload.fotoStatus || "-", payload.grandTotal || 0, 'MENUNGGU', 'BELUM LUNAS', '-', '-', '-'
+  ];
+  sheetPesanan.appendRow(rowPesanan);
 
-        function switchMenu(menuId, btnElement) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            if(document.getElementById(menuId)) document.getElementById(menuId).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600/10', 'text-blue-400'); btn.classList.add('hover:bg-white/5', 'text-slate-400');
-            });
-            btnElement.classList.add('bg-blue-600/10', 'text-blue-400');
-        }
+  var sheetPelanggan = ss.getSheetByName('Pelanggan');
+  if (sheetPelanggan) {
+    var dbPelanggan = sheetPelanggan.getDataRange().getValues();
+    var sudahAda = false;
+    for (var i = 1; i < dbPelanggan.length; i++) { if (dbPelanggan[i][2] == payload.whatsapp) { sudahAda = true; break; } }
+    if (!sudahAda) sheetPelanggan.appendRow(["CUST-" + Math.floor(10000+Math.random()*90000), payload.nama, payload.whatsapp, payload.alamatJemput, jamStr]);
+  }
+  return createJsonResponse({ status: 'success', noOrder: noOrder });
+}
 
-        // FUNGSI SUPER: MENARIK DATA LANGSUNG DARI SPREADSHEET
-        function fetchDataDariSpreadsheet() {
-            Swal.fire({ title: 'Menarik Data...', didOpen: ()=>Swal.showLoading() });
-            
-            fetch(gasUrl + "?action=getData")
-            .then(res => res.json())
-            .then(data => {
-                Swal.close();
-                if(data.status === 'success') {
-                    renderPesanan(data.pesanan);
-                    renderArmada(data.driver);
-                    Swal.fire({toast:true, position:'top-end', icon:'success', title:'Data berhasil diperbarui', showConfirmButton:false, timer:2000});
-                }
-            }).catch(err => {
-                Swal.fire('Gagal', 'Terjadi kesalahan koneksi internet', 'error');
-            });
-        }
+function addSheetData(sheetName, rowData) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  if (sheet) sheet.appendRow(rowData);
+  return createJsonResponse({ status: 'success' });
+}
 
-        function renderPesanan(rows) {
-            const tbody = document.getElementById('tabelPesanan');
-            tbody.innerHTML = '';
-            if(rows.length <= 1) { tbody.innerHTML = '<tr><td colspan="3" class="text-center p-5 text-slate-500">Belum ada pesanan masuk.</td></tr>'; return; }
-            
-            // Loop mundur agar pesanan terbaru di atas (Mulai dari indeks length-1 sampai 1 karena 0 adalah judul kolom)
-            for(let i = rows.length - 1; i >= 1; i--) {
-                let r = rows[i];
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="p-5 align-top">
-                            <div class="font-bold text-slate-800">${r[2]} <span class="text-xs text-blue-500 font-normal ml-2">(${r[0]})</span></div>
-                            <div class="text-xs text-emerald-600 mt-1"><i class="bi bi-whatsapp"></i> ${r[3]}</div>
-                            <div class="mt-3 text-xs text-slate-500 space-y-1"><div><span class="font-bold">Dari:</span> ${r[4]}</div><div><span class="font-bold">Ke:</span> ${r[5]}</div></div>
-                        </td>
-                        <td class="p-5 align-top">
-                            <div class="text-sm font-medium text-slate-700">${r[10]} (${r[8]} Kg)</div>
-                            <div class="text-xs text-slate-500 mt-1">Dimensi: ${r[9]} | Jarak: ${r[6]} Km</div>
-                            <div class="mt-2 text-xs text-blue-600 bg-blue-50 p-1.5 rounded inline-block"><i class="bi bi-image"></i> ${r[11] || 'TIDAK ADA FOTO'}</div>
-                        </td>
-                        <td class="p-5 align-top">
-                            <div class="flex flex-col gap-2">
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-slate-200 text-slate-700 px-2 py-1 rounded text-[10px] font-bold">${r[13] || 'MENUNGGU'}</span>
-                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">${r[14] || 'BELUM LUNAS'}</span>
-                                </div>
-                                <div class="text-[11px] text-slate-500 mt-2 bg-slate-50 p-2 rounded">
-                                    <div class="mb-1"><span class="font-bold">Sopir:</span> ${r[15] || '-'}</div>
-                                    <div class="mb-1"><span class="font-bold">Kernet:</span> ${r[16] || '-'}</div>
-                                    <div><span class="font-bold">Kendaraan:</span> ${r[17] || '-'}</div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-
-        function renderArmada(rows) {
-            const grid = document.getElementById('gridArmada');
-            grid.innerHTML = '';
-            if(rows.length <= 1) { grid.innerHTML = '<div class="col-span-full text-center p-5 text-slate-500">Belum ada data kru.</div>'; return; }
-            
-            for(let i = rows.length - 1; i >= 1; i--) {
-                let r = rows[i];
-                let isSopir = r[2].toLowerCase() === 'sopir';
-                let badgeClass = isSopir ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700';
-                grid.innerHTML += `
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-black text-slate-800 text-lg">${r[1]}</h3>
-                            <span class="${badgeClass} px-2 py-0.5 rounded text-[10px] font-bold uppercase">${r[2]}</span>
-                        </div>
-                        <div class="text-xs text-slate-500 mb-3"><i class="bi bi-telephone"></i> ${r[3]}</div>
-                        <div class="mt-3 text-sm space-y-1 pt-3 border-t border-slate-100">
-                            <div class="flex justify-between"><span class="text-slate-400">Kendaraan</span> <span class="font-bold text-slate-700">${r[4] || '-'}</span></div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function tambahKru() {
-            Swal.fire({
-                title: 'Tambah Kru Baru',
-                html: `
-                    <div class="space-y-3 text-left">
-                        <input id="kNama" class="w-full border p-2 rounded" placeholder="Nama Lengkap">
-                        <select id="kPosisi" class="w-full border p-2 rounded"><option value="Sopir">Sopir</option><option value="Kernet">Kernet / Helper</option></select>
-                        <input id="kHp" type="tel" class="w-full border p-2 rounded" placeholder="No HP">
-                        <input id="kPlat" class="w-full border p-2 rounded" placeholder="Kendaraan & Plat (Kosongi jika Kernet)">
-                    </div>`,
-                showCancelButton: true, confirmButtonText: 'Simpan',
-                preConfirm: () => {
-                    return { id: 'KRU-'+Math.floor(Math.random()*100), nama: document.getElementById('kNama').value, posisi: document.getElementById('kPosisi').value, hp: document.getElementById('kHp').value, plat: document.getElementById('kPlat').value || '-' }
-                }
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    Swal.fire({title: 'Menyimpan...', didOpen: ()=>Swal.showLoading()});
-                    fetch(gasUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'addDriver', payload: res.value }) })
-                    .then(() => {
-                        Swal.fire('Tersimpan!', '', 'success');
-                        setTimeout(fetchDataDariSpreadsheet, 2000); // Otomatis refresh tabel setelah simpan
-                    });
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+function createJsonResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+}
