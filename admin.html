@@ -3,428 +3,446 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruang Kontrol - Mazaya Pro</title>
+    <title>Ruang Kontrol - Mazaya</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .view-section { display: none; opacity: 0; transition: all 0.3s ease; transform: translateY(10px); }
-        .view-section.active { display: block; opacity: 1; transform: translateY(0); }
-        .glass-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
-        .bg-ready { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .bg-jalan { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
-        .bg-bengkel { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-        .bg-lain { background: #f3f4f6; color: #475569; border: 1px solid #e2e8f0; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .sidebar { background: #0f172a; transition: all 0.3s; }
+        .nav-link { transition: 0.2s; border-radius: 0.5rem; color: #94a3b8; padding: 0.875rem 1rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 500; margin-bottom: 0.5rem; }
+        .nav-link:hover { background: #1e293b; color: #f8fafc; }
+        .nav-link.active { background: #3b82f6; color: white; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5); }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        /* Scrollbar kustom untuk tabel */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex text-slate-800">
+<body class="flex h-screen overflow-hidden">
 
-    <aside class="w-64 bg-[#0f172a] text-slate-400 flex flex-col relative z-20 shadow-2xl">
-        <div class="h-20 flex items-center px-6 border-b border-white/10 bg-black/20">
-            <div class="bg-blue-600 w-8 h-8 rounded-lg flex items-center justify-center mr-3"><i class="bi bi-display text-white"></i></div>
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 flex-shrink-0 hidden md:flex flex-col h-full z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-slate-700/50">
+            <div class="bg-blue-500 text-white p-2 rounded-lg shadow-lg">
+                <i class="bi bi-truck text-xl"></i>
+            </div>
             <div>
-                <span class="font-bold text-white text-lg tracking-wide block leading-none">MAZAYA</span>
-                <span class="text-[9px] text-blue-400 font-bold uppercase tracking-widest">Ruang Kontrol</span>
+                <h2 class="text-xl font-bold text-white tracking-wide">MAZAYA</h2>
+                <p class="text-[10px] text-slate-400 font-medium tracking-wider">ADMIN DASHBOARD</p>
             </div>
         </div>
-        <div class="px-4 py-6 overflow-y-auto">
-            <p class="text-[10px] font-bold text-slate-500 mb-3 px-2 uppercase tracking-wider">Navigasi Utama</p>
-            <nav class="space-y-1">
-                <button onclick="switchMenu('dashboard', this)" class="nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 bg-blue-600/20 text-blue-400 font-bold transition"><i class="bi bi-grid-1x2"></i> Ringkasan</button>
-                <button onclick="switchMenu('pesanan', this)" class="nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-white/5 hover:text-white font-medium transition"><i class="bi bi-receipt"></i> Data Pesanan</button>
-                <button onclick="switchMenu('pelanggan', this)" class="nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-white/5 hover:text-white font-medium transition"><i class="bi bi-person-lines-fill"></i> Buku Pelanggan</button>
-                
-                <p class="text-[10px] font-bold text-slate-500 mt-6 mb-2 px-2 uppercase tracking-wider">Aset & Operasional</p>
-                <button onclick="switchMenu('armada', this)" class="nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-white/5 hover:text-white font-medium transition"><i class="bi bi-truck"></i> Data Armada</button>
-                <button onclick="switchMenu('kru', this)" class="nav-btn w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 hover:bg-white/5 hover:text-white font-medium transition"><i class="bi bi-people-fill"></i> Data Kru</button>
+        
+        <div class="p-4 flex-1 overflow-y-auto">
+            <p class="text-xs font-semibold text-slate-500 mb-4 px-2 uppercase tracking-wider">Menu Utama</p>
+            <nav id="navMenu">
+                <a href="#" onclick="showSection('pesanan', this)" class="nav-link active"><i class="bi bi-list-task text-lg"></i> Data Pesanan</a>
+                <a href="#" onclick="showSection('pelanggan', this)" class="nav-link"><i class="bi bi-people text-lg"></i> Data Pelanggan</a>
+                <a href="#" onclick="showSection('armada', this)" class="nav-link"><i class="bi bi-car-front text-lg"></i> Data Armada</a>
+                <a href="#" onclick="showSection('kru', this)" class="nav-link"><i class="bi bi-person-vcard text-lg"></i> Data Kru</a>
+                <a href="#" onclick="showSection('finansial', this)" class="nav-link"><i class="bi bi-wallet2 text-lg"></i> Finansial</a>
             </nav>
         </div>
-        <div class="mt-auto p-4 border-t border-white/10">
-            <a href="index.html" class="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white py-3 rounded-xl font-medium transition text-sm"><i class="bi bi-box-arrow-left"></i> Keluar Dashboard</a>
+        
+        <div class="p-4 border-t border-slate-700/50">
+            <button onclick="sinkronData()" class="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-lg transition text-sm font-medium">
+                <i class="bi bi-arrow-clockwise"></i> Refresh Data
+            </button>
         </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto p-6 md:p-8 relative w-full">
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col h-full relative overflow-hidden bg-slate-50">
         
-        <div id="sysNotif" class="fixed top-4 right-4 bg-white px-4 py-3 rounded-xl shadow-lg border-l-4 border-blue-500 text-sm font-bold z-50 transition-all transform translate-x-full">
-            <i class="bi bi-arrow-repeat animate-spin inline-block mr-2 text-blue-500"></i> <span id="sysNotifText">Memproses...</span>
-        </div>
+        <!-- Header Mobile (Tampil saat di HP) -->
+        <header class="md:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between z-10 shadow-sm">
+            <div class="flex items-center gap-2">
+                <i class="bi bi-truck text-blue-500 text-xl"></i>
+                <span class="font-bold text-slate-800">MAZAYA</span>
+            </div>
+            <button class="text-slate-500 text-2xl" onclick="alert('Gunakan perangkat layar besar (Laptop/PC) untuk pengalaman Admin terbaik.')">
+                <i class="bi bi-list"></i>
+            </button>
+        </header>
 
-        <!-- 1. DASHBOARD -->
-        <div id="dashboard" class="view-section active">
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h1 class="text-3xl font-extrabold text-slate-900">Live Monitoring</h1>
-                    <p class="text-sm text-slate-500 mt-1">Sistem informasi real-time Jasa Angkut Mazaya.</p>
-                </div>
-                <button onclick="fetchDataDariSpreadsheet()" class="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-slate-800 transition flex items-center gap-2">
-                    <i class="bi bi-arrow-clockwise"></i> Tarik Data Terbaru
-                </button>
+        <!-- Header Halaman -->
+        <header class="bg-white px-8 py-5 border-b border-slate-200 z-10 flex items-center justify-between shadow-sm">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 capitalize" id="pageTitle">Data Pesanan</h1>
+                <p class="text-sm text-slate-500 mt-1" id="pageSubtitle">Manajemen dan pemantauan order aktif.</p>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div class="glass-card p-6 flex items-center gap-4 border-l-4 border-blue-500">
-                    <div class="bg-blue-50 p-4 rounded-2xl text-blue-600 text-2xl"><i class="bi bi-box-seam"></i></div>
-                    <div><p class="text-[10px] font-bold text-slate-400 uppercase">Total Pesanan</p><p class="text-3xl font-black text-slate-800" id="statPesanan">0</p></div>
-                </div>
-                <div class="glass-card p-6 flex items-center gap-4 border-l-4 border-emerald-500">
-                    <div class="bg-emerald-50 p-4 rounded-2xl text-emerald-600 text-2xl"><i class="bi bi-people"></i></div>
-                    <div><p class="text-[10px] font-bold text-slate-400 uppercase">Pelanggan</p><p class="text-3xl font-black text-slate-800" id="statPelanggan">0</p></div>
-                </div>
-                <div class="glass-card p-6 flex items-center gap-4 border-l-4 border-orange-500">
-                    <div class="bg-orange-50 p-4 rounded-2xl text-orange-600 text-2xl"><i class="bi bi-truck"></i></div>
-                    <div><p class="text-[10px] font-bold text-slate-400 uppercase">Armada Kendaraan</p><p class="text-3xl font-black text-slate-800" id="statArmada">0</p></div>
-                </div>
-                <div class="glass-card p-6 flex items-center gap-4 border-l-4 border-purple-500">
-                    <div class="bg-purple-50 p-4 rounded-2xl text-purple-600 text-2xl"><i class="bi bi-person-badge"></i></div>
-                    <div><p class="text-[10px] font-bold text-slate-400 uppercase">Kru Aktif</p><p class="text-3xl font-black text-slate-800" id="statKru">0</p></div>
-                </div>
+            <div class="flex items-center gap-3">
+                <span id="statusKoneksi" class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold flex items-center gap-2 border border-yellow-200">
+                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span>
+                    Menghubungkan...
+                </span>
             </div>
-        </div>
+        </header>
 
-        <!-- 2. DATA PESANAN -->
-        <div id="pesanan" class="view-section">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-extrabold text-slate-800">Tabel Pesanan</h3>
+        <!-- Area Data (Berubah-ubah sesuai menu) -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8" id="containerData">
+            <!-- Loading State -->
+            <div class="flex flex-col items-center justify-center h-64">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                <p class="text-slate-500 font-medium">Sedang memuat data dari database...</p>
             </div>
-            <div class="glass-card overflow-hidden">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                        <tr>
-                            <th class="p-4 font-bold uppercase text-[10px] tracking-wider">Info Pelanggan & Rute</th>
-                            <th class="p-4 font-bold uppercase text-[10px] tracking-wider">Detail Muatan & Harga</th>
-                            <th class="p-4 font-bold uppercase text-[10px] tracking-wider text-right">Operasional & Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelPesanan" class="divide-y divide-slate-100">
-                        <tr><td colspan="3" class="p-8 text-center text-slate-400">Tekan "Tarik Data Terbaru" di menu Ringkasan...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 3. PELANGGAN -->
-        <div id="pelanggan" class="view-section">
-            <h3 class="text-2xl font-extrabold text-slate-800 mb-6">Buku Pelanggan</h3>
-            <div class="glass-card overflow-hidden">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                        <tr><th class="p-4 font-bold text-xs">ID & Nama</th><th class="p-4 font-bold text-xs">WhatsApp</th><th class="p-4 font-bold text-xs">Alamat Jemput Terakhir</th></tr>
-                    </thead>
-                    <tbody id="tabelPelanggan" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 4. DATA ARMADA (PISAH) -->
-        <div id="armada" class="view-section">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="text-2xl font-extrabold text-slate-800">Data Armada</h3>
-                    <p class="text-sm text-slate-500">Monitoring status fisik dan ketersediaan kendaraan.</p>
-                </div>
-                <button onclick="tambahArmada()" class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-orange-600 transition">+ Register Armada</button>
-            </div>
-            <div id="gridArmada" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <!-- Armada Cards Here -->
-            </div>
-        </div>
-
-        <!-- 5. DATA KRU (PISAH) -->
-        <div id="kru" class="view-section">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h3 class="text-2xl font-extrabold text-slate-800">Database Kru</h3>
-                    <p class="text-sm text-slate-500">Manajemen SDM (Sopir dan Kernet / Helper).</p>
-                </div>
-                <button onclick="tambahKru()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-blue-700 transition">+ Tambah Kru</button>
-            </div>
-            <div class="glass-card overflow-hidden">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
-                        <tr><th class="p-4 text-xs font-bold">ID Kru</th><th class="p-4 text-xs font-bold">Nama Lengkap</th><th class="p-4 text-xs font-bold">Posisi</th><th class="p-4 text-xs font-bold">No WhatsApp</th></tr>
-                    </thead>
-                    <tbody id="tabelKru" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </div>
-
-    </main>
+        </main>
+    </div>
 
     <script>
-        // MASUKKAN URL GAS TERBARU ANDA DI SINI
-        const gasUrl = 'https://script.google.com/macros/s/AKfycbyFAS7hUgpxO7buBN3hrkt3Xe9A6efeDtevZbbDaSGZvgyXTVZMk7aMOyiTYD8jfEfH9g/exec';
+        // URL DATABASE GOOGLE APPS SCRIPT ANDA (YANG PALING BARU)
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFAS7hUgpxO7buBN3hrkt3Xe9A6efeDtevZbbDaSGZvgyXTVZMk7aMOyiTYD8jfEfH9g/exec';
         
-        let globalKru = [], globalArmada = [], globalPesanan = [];
+        let globalData = { pesanan: [], pelanggan: [], armada: [], kru: [] };
+        let currentSection = 'pesanan';
 
-        function showNotif(msg, isError=false) {
-            const notif = document.getElementById('sysNotif');
-            document.getElementById('sysNotifText').innerHTML = msg;
-            notif.classList.remove('translate-x-full');
-            if(isError) { notif.classList.replace('border-blue-500', 'border-red-500'); notif.querySelector('i').className = "bi bi-exclamation-triangle-fill text-red-500 mr-2"; }
-            else { notif.classList.replace('border-red-500', 'border-blue-500'); notif.querySelector('i').className = "bi bi-check-circle-fill text-blue-500 mr-2"; }
-            setTimeout(() => notif.classList.add('translate-x-full'), 3000);
-        }
+        // Fungsi saat halaman pertama kali dimuat
+        window.onload = () => {
+            sinkronData();
+        };
 
-        function switchMenu(menuId, btn) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.getElementById(menuId).classList.add('active');
-            
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.remove('bg-blue-600/20', 'text-blue-400', 'font-bold'); 
-                b.classList.add('hover:bg-white/5', 'hover:text-white', 'font-medium');
-            });
-            btn.classList.remove('hover:bg-white/5', 'hover:text-white', 'font-medium');
-            btn.classList.add('bg-blue-600/20', 'text-blue-400', 'font-bold');
-        }
+        // Fungsi mengambil data dari Excel
+        async function sinkronData() {
+            const statusEl = document.getElementById('statusKoneksi');
+            statusEl.innerHTML = `<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span></span> Sinkronisasi...`;
+            statusEl.className = "px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold flex items-center gap-2 border border-blue-200 shadow-sm";
 
-        function fetchDataDariSpreadsheet() {
-            showNotif('<i class="bi bi-arrow-repeat animate-spin mr-2"></i> Mensinkronkan Database...');
-            fetch(gasUrl + '?action=getData')
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    globalPesanan = data.pesanan || [];
-                    globalKru = data.kru || [];
-                    globalArmada = data.armada || [];
-                    
-                    document.getElementById('statPesanan').innerText = Math.max(0, globalPesanan.length - 1);
-                    document.getElementById('statPelanggan').innerText = Math.max(0, (data.pelanggan || []).length - 1);
-                    document.getElementById('statArmada').innerText = Math.max(0, globalArmada.length - 1);
-                    document.getElementById('statKru').innerText = Math.max(0, globalKru.length - 1);
-
-                    renderPesanan(globalPesanan);
-                    renderPelanggan(data.pelanggan || []);
-                    renderKru();
-                    renderArmada();
-                    showNotif('Database Tersinkronisasi!');
+            try {
+                const response = await fetch(GAS_URL);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    globalData = data;
+                    statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> Terhubung`;
+                    statusEl.className = "px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold flex items-center gap-1.5 border border-emerald-200 shadow-sm";
+                    renderCurrentSection();
                 } else {
-                    showNotif('Gagal merender data dari Excel', true);
+                    throw new Error("Format data tidak sesuai");
                 }
-            })
-            .catch(() => showNotif('Koneksi terputus. Coba lagi.', true));
-        }
-
-        window.onload = fetchDataDariSpreadsheet;
-
-        function renderPesanan(rows) {
-            const tbody = document.getElementById('tabelPesanan'); tbody.innerHTML = '';
-            if(rows.length <= 1) return tbody.innerHTML = '<tr><td colspan="3" class="p-8 text-center text-slate-400 font-medium">Belum ada pesanan terdaftar.</td></tr>';
-            
-            for(let i = rows.length - 1; i >= 1; i--) {
-                let r = rows[i];
-                let linkFoto = r[11] || "";
-                let elemFoto = '<span class="text-[10px] text-slate-400 italic bg-slate-100 px-2 py-1 rounded">Tidak Lampirkan Foto</span>';
-                if(linkFoto.includes("http")) {
-                    elemFoto = `<a href="${linkFoto}" target="_blank" class="text-blue-600 hover:text-blue-800 text-[11px] font-bold underline bg-blue-50 px-2 py-1 rounded inline-flex items-center gap-1 border border-blue-200"><i class="bi bi-camera"></i> Lihat Foto Barang</a>`;
-                }
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="p-4 align-top">
-                            <div class="font-extrabold text-slate-800 text-base uppercase">${r[2]}</div>
-                            <div class="text-[10px] text-slate-400 mb-2 font-mono"><span class="text-blue-500 font-bold">${r[0]}</span> &nbsp;|&nbsp; ${r[1]}</div>
-                            <div class="text-xs font-bold text-emerald-600 mb-3"><i class="bi bi-whatsapp"></i> ${r[3]}</div>
-                            
-                            <div class="text-xs bg-slate-100/50 p-2.5 rounded-lg border border-slate-200 space-y-1">
-                                <div class="flex gap-2"><i class="bi bi-geo-alt text-blue-500 mt-0.5"></i> <span class="text-slate-600">Jemput:<br><b class="text-slate-800">${r[4]}</b></span></div>
-                                <div class="flex gap-2 mt-2 pt-2 border-t border-slate-200"><i class="bi bi-flag text-orange-500 mt-0.5"></i> <span class="text-slate-600">Tujuan:<br><b class="text-slate-800">${r[5]}</b></span></div>
-                            </div>
-                        </td>
-                        <td class="p-4 align-top">
-                            <div class="font-black text-orange-600 text-lg mb-1">Rp ${Number(r[12]).toLocaleString('id-ID')}</div>
-                            <div class="text-xs text-slate-700 font-medium mb-3 bg-orange-50 p-2 rounded-lg border border-orange-100"><i class="bi bi-box-seam text-orange-400 mr-1"></i> ${r[10]}</div>
-                            <div class="text-[10px] text-slate-500 space-y-1 mb-3">
-                                <div>Berat: <b class="text-slate-700">${r[8]} Kg</b></div>
-                                <div>Dimensi: <b class="text-slate-700">${r[9]}</b></div>
-                                <div>Jarak & Waktu: <b class="text-slate-700">${r[6]} Km (${r[7]})</b></div>
-                            </div>
-                            ${elemFoto}
-                        </td>
-                        <td class="p-4 align-top text-right">
-                            <div class="flex justify-end gap-1 mb-3">
-                                <span class="status-badge ${r[13]=='SELESAI'?'bg-ready':(r[13]=='MENUNGGU'?'bg-lain':'bg-jalan')}">${r[13]}</span>
-                                <span class="status-badge ${r[14]=='LUNAS'?'bg-ready':'bg-bengkel'}">${r[14]}</span>
-                            </div>
-                            <div class="text-[10px] text-slate-500 mb-3 bg-white border border-slate-200 p-2.5 rounded-lg text-left inline-block w-56 shadow-sm">
-                                <div class="flex justify-between border-b border-slate-100 pb-1.5 mb-1.5"><span><i class="bi bi-person-badge text-blue-500"></i> Sopir:</span> <b class="text-slate-800">${r[15]||'-'}</b></div>
-                                <div class="flex justify-between border-b border-slate-100 pb-1.5 mb-1.5"><span><i class="bi bi-person text-orange-500"></i> Kernet/Helper:</span> <b class="text-slate-800">${r[16]||'-'}</b></div>
-                                <div class="flex justify-between"><span><i class="bi bi-truck text-slate-400"></i> Armada (Plat):</span> <b class="text-slate-800">${r[17]||'-'}</b></div>
-                            </div>
-                            <div class="block">
-                                <button onclick="editPesanan('${r[0]}', '${r[13]}', '${r[14]}', '${r[15]}', '${r[16]}', '${r[17]}')" class="w-56 bg-slate-900 text-white text-[11px] font-bold px-3 py-2 rounded-lg hover:bg-blue-600 transition shadow-md"><i class="bi bi-pencil-square"></i> Kontrol Pesanan</button>
-                            </div>
-                        </td>
-                    </tr>`;
+            } catch (error) {
+                console.error("Gagal load data:", error);
+                statusEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Gagal Muat`;
+                statusEl.className = "px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-bold flex items-center gap-1.5 border border-red-200 shadow-sm cursor-pointer";
+                statusEl.onclick = sinkronData;
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Koneksi Terputus',
+                    text: 'Gagal mengambil data dari Google Spreadsheet. Coba refresh kembali.',
+                    confirmButtonColor: '#3b82f6'
+                });
             }
         }
 
-        function renderArmada() {
-            const grid = document.getElementById('gridArmada'); grid.innerHTML = '';
-            if(globalArmada.length <= 1) return grid.innerHTML = '<div class="col-span-3 text-center text-sm text-slate-400">Belum ada armada terdaftar di Excel.</div>';
+        // Fungsi ganti menu
+        function showSection(section, element = null) {
+            currentSection = section;
             
-            for(let i = 1; i < globalArmada.length; i++) {
-                let r = globalArmada[i];
-                let s = r[3]; // Status Armada
+            // Update UI Menu Aktif
+            if(element) {
+                document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+            }
+            
+            // Update Judul
+            const titleMap = {
+                'pesanan': { t: 'Data Pesanan', s: 'Manajemen dan pemantauan order aktif.' },
+                'pelanggan': { t: 'Data Pelanggan', s: 'Daftar riwayat kontak pelanggan Anda.' },
+                'armada': { t: 'Data Armada', s: 'Monitoring status kesiapan kendaraan.' },
+                'kru': { t: 'Data Kru', s: 'Manajemen Sopir dan Helper/Kernet.' },
+                'finansial': { t: 'Finansial & Keuangan', s: 'Rekapitulasi pendapatan dan pengeluaran.' }
+            };
+            document.getElementById('pageTitle').innerText = titleMap[section].t;
+            document.getElementById('pageSubtitle').innerText = titleMap[section].s;
+            
+            renderCurrentSection();
+        }
+
+        // Fungsi penyalur render
+        function renderCurrentSection() {
+            const container = document.getElementById('containerData');
+            container.innerHTML = ''; // Kosongkan layar
+            
+            if (currentSection === 'pesanan') renderPesanan(container);
+            else if (currentSection === 'pelanggan') renderPelanggan(container);
+            else if (currentSection === 'armada') renderArmada(container);
+            else if (currentSection === 'kru') renderKru(container);
+            else if (currentSection === 'finansial') renderFinansial(container);
+        }
+
+        function renderPesanan(container) {
+            const dataSheet = globalData.pesanan || [];
+            if (dataSheet.length <= 1) {
+                container.innerHTML = `<div class="bg-white rounded-xl p-10 text-center border border-dashed border-slate-300"><i class="bi bi-inbox text-4xl text-slate-300 mb-3 block"></i><p class="text-slate-500">Belum ada data pesanan.</p></div>`;
+                return;
+            }
+
+            let html = `<div class="grid gap-5">`;
+            // Looping dari bawah (data terbaru di atas), i=0 adalah header/judul kolom jadi dilewati
+            for (let i = dataSheet.length - 1; i > 0; i--) {
+                const row = dataSheet[i];
+                if (!row[0]) continue; // Lewati baris kosong
                 
-                let bgClass = 'bg-lain';
-                if(s.includes('Ready') || s.includes('Online')) bgClass = 'bg-ready';
-                else if(s.includes('Jalan') || s.includes('Beroperasi')) bgClass = 'bg-jalan';
-                else if(s.includes('Bengkel')) bgClass = 'bg-bengkel';
+                // Indeks Kolom: 0:ID, 1:Tgl, 2:Nama, 3:WA, 4:Jemput, 5:Tujuan, 6:Jarak, 7:Waktu, 8:Berat, 9:Dimensi, 10:Ket, 11:Foto, 12:Total, 13:Status, 14:Bayar
                 
-                grid.innerHTML += `
-                    <div class="glass-card p-5 relative overflow-hidden group">
-                        <div class="absolute top-4 right-4 ${bgClass} status-badge shadow-sm">${s}</div>
-                        <h4 class="font-extrabold text-lg text-slate-800 mt-2"><i class="bi bi-truck text-slate-400 mr-2"></i>${r[1]}</h4>
-                        <div class="font-mono text-slate-500 text-sm mb-4 bg-slate-50 inline-block px-3 py-1.5 rounded-lg border border-slate-200 mt-2">${r[2]}</div>
+                const idOrder = row[0]; const tgl = new Date(row[1]).toLocaleString('id-ID');
+                const nama = row[2]; const hp = row[3];
+                const rute = `Jemput: ${row[4]} <br> Tujuan: ${row[5]}`;
+                const muatan = `${row[10]} (Berat: ${row[8]}Kg)`;
+                const total = parseInt(row[12] || 0).toLocaleString('id-ID');
+                
+                // Logika Foto
+                let fotoHtml = `<span class="text-xs text-slate-400 italic">Tidak ada foto</span>`;
+                if (row[11] && row[11].includes("http")) {
+                    fotoHtml = `<a href="${row[11]}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition duration-200 border border-blue-200"><i class="bi bi-image"></i> Lihat Foto Barang</a>`;
+                }
+
+                // Warna Status Order
+                let statusOrder = row[13] || 'MENUNGGU';
+                let colorOrder = statusOrder.includes('PROSES') ? 'bg-blue-100 text-blue-700' : (statusOrder.includes('SELESAI') ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700');
+                
+                html += `
+                <div class="bg-white rounded-xl card-shadow border border-slate-200 p-5 hover:border-blue-300 transition duration-300">
+                    <div class="flex flex-col md:flex-row justify-between gap-4">
                         
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Set Status Unit:</label>
-                        <select onchange="updateStatusArmada('${r[2]}', this.value)" class="w-full p-2.5 text-xs font-bold text-slate-600 border border-slate-300 rounded-lg outline-none hover:border-blue-500 focus:border-blue-500 transition cursor-pointer bg-slate-50">
-                            <option value="Ready / Online" ${s.includes('Ready')?'selected':''}>🟢 Ready / Online</option>
-                            <option value="Jalan / Beroperasi" ${s.includes('Jalan')?'selected':''}>🔵 Jalan / Beroperasi</option>
-                            <option value="Di Bengkel" ${s.includes('Bengkel')?'selected':''}>🔴 Di Bengkel</option>
-                            <option value="Offline / Istirahat" ${s.includes('Offline')?'selected':''}>⚫ Offline / Istirahat</option>
-                        </select>
-                    </div>`;
+                        <!-- Info Order -->
+                        <div class="md:w-1/3 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-lg">${nama}</h3>
+                                    <p class="text-[10px] text-slate-400 font-mono">${idOrder} &bull; ${tgl}</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-black tracking-wide uppercase ${colorOrder}">${statusOrder}</span>
+                            </div>
+                            <div class="mt-3 flex items-center gap-2 text-sm">
+                                <a href="https://wa.me/62${hp.replace(/^0/,'')}" target="_blank" class="text-emerald-600 font-medium hover:underline bg-emerald-50 px-2 py-1 rounded"><i class="bi bi-whatsapp"></i> ${hp}</a>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-dashed border-slate-100">
+                                ${fotoHtml}
+                            </div>
+                        </div>
+
+                        <!-- Info Rute & Barang -->
+                        <div class="md:w-1/3 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4 md:pl-2 text-sm text-slate-600 space-y-3">
+                            <div><span class="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">Rute Perjalanan</span> <p class="leading-relaxed bg-slate-50 p-2 rounded border border-slate-100">${rute}</p></div>
+                            <div><span class="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">Detail Muatan</span> <p class="font-medium">${muatan}</p></div>
+                        </div>
+
+                        <!-- Info Harga & Operasional -->
+                        <div class="md:w-1/3 md:pl-2 flex flex-col justify-between space-y-4">
+                            <div>
+                                <span class="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">Estimasi Pendapatan</span>
+                                <p class="text-xl font-black text-slate-800">Rp ${total}</p>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs text-slate-500 space-y-1.5">
+                                <div class="flex justify-between"><span class="font-medium">Pembayaran:</span> <span class="font-bold ${row[14] === 'LUNAS' ? 'text-emerald-600' : 'text-red-500'}">${row[14] || 'BELUM LUNAS'}</span></div>
+                                <div class="flex justify-between"><span class="font-medium">Jarak/Waktu:</span> <span class="font-bold text-slate-700">${row[6]} Km / ${row[7]}</span></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>`;
             }
+            html += `</div>`;
+            container.innerHTML = html;
         }
 
-        function renderKru() {
-            const tbody = document.getElementById('tabelKru'); tbody.innerHTML = '';
-            if(globalKru.length <= 1) return tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">Belum ada data kru di Excel.</td></tr>';
+        function renderArmada(container) {
+            const dataSheet = globalData.armada || [];
+            let html = `
+            <div class="mb-6 flex justify-between items-center">
+                <p class="text-sm text-slate-500">Status kesiapan operasional kendaraan Anda.</p>
+                <button onclick="tambahArmada()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2">
+                    <i class="bi bi-plus-lg"></i> Register Armada
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
             
-            for(let i = 1; i < globalKru.length; i++) {
-                let r = globalKru[i];
-                let posColor = r[2] == 'Sopir' ? 'text-blue-600 bg-blue-50 border-blue-200' : 'text-orange-600 bg-orange-50 border-orange-200';
-                tbody.innerHTML += `<tr>
-                    <td class="p-4 text-xs font-mono text-slate-400">${r[0]}</td>
-                    <td class="p-4 font-bold text-slate-700">${r[1]}</td>
-                    <td class="p-4"><span class="px-2 py-1 text-[10px] font-bold rounded border ${posColor} uppercase">${r[2]}</span></td>
-                    <td class="p-4 text-xs font-mono font-bold text-emerald-600"><i class="bi bi-whatsapp"></i> ${r[3]}</td>
-                </tr>`;
+            if(dataSheet.length <= 1) { html += `<div class="col-span-full p-8 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-300">Data armada belum ditambahkan.</div>`; }
+            
+            for (let i = 1; i < dataSheet.length; i++) {
+                const row = dataSheet[i];
+                if (!row[0]) continue;
+                
+                let status = row[3] || 'Ready';
+                let stColor = status === 'Ready' ? 'bg-emerald-100 text-emerald-700' : (status === 'Di Bengkel' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700');
+
+                html += `
+                <div class="bg-white rounded-xl border border-slate-200 card-shadow p-5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-slate-50 rounded-bl-full -z-10 group-hover:bg-blue-50 transition"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-slate-100 text-slate-600 w-12 h-12 rounded-lg flex items-center justify-center text-2xl border border-slate-200"><i class="bi bi-truck"></i></div>
+                        <span class="px-2 py-1 text-[10px] font-bold rounded-md ${stColor} uppercase tracking-wider">${status}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800">${row[1]}</h3> <!-- Jenis Mobil -->
+                    <p class="text-sm font-mono font-medium text-slate-500 bg-slate-50 inline-block px-2 py-1 border border-slate-100 rounded mt-2">${row[2]}</p> <!-- Plat -->
+                </div>`;
             }
+            html += `</div>`;
+            container.innerHTML = html;
         }
 
-        function renderPelanggan(rows) {
-            const tbody = document.getElementById('tabelPelanggan'); tbody.innerHTML = '';
-            if(rows.length <= 1) return tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">Belum ada pelanggan.</td></tr>';
-            for(let i = 1; i < rows.length; i++) {
-                tbody.innerHTML += `<tr>
-                    <td class="p-4"><div class="font-bold text-slate-700 uppercase">${rows[i][1]}</div><div class="text-[10px] text-slate-400 font-mono">${rows[i][0]}</div></td>
-                    <td class="p-4 text-xs font-mono font-bold"><a href="https://wa.me/${rows[i][2]}" target="_blank" class="text-emerald-600 hover:underline"><i class="bi bi-whatsapp"></i> ${rows[i][2]}</a></td>
-                    <td class="p-4 text-xs text-slate-500">${rows[i][3]}</td>
-                </tr>`;
+        function renderKru(container) {
+            const dataSheet = globalData.kru || [];
+            let html = `
+            <div class="mb-6 flex justify-between items-center">
+                <p class="text-sm text-slate-500">Daftar anggota Sopir dan Helper/Kernet.</p>
+                <button onclick="tambahKru()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2">
+                    <i class="bi bi-person-plus-fill"></i> Tambah Kru
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">`;
+
+            if(dataSheet.length <= 1) { html += `<div class="col-span-full p-8 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-300">Data kru belum ditambahkan.</div>`; }
+
+            for (let i = 1; i < dataSheet.length; i++) {
+                const row = dataSheet[i];
+                if (!row[0]) continue;
+
+                let posisi = row[2] || 'Sopir';
+                let icon = posisi === 'Sopir' ? 'bi-person-vcard' : 'bi-person-arms-up';
+
+                html += `
+                <div class="bg-white rounded-xl border border-slate-200 card-shadow p-4 flex items-center gap-4">
+                    <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0"><i class="bi ${icon}"></i></div>
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-slate-800 truncate">${row[1]}</h4>
+                        <p class="text-xs text-slate-500 font-medium">${posisi}</p>
+                        <p class="text-xs text-slate-400 mt-1 truncate"><i class="bi bi-telephone"></i> ${row[3] || '-'}</p>
+                    </div>
+                </div>`;
             }
+            html += `</div>`;
+            container.innerHTML = html;
         }
 
         function tambahArmada() {
-            Swal.fire({ 
-                title: 'Register Armada Baru', 
+            Swal.fire({
+                title: 'Register Armada Baru',
                 html: `
-                    <div class="text-left space-y-3">
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Jenis Kendaraan</label><input id="aMerek" class="swal2-input !m-0 !w-full text-sm" placeholder="Cth: L300 Box / Engkel"></div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Plat Nomor (ID Utama)</label><input id="aPlat" class="swal2-input !m-0 !w-full text-sm" placeholder="Cth: P 1234 XX"></div>
-                    </div>`, 
-                showCancelButton: true, confirmButtonColor: '#f97316', confirmButtonText: 'Simpan Armada',
+                    <input id="swal-jenis" class="swal2-input text-sm" placeholder="Jenis (Cth: L300 Box, Engkel)">
+                    <input id="swal-plat" class="swal2-input text-sm font-mono uppercase" placeholder="Plat (Cth: P 1234 XY)">
+                    <select id="swal-status" class="swal2-select text-sm"><option value="Ready">Ready / Siap</option><option value="Di Bengkel">Di Bengkel / Rusak</option><option value="Offline">Offline / Parkir</option></select>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
                 preConfirm: () => {
-                    const k = document.getElementById('aMerek').value;
-                    const p = document.getElementById('aPlat').value.toUpperCase();
-                    if(!k || !p) { Swal.showValidationMessage('Semua kolom wajib diisi'); return false; }
-                    return { id: 'TRK-'+Math.floor(Math.random()*9000), kendaraan: k, plat: p, status: 'Ready / Online' };
-                } 
-            }).then(res => { if(res.isConfirmed) jalankanBackend('addArmada', res.value); });
+                    return {
+                        id: 'ARM-' + Math.floor(Math.random()*9000),
+                        jenis: document.getElementById('swal-jenis').value,
+                        plat: document.getElementById('swal-plat').value.toUpperCase(),
+                        status: document.getElementById('swal-status').value
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    kirimDataBaru('addArmada', result.value);
+                }
+            });
         }
 
         function tambahKru() {
-            Swal.fire({ 
-                title: 'Tambah Data Kru', 
-                html: `
-                    <div class="text-left space-y-3">
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nama Lengkap</label><input id="kNama" class="swal2-input !m-0 !w-full text-sm" placeholder="Nama Lengkap"></div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Posisi / Jabatan</label>
-                            <select id="kPos" class="swal2-input !m-0 !w-full text-sm">
-                                <option value="Sopir">Sopir</option>
-                                <option value="Kernet / Helper">Kernet / Helper</option>
-                            </select>
-                        </div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">No WhatsApp Aktif</label><input id="kHp" type="number" class="swal2-input !m-0 !w-full text-sm" placeholder="Cth: 628..."></div>
-                    </div>`, 
-                showCancelButton: true, confirmButtonColor: '#2563eb', confirmButtonText: 'Simpan Kru',
-                preConfirm: () => {
-                    const n = document.getElementById('kNama').value;
-                    if(!n) { Swal.showValidationMessage('Nama wajib diisi'); return false; }
-                    return { id: 'KRU-'+Math.floor(Math.random()*9000), nama: n, posisi: document.getElementById('kPos').value, hp: document.getElementById('kHp').value }
-                } 
-            }).then(res => { if(res.isConfirmed) jalankanBackend('addKru', res.value); });
-        }
-
-        function updateStatusArmada(plat, statusBaru) {
-            if(!statusBaru) return;
-            Swal.fire({title: 'Ubah Status Unit?', text: `Pastikan status kendaraan ${plat} menjadi ${statusBaru}?`, icon: 'question', showCancelButton: true, confirmButtonColor: '#0f172a'}).then(res => {
-                if(res.isConfirmed) jalankanBackend('updateArmada', {plat: plat, status: statusBaru});
-                else fetchDataDariSpreadsheet(); 
-            });
-        }
-
-        function editPesanan(id, cStatus, cBayar, cSopir, cKernet, cArmada) {
-            let optSopir = '<option value="-">Belum Ditugaskan</option>';
-            let optKernet = '<option value="-">Tanpa Kernet / Helper</option>';
-            let optArmada = '<option value="-">Belum Ada Kendaraan</option>';
-
-            globalKru.forEach((k,i)=>{ 
-                if(i>0) { 
-                    if(k[2]==='Sopir') optSopir+=`<option value="${k[1]}" ${k[1]===cSopir?'selected':''}>${k[1]}</option>`; 
-                    else optKernet+=`<option value="${k[1]}" ${k[1]===cKernet?'selected':''}>${k[1]}</option>`; 
-                }
-            });
-            globalArmada.forEach((a,i)=>{ 
-                if(i>0) optArmada+=`<option value="${a[2]}" ${a[2]===cArmada?'selected':''}>${a[2]} - ${a[1]}</option>`; 
-            });
-
             Swal.fire({
-                title: 'Kontrol Pesanan',
+                title: 'Tambah Anggota Kru',
                 html: `
-                    <div class="space-y-4 text-left text-sm mt-3 p-1">
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Progres Perjalanan</label><select id="uOrder" class="w-full p-2.5 border rounded-lg font-bold"><option value="MENUNGGU" ${cStatus=='MENUNGGU'?'selected':''}>MENUNGGU</option><option value="PROSES JEMPUT" ${cStatus=='PROSES JEMPUT'?'selected':''}>PROSES JEMPUT</option><option value="DALAM PERJALANAN" ${cStatus=='DALAM PERJALANAN'?'selected':''}>DALAM PERJALANAN</option><option value="SELESAI" ${cStatus=='SELESAI'?'selected':''}>SELESAI</option></select></div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Status Keuangan</label><select id="uBayar" class="w-full p-2.5 border rounded-lg font-bold"><option value="BELUM LUNAS" ${cBayar=='BELUM LUNAS'?'selected':''}>BELUM LUNAS</option><option value="LUNAS" ${cBayar=='LUNAS'?'selected':''}>LUNAS</option></select></div>
-                        <div class="pt-4 border-t-2 border-dashed border-slate-200 font-black text-xs text-blue-600 tracking-wider">PENUGASAN TIM & ARMADA</div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Pilih Sopir Bertugas</label><select id="uSopir" class="w-full p-2.5 border rounded-lg">${optSopir}</select></div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Pilih Kernet / Helper</label><select id="uKernet" class="w-full p-2.5 border rounded-lg">${optKernet}</select></div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Pilih Armada (Plat Nomor)</label><select id="uArmada" class="w-full p-2.5 border rounded-lg">${optArmada}</select></div>
-                    </div>`,
-                showCancelButton: true, confirmButtonText: 'Terapkan Perubahan', confirmButtonColor: '#0f172a',
-                preConfirm: () => ({ orderId: id, statusOrder: document.getElementById('uOrder').value, statusBayar: document.getElementById('uBayar').value, sopir: document.getElementById('uSopir').value, kernet: document.getElementById('uKernet').value, armada: document.getElementById('uArmada').value })
-            }).then(res => {
-                if(res.isConfirmed) jalankanBackend('updateOrder', res.value);
+                    <input id="swal-nama" class="swal2-input text-sm" placeholder="Nama Lengkap">
+                    <select id="swal-posisi" class="swal2-select text-sm"><option value="Sopir">Sopir</option><option value="Helper/Kernet">Helper / Kernet</option></select>
+                    <input id="swal-hp" type="tel" class="swal2-input text-sm" placeholder="No HP/WA">
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+                preConfirm: () => {
+                    return {
+                        id: 'KRU-' + Math.floor(Math.random()*9000),
+                        nama: document.getElementById('swal-nama').value,
+                        posisi: document.getElementById('swal-posisi').value,
+                        hp: document.getElementById('swal-hp').value,
+                        status: 'Aktif'
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    kirimDataBaru('addKru', result.value);
+                }
             });
         }
 
-        function jalankanBackend(action, payload) {
-            Swal.fire({title: 'Menyimpan ke Excel...', didOpen: ()=>Swal.showLoading(), allowOutsideClick: false});
-            
-            // Perhatikan: mode 'no-cors' DIBUANG agar Admin bisa membaca pesan Error jika Tab Excel salah nama!
-            fetch(gasUrl, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: action, payload: payload }) 
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    Swal.fire({icon: 'success', title: 'Berhasil Tersimpan!', timer: 1500, showConfirmButton: false}).then(()=>fetchDataDariSpreadsheet());
-                } else {
-                    Swal.fire('Gagal Menyimpan!', data.message || 'Cek nama Tab di Excel Anda.', 'error');
+        async function kirimDataBaru(actionType, payloadData) {
+            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+                // Di sini kita gunakan mode no-cors karena GAS default tidak merespon balasan dengan header CORS penuh jika hanya appendRow
+                await fetch(GAS_URL, {
+                    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: actionType, payload: payloadData })
+                });
+                
+                Swal.fire({ icon: 'success', title: 'Berhasil Disimpan!', timer: 1500, showConfirmButton: false });
+                setTimeout(sinkronData, 1600); // Tarik ulang data dari server
+            } catch (err) {
+                Swal.fire('Gagal Menyimpan', 'Terjadi kesalahan sistem', 'error');
+            }
+        }
+
+        function renderPelanggan(container) {
+            const dataSheet = globalData.pelanggan || [];
+            let html = `
+            <div class="mb-6 flex justify-between items-center">
+                <p class="text-sm text-slate-500">Daftar riwayat kontak dan database pelanggan Anda.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">`;
+
+            if(dataSheet.length <= 1) { 
+                html += `<div class="col-span-full p-8 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-300">Data pelanggan belum tersedia di database.</div>`; 
+            } else {
+                // Looping data pelanggan (melewati baris 0 / judul kolom)
+                for (let i = 1; i < dataSheet.length; i++) {
+                    const row = dataSheet[i];
+                    if (!row[0] && !row[1]) continue;
+
+                    // Asumsi Kolom Excel: B(1)=Nama, C(2)=WA, D(3)=Alamat/Ket
+                    const nama = row[1] || 'Tanpa Nama';
+                    const wa = row[2] || '-';
+                    const keterangan = row[3] || 'Pelanggan Jasa Angkut';
+                    const inisial = nama.charAt(0).toUpperCase();
+
+                    html += `
+                    <div class="bg-white rounded-xl border border-slate-200 card-shadow p-5 flex flex-col justify-between hover:border-blue-300 transition duration-300">
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 font-bold shadow-md">
+                                ${inisial}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-slate-800 truncate text-lg">${nama}</h4>
+                                <p class="text-xs text-slate-500 mt-0.5 line-clamp-2">${keterangan}</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-slate-100 pt-3 mt-auto">
+                            <a href="https://wa.me/62${wa.toString().replace(/^0/,'')}" target="_blank" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg text-sm font-bold transition duration-200">
+                                <i class="bi bi-whatsapp"></i> Hubungi WA
+                            </a>
+                        </div>
+                    </div>`;
                 }
-            })
-            .catch(err => {
-                Swal.fire('Koneksi Gagal', 'Data terkirim, namun respon server terputus. Silakan klik Tarik Data Terbaru.', 'warning').then(()=>fetchDataDariSpreadsheet());
-            });
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderFinansial(container) {
+            container.innerHTML = `
+            <div class="bg-white rounded-xl border border-slate-200 card-shadow p-8 text-center max-w-2xl mx-auto mt-10">
+                <i class="bi bi-wallet2 text-6xl text-emerald-200 mb-4 block"></i>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Laporan Finansial</h3>
+                <p class="text-slate-500 mb-6 text-sm">Fitur pencatatan operasional jalan, gaji kru, dan pemasukan bersih akan tersedia di modul ini.</p>
+                <div class="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg inline-block text-sm font-medium border border-emerald-100">Tahap Pengembangan</div>
+            </div>`;
         }
     </script>
 </body>
