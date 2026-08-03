@@ -3,446 +3,548 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruang Kontrol - Mazaya</title>
+    <title>Ruang Kontrol - Mazaya Logistics</title>
+    
+    <!-- Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .sidebar { background: #0f172a; transition: all 0.3s; }
-        .nav-link { transition: 0.2s; border-radius: 0.5rem; color: #94a3b8; padding: 0.875rem 1rem; display: flex; align-items: center; gap: 0.75rem; font-weight: 500; margin-bottom: 0.5rem; }
-        .nav-link:hover { background: #1e293b; color: #f8fafc; }
-        .nav-link.active { background: #3b82f6; color: white; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5); }
-        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
-        /* Scrollbar kustom untuk tabel */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
+        .bg-mazaya-navy { background-color: #0b192c; }
+        .text-mazaya-navy { color: #0b192c; }
+        .text-mazaya-yellow { color: #ffb703; }
+        .bg-mazaya-yellow { background-color: #ffb703; }
+        
+        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.25rem; border-radius: 0.5rem; color: #94a3b8; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+        .sidebar-link:hover { background-color: #1e293b; color: #ffffff; }
+        .sidebar-link.active { background-color: #3b82f6; color: #ffffff; }
+        
+        .card-order { transition: all 0.2s; }
+        .card-order:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        
+        /* Custom Scrollbar for table */
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .tab-section { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <!-- Sidebar -->
-    <aside class="sidebar w-64 flex-shrink-0 hidden md:flex flex-col h-full z-20">
-        <div class="p-6 flex items-center gap-3 border-b border-slate-700/50">
-            <div class="bg-blue-500 text-white p-2 rounded-lg shadow-lg">
-                <i class="bi bi-truck text-xl"></i>
+    <!-- SIDEBAR (Desktop) -->
+    <aside class="w-64 bg-mazaya-navy flex-shrink-0 hidden md:flex flex-col border-r border-slate-800 z-20">
+        <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+            <div class="bg-mazaya-yellow text-mazaya-navy p-2 rounded-lg flex items-center justify-center shadow-lg">
+                <i class="bi bi-speedometer2 text-xl font-black"></i>
             </div>
             <div>
-                <h2 class="text-xl font-bold text-white tracking-wide">MAZAYA</h2>
-                <p class="text-[10px] text-slate-400 font-medium tracking-wider">ADMIN DASHBOARD</p>
+                <h1 class="text-white font-black tracking-tight text-lg leading-none italic">MAZAYA</h1>
+                <p class="text-[10px] text-blue-400 font-bold uppercase tracking-widest mt-1">Sistem Logistik</p>
             </div>
         </div>
         
-        <div class="p-4 flex-1 overflow-y-auto">
-            <p class="text-xs font-semibold text-slate-500 mb-4 px-2 uppercase tracking-wider">Menu Utama</p>
-            <nav id="navMenu">
-                <a href="#" onclick="showSection('pesanan', this)" class="nav-link active"><i class="bi bi-list-task text-lg"></i> Data Pesanan</a>
-                <a href="#" onclick="showSection('pelanggan', this)" class="nav-link"><i class="bi bi-people text-lg"></i> Data Pelanggan</a>
-                <a href="#" onclick="showSection('armada', this)" class="nav-link"><i class="bi bi-car-front text-lg"></i> Data Armada</a>
-                <a href="#" onclick="showSection('kru', this)" class="nav-link"><i class="bi bi-person-vcard text-lg"></i> Data Kru</a>
-                <a href="#" onclick="showSection('finansial', this)" class="nav-link"><i class="bi bi-wallet2 text-lg"></i> Finansial</a>
-            </nav>
-        </div>
+        <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+            <div onclick="switchTab('pesanan')" id="nav-pesanan" class="sidebar-link active"><i class="bi bi-inbox-fill text-lg"></i> Pesanan Masuk</div>
+            <div onclick="switchTab('pelanggan')" id="nav-pelanggan" class="sidebar-link"><i class="bi bi-people-fill text-lg"></i> Data Pelanggan</div>
+            <div onclick="switchTab('keuangan')" id="nav-keuangan" class="sidebar-link"><i class="bi bi-wallet-fill text-lg"></i> Finansial & Kas</div>
+            <div onclick="switchTab('pengaturan')" id="nav-pengaturan" class="sidebar-link"><i class="bi bi-sliders text-lg"></i> Pengaturan Tarif</div>
+        </nav>
         
-        <div class="p-4 border-t border-slate-700/50">
-            <button onclick="sinkronData()" class="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-lg transition text-sm font-medium">
-                <i class="bi bi-arrow-clockwise"></i> Refresh Data
-            </button>
+        <div class="p-4 border-t border-slate-800">
+            <a href="index.html" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors border border-slate-700">
+                <i class="bi bi-box-arrow-up-right"></i> Buka Website
+            </a>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col h-full relative overflow-hidden bg-slate-50">
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative bg-slate-50">
         
-        <!-- Header Mobile (Tampil saat di HP) -->
-        <header class="md:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between z-10 shadow-sm">
-            <div class="flex items-center gap-2">
-                <i class="bi bi-truck text-blue-500 text-xl"></i>
-                <span class="font-bold text-slate-800">MAZAYA</span>
+        <!-- HEADER MOBILE & TOP BAR -->
+        <header class="bg-white border-b border-slate-200 p-4 flex items-center justify-between z-10 shadow-sm">
+            <div class="flex items-center gap-3 md:hidden">
+                <div class="bg-mazaya-navy text-white p-1.5 rounded flex items-center justify-center"><i class="bi bi-truck"></i></div>
+                <h1 class="font-black text-mazaya-navy italic">MAZAYA</h1>
             </div>
-            <button class="text-slate-500 text-2xl" onclick="alert('Gunakan perangkat layar besar (Laptop/PC) untuk pengalaman Admin terbaik.')">
-                <i class="bi bi-list"></i>
+            
+            <div class="hidden md:block">
+                <h2 id="header-title" class="text-xl font-black text-slate-800">Daftar Pesanan Baru</h2>
+                <p id="header-subtitle" class="text-xs text-slate-500 font-medium">Pantau dan kelola orderan pelanggan secara realtime.</p>
+            </div>
+            
+            <button onclick="fetchData()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-colors border border-blue-200 shadow-sm">
+                <i class="bi bi-arrow-clockwise" id="icon-refresh"></i> <span class="hidden sm:inline">Refresh Data</span>
             </button>
         </header>
 
-        <!-- Header Halaman -->
-        <header class="bg-white px-8 py-5 border-b border-slate-200 z-10 flex items-center justify-between shadow-sm">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800 capitalize" id="pageTitle">Data Pesanan</h1>
-                <p class="text-sm text-slate-500 mt-1" id="pageSubtitle">Manajemen dan pemantauan order aktif.</p>
+        <!-- TAB 1: PESANAN MASUK -->
+        <div id="tab-pesanan" class="tab-section flex-1 overflow-y-auto p-4 md:p-6 w-full block">
+            <div id="loading-state" class="flex flex-col items-center justify-center h-64 text-slate-400">
+                <i class="bi bi-arrow-repeat animate-spin text-5xl text-blue-500 mb-4"></i>
+                <p class="font-bold text-slate-600">Menghubungkan Database...</p>
+                <p class="text-xs mt-1">Mengambil data terbaru secara aman.</p>
             </div>
-            <div class="flex items-center gap-3">
-                <span id="statusKoneksi" class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold flex items-center gap-2 border border-yellow-200">
-                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span></span>
-                    Menghubungkan...
-                </span>
-            </div>
-        </header>
 
-        <!-- Area Data (Berubah-ubah sesuai menu) -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-8" id="containerData">
-            <!-- Loading State -->
-            <div class="flex flex-col items-center justify-center h-64">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-                <p class="text-slate-500 font-medium">Sedang memuat data dari database...</p>
+            <div id="pesanan-list" class="space-y-4 hidden max-w-5xl mx-auto"></div>
+        </div>
+
+        <!-- TAB 2: DATA PELANGGAN (BARU) -->
+        <div id="tab-pelanggan" class="tab-section flex-1 overflow-y-auto p-4 md:p-6 w-full hidden">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <!-- Header Pelanggan -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-indigo-100 text-indigo-600 p-3 rounded-xl text-2xl"><i class="bi bi-person-lines-fill"></i></div>
+                        <div>
+                            <h3 class="font-black text-slate-800 text-lg">Database Pelanggan</h3>
+                            <p class="text-xs text-slate-500">Total: <span id="total-pelanggan" class="font-bold text-indigo-600">0</span> Kontak Tersimpan</p>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-auto relative">
+                        <i class="bi bi-search absolute left-3 top-2.5 text-slate-400"></i>
+                        <input type="text" placeholder="Cari nama atau nomor..." class="w-full md:w-64 pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 outline-none focus:border-indigo-500 transition">
+                    </div>
+                </div>
+
+                <!-- Tabel Pelanggan -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    <th class="p-4">ID / Tanggal</th>
+                                    <th class="p-4">Nama Pelanggan</th>
+                                    <th class="p-4">WhatsApp Kontak</th>
+                                    <th class="p-4">Alamat Penjemputan Terakhir</th>
+                                    <th class="p-4 text-center">Aksi Cepat</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pelanggan-list" class="divide-y divide-slate-100">
+                                <!-- Data Pelanggan dirender di sini via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty State Pelanggan -->
+                    <div id="pelanggan-empty" class="hidden flex-col items-center justify-center py-12 text-slate-400 bg-white">
+                        <i class="bi bi-people text-5xl mb-3 text-slate-300"></i>
+                        <p class="font-bold text-slate-600">Belum Ada Pelanggan</p>
+                    </div>
+                </div>
             </div>
-        </main>
-    </div>
+        </div>
+
+        <!-- TAB 3: FINANSIAL & KAS -->
+        <div id="tab-keuangan" class="tab-section flex-1 overflow-y-auto p-4 md:p-6 w-full hidden">
+            <div class="max-w-5xl mx-auto space-y-6">
+                <!-- Ringkasan Keuangan -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
+                        <div class="bg-green-100 text-green-600 p-3 rounded-xl text-2xl"><i class="bi bi-cash-stack"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Pemasukan</p>
+                            <p class="text-2xl font-black text-slate-800 mt-1">Rp 4.550.000</p>
+                            <p class="text-[10px] text-green-600 font-bold mt-1"><i class="bi bi-arrow-up-right"></i> Dari Pesanan Selesai</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
+                        <div class="bg-red-100 text-red-600 p-3 rounded-xl text-2xl"><i class="bi bi-graph-down-arrow"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Pengeluaran</p>
+                            <p class="text-2xl font-black text-slate-800 mt-1">Rp 1.200.000</p>
+                            <p class="text-[10px] text-red-500 font-bold mt-1"><i class="bi bi-tools"></i> Operasional & Perawatan</p>
+                        </div>
+                    </div>
+                    <div class="bg-mazaya-navy p-5 rounded-2xl shadow-md border-b-4 border-mazaya-yellow flex items-center gap-4">
+                        <div class="bg-slate-800 text-mazaya-yellow p-3 rounded-xl text-2xl border border-slate-600"><i class="bi bi-wallet2"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Saldo Bersih (Profit)</p>
+                            <p class="text-2xl font-black text-white mt-1">Rp 3.350.000</p>
+                            <p class="text-[10px] text-blue-300 font-bold mt-1">Bulan Ini</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit">
+                        <h3 class="font-black text-slate-800 mb-4 border-b border-slate-100 pb-2"><i class="bi bi-receipt-cutoff text-red-500"></i> Catat Pengeluaran Baru</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Kategori Biaya</label>
+                                <select class="w-full p-2.5 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:border-blue-500 outline-none">
+                                    <optgroup label="Biaya Perjalanan"><option>BBM (Solar/Bensin)</option><option>E-Toll & Parkir</option></optgroup>
+                                    <optgroup label="Gaji & Upah"><option>Gaji Sopir Utama</option><option>Gaji Kernet / Jasa Kuli</option></optgroup>
+                                    <optgroup label="Perawatan"><option>Ganti Oli Mesin</option><option>Tambal Ban / Ganti Ban</option><option>Service / Sparepart</option></optgroup>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Nominal (Rp)</label>
+                                <input type="number" placeholder="Contoh: 150000" class="w-full p-2.5 text-sm border border-slate-300 rounded-lg bg-slate-50 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Keterangan Tambahan</label>
+                                <textarea rows="2" placeholder="Ganti oli rutin bulan Agustus..." class="w-full p-2.5 text-sm border border-slate-300 rounded-lg bg-slate-50 outline-none"></textarea>
+                            </div>
+                            <button onclick="Swal.fire('Fitur Backend', 'Fitur tulis ke Google Sheets untuk modul Keuangan akan diaktifkan pada pembaruan tahap 2.', 'info')" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-lg shadow transition-colors">
+                                <i class="bi bi-save"></i> Simpan Pengeluaran
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="font-black text-slate-800 mb-4 border-b border-slate-100 pb-2"><i class="bi bi-clock-history text-blue-500"></i> Riwayat Transaksi Terakhir</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100 transition">
+                                <div class="flex items-center gap-3"><div class="bg-green-100 text-green-600 w-10 h-10 rounded-full flex items-center justify-center font-black"><i class="bi bi-plus-lg"></i></div>
+                                <div><p class="text-sm font-bold text-slate-800">Order Selesai (ORD-2026)</p><p class="text-[11px] text-slate-500">Pindahan Kost - 03 Agu 2026</p></div></div>
+                                <p class="text-sm font-black text-green-600">+ Rp 150.000</p>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100 transition">
+                                <div class="flex items-center gap-3"><div class="bg-red-100 text-red-600 w-10 h-10 rounded-full flex items-center justify-center font-black"><i class="bi bi-dash-lg"></i></div>
+                                <div><p class="text-sm font-bold text-slate-800">Ganti Oli Mesin</p><p class="text-[11px] text-slate-500">Carry Pick-Up - 02 Agu 2026</p></div></div>
+                                <p class="text-sm font-black text-red-600">- Rp 250.000</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: PENGATURAN TARIF -->
+        <div id="tab-pengaturan" class="tab-section flex-1 overflow-y-auto p-4 md:p-6 w-full hidden">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl flex gap-3 text-blue-800 shadow-sm">
+                    <i class="bi bi-info-circle-fill text-xl mt-0.5 text-blue-600"></i>
+                    <div>
+                        <h4 class="font-bold">Manajemen Tarif Dinamis</h4>
+                        <p class="text-xs mt-1">Ubah nilai di bawah ini untuk memperbarui harga kalkulator di website utama pelanggan secara otomatis.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-black text-slate-800 mb-6 flex items-center gap-2"><i class="bi bi-cash-coin text-green-500 text-xl"></i> Skema Tarif Berdasarkan Jarak</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-50 border border-slate-100 rounded-xl items-center">
+                            <div><p class="font-bold text-sm text-slate-700">Tarif Jarak Dekat</p><p class="text-[11px] text-slate-500">Jarak tempuh 0 sampai 5 KM</p></div>
+                            <div><label class="text-[10px] font-bold text-slate-500">Harga Per KM (Rp)</label><input type="number" value="10000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
+                            <div><label class="text-[10px] font-bold text-slate-500">Harga Minimal (Rp)</label><input type="number" value="50000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-50 border border-slate-100 rounded-xl items-center">
+                            <div><p class="font-bold text-sm text-slate-700">Tarif Jarak Menengah</p><p class="text-[11px] text-slate-500">Jarak tempuh 6 sampai 10 KM</p></div>
+                            <div><label class="text-[10px] font-bold text-slate-500">Harga Per KM (Rp)</label><input type="number" value="12000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
+                            <div><label class="text-[10px] font-bold text-slate-500">Harga Minimal (Rp)</label><input type="number" value="80000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-50 border border-slate-100 rounded-xl items-center">
+                            <div><p class="font-bold text-sm text-slate-700">Tarif Jarak Jauh</p><p class="text-[11px] text-slate-500">Jarak tempuh 11 sampai 30 KM</p></div>
+                            <div><label class="text-[10px] font-bold text-slate-500">Harga Per KM (Rp)</label><input type="number" value="14000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
+                            <div><label class="text-[10px] font-bold text-slate-500">Harga Minimal (Rp)</label><input type="number" value="100000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
+                        </div>
+
+                        <div class="pt-4 flex justify-end gap-3">
+                            <button class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-6 py-2.5 rounded-lg transition-colors">Batal</button>
+                            <button onclick="Swal.fire('Fitur Tahap 2', 'Sistem Database Pengaturan Server sedang disiapkan.', 'info')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-lg shadow-md transition-colors"><i class="bi bi-check-lg"></i> Simpan Tarif</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
     <script>
-        // URL DATABASE GOOGLE APPS SCRIPT ANDA (YANG PALING BARU)
+        // LINK GOOGLE APPS SCRIPT
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFAS7hUgpxO7buBN3hrkt3Xe9A6efeDtevZbbDaSGZvgyXTVZMk7aMOyiTYD8jfEfH9g/exec';
-        
-        let globalData = { pesanan: [], pelanggan: [], armada: [], kru: [] };
-        let currentSection = 'pesanan';
 
-        // Fungsi saat halaman pertama kali dimuat
-        window.onload = () => {
-            sinkronData();
+        window.onload = function() {
+            fetchData();
         };
 
-        // Fungsi mengambil data dari Excel
-        async function sinkronData() {
-            const statusEl = document.getElementById('statusKoneksi');
-            statusEl.innerHTML = `<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span></span> Sinkronisasi...`;
-            statusEl.className = "px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold flex items-center gap-2 border border-blue-200 shadow-sm";
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-section').forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('block');
+            document.getElementById('nav-' + tabId).classList.add('active');
+
+            const title = document.getElementById('header-title');
+            const subtitle = document.getElementById('header-subtitle');
+            
+            if (tabId === 'pesanan') {
+                title.innerText = "Daftar Pesanan Baru";
+                subtitle.innerText = "Pantau dan kelola orderan pelanggan secara realtime.";
+                document.getElementById('icon-refresh').parentElement.classList.remove('hidden');
+            } else if (tabId === 'pelanggan') {
+                title.innerText = "Data Pelanggan Internal";
+                subtitle.innerText = "Manajemen kontak WhatsApp pelanggan yang pernah order.";
+                document.getElementById('icon-refresh').parentElement.classList.add('hidden');
+            } else if (tabId === 'keuangan') {
+                title.innerText = "Buku Kas & Operasional";
+                subtitle.innerText = "Pantau profit, catat gaji kru, BBM, dan biaya perawatan truk.";
+                document.getElementById('icon-refresh').parentElement.classList.add('hidden');
+            } else if (tabId === 'pengaturan') {
+                title.innerText = "Pengaturan Sistem";
+                subtitle.innerText = "Ubah harga tarif dan aturan batas muatan pelanggan.";
+                document.getElementById('icon-refresh').parentElement.classList.add('hidden');
+            }
+        }
+
+        async function fetchData() {
+            const btnIcon = document.getElementById('icon-refresh');
+            const loading = document.getElementById('loading-state');
+            const container = document.getElementById('pesanan-list');
+            
+            btnIcon.classList.add('animate-spin');
+            if (container.children.length === 0) {
+                loading.classList.remove('hidden');
+                container.classList.add('hidden');
+            }
 
             try {
                 const response = await fetch(GAS_URL);
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    globalData = data;
-                    statusEl.innerHTML = `<i class="bi bi-check-circle-fill"></i> Terhubung`;
-                    statusEl.className = "px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold flex items-center gap-1.5 border border-emerald-200 shadow-sm";
-                    renderCurrentSection();
+                    renderPesanan(data.pesanan);
+                    renderPelanggan(data.pelanggan); // Render Pelanggan Baru!
                 } else {
-                    throw new Error("Format data tidak sesuai");
+                    Swal.fire('Error', 'Gagal memuat data dari server.', 'error');
                 }
             } catch (error) {
-                console.error("Gagal load data:", error);
-                statusEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> Gagal Muat`;
-                statusEl.className = "px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-bold flex items-center gap-1.5 border border-red-200 shadow-sm cursor-pointer";
-                statusEl.onclick = sinkronData;
-                
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Koneksi Terputus',
-                    text: 'Gagal mengambil data dari Google Spreadsheet. Coba refresh kembali.',
-                    confirmButtonColor: '#3b82f6'
-                });
+                Swal.fire('Koneksi Gagal', 'Pastikan internet stabil.', 'error');
+            } finally {
+                btnIcon.classList.remove('animate-spin');
+                loading.classList.add('hidden');
+                container.classList.remove('hidden');
             }
         }
 
-        // Fungsi ganti menu
-        function showSection(section, element = null) {
-            currentSection = section;
-            
-            // Update UI Menu Aktif
-            if(element) {
-                document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-                element.classList.add('active');
-            }
-            
-            // Update Judul
-            const titleMap = {
-                'pesanan': { t: 'Data Pesanan', s: 'Manajemen dan pemantauan order aktif.' },
-                'pelanggan': { t: 'Data Pelanggan', s: 'Daftar riwayat kontak pelanggan Anda.' },
-                'armada': { t: 'Data Armada', s: 'Monitoring status kesiapan kendaraan.' },
-                'kru': { t: 'Data Kru', s: 'Manajemen Sopir dan Helper/Kernet.' },
-                'finansial': { t: 'Finansial & Keuangan', s: 'Rekapitulasi pendapatan dan pengeluaran.' }
-            };
-            document.getElementById('pageTitle').innerText = titleMap[section].t;
-            document.getElementById('pageSubtitle').innerText = titleMap[section].s;
-            
-            renderCurrentSection();
-        }
+        function renderPesanan(rows) {
+            const container = document.getElementById('pesanan-list');
+            container.innerHTML = '';
 
-        // Fungsi penyalur render
-        function renderCurrentSection() {
-            const container = document.getElementById('containerData');
-            container.innerHTML = ''; // Kosongkan layar
-            
-            if (currentSection === 'pesanan') renderPesanan(container);
-            else if (currentSection === 'pelanggan') renderPelanggan(container);
-            else if (currentSection === 'armada') renderArmada(container);
-            else if (currentSection === 'kru') renderKru(container);
-            else if (currentSection === 'finansial') renderFinansial(container);
-        }
-
-        function renderPesanan(container) {
-            const dataSheet = globalData.pesanan || [];
-            if (dataSheet.length <= 1) {
-                container.innerHTML = `<div class="bg-white rounded-xl p-10 text-center border border-dashed border-slate-300"><i class="bi bi-inbox text-4xl text-slate-300 mb-3 block"></i><p class="text-slate-500">Belum ada data pesanan.</p></div>`;
+            if (!rows || rows.length <= 1) {
+                container.innerHTML = `
+                    <div class="bg-white border border-slate-200 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center text-slate-400">
+                        <i class="bi bi-inbox text-5xl mb-3 text-slate-300"></i>
+                        <p class="font-bold text-slate-600">Belum Ada Pesanan</p>
+                    </div>`;
                 return;
             }
 
-            let html = `<div class="grid gap-5">`;
-            // Looping dari bawah (data terbaru di atas), i=0 adalah header/judul kolom jadi dilewati
-            for (let i = dataSheet.length - 1; i > 0; i--) {
-                const row = dataSheet[i];
-                if (!row[0]) continue; // Lewati baris kosong
+            for (let i = rows.length - 1; i > 0; i--) {
+                const row = rows[i];
+                if(!row[0] || row[0] === "") continue;
+
+                // Membaca Kolom (Asumsi Format 14 Kolom Standar)
+                // 0:ID, 1:Waktu, 2:Nama, 3:WA, 4:Jemput, 5:Tujuan, 6:Jarak, 7:Estimasi, 8:Berat, 9:Dimensi, 10:Keterangan (Termasuk Rincian), 11:Foto, 12:Total Biaya, 13:Status
                 
-                // Indeks Kolom: 0:ID, 1:Tgl, 2:Nama, 3:WA, 4:Jemput, 5:Tujuan, 6:Jarak, 7:Waktu, 8:Berat, 9:Dimensi, 10:Ket, 11:Foto, 12:Total, 13:Status, 14:Bayar
-                
-                const idOrder = row[0]; const tgl = new Date(row[1]).toLocaleString('id-ID');
-                const nama = row[2]; const hp = row[3];
-                const rute = `Jemput: ${row[4]} <br> Tujuan: ${row[5]}`;
-                const muatan = `${row[10]} (Berat: ${row[8]}Kg)`;
-                const total = parseInt(row[12] || 0).toLocaleString('id-ID');
-                
-                // Logika Foto
-                let fotoHtml = `<span class="text-xs text-slate-400 italic">Tidak ada foto</span>`;
-                if (row[11] && row[11].includes("http")) {
-                    fotoHtml = `<a href="${row[11]}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition duration-200 border border-blue-200"><i class="bi bi-image"></i> Lihat Foto Barang</a>`;
+                let status = row[13] || 'MENUNGGU';
+                let badgeClass = "bg-yellow-100 text-yellow-800 border-yellow-200";
+                if(status === 'PROSES') badgeClass = "bg-blue-100 text-blue-800 border-blue-200";
+                else if(status === 'SELESAI') badgeClass = "bg-green-100 text-green-800 border-green-200";
+                else if(status === 'BATAL') badgeClass = "bg-red-100 text-red-800 border-red-200";
+
+                let noWA = row[3] ? row[3].toString() : '';
+                if(noWA.startsWith('0')) noWA = '62' + noWA.substring(1);
+
+                let fotoHtml = '';
+                if (row[11] && row[11].toString().startsWith('http')) {
+                    fotoHtml = `<a href="${row[11]}" target="_blank" class="block w-full text-center text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2 rounded-lg border border-indigo-200 transition-colors font-bold shadow-sm"><i class="bi bi-image"></i> Buka Foto Barang</a>`;
+                } else {
+                    fotoHtml = `<div class="text-[11px] text-slate-400 bg-slate-50 py-2 text-center rounded-lg border border-slate-100 border-dashed italic">Tidak ada foto / Gagal</div>`;
                 }
 
-                // Warna Status Order
-                let statusOrder = row[13] || 'MENUNGGU';
-                let colorOrder = statusOrder.includes('PROSES') ? 'bg-blue-100 text-blue-700' : (statusOrder.includes('SELESAI') ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700');
-                
-                html += `
-                <div class="bg-white rounded-xl card-shadow border border-slate-200 p-5 hover:border-blue-300 transition duration-300">
-                    <div class="flex flex-col md:flex-row justify-between gap-4">
-                        
-                        <!-- Info Order -->
-                        <div class="md:w-1/3 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4">
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3 class="font-bold text-slate-800 text-lg">${nama}</h3>
-                                    <p class="text-[10px] text-slate-400 font-mono">${idOrder} &bull; ${tgl}</p>
+                let totalBiaya = 0;
+                try { totalBiaya = parseInt(row[12]) || 0; } catch(e){}
+
+                // Pecah Keterangan untuk memisahkan Detail Barang dan Rincian Biaya
+                let ketUtama = row[10] || '-';
+                let ketTambahan = '';
+                if(ketUtama.includes('[')) {
+                    let parts = ketUtama.split('[');
+                    ketUtama = parts[0].trim();
+                    ketTambahan = '[' + parts[1];
+                }
+
+                const card = `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden card-order">
+                    <div class="bg-slate-50 border-b border-slate-200 p-3 md:p-4 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-blue-600 text-white text-[10px] font-black px-2 py-1 rounded shadow-sm">${row[0]}</span>
+                            <span class="text-xs font-bold text-slate-500"><i class="bi bi-calendar-event"></i> ${row[1]}</span>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black border ${badgeClass} uppercase shadow-sm">${status}</span>
+                    </div>
+
+                    <div class="p-4 md:p-5 grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <!-- Detail Kiri -->
+                        <div class="md:col-span-3 space-y-4">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100 gap-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-lg"><i class="bi bi-person"></i></div>
+                                    <div>
+                                        <p class="text-[10px] text-slate-500 font-bold uppercase">Nama Pemesan</p>
+                                        <p class="font-black text-slate-800 text-sm">${row[2]}</p>
+                                    </div>
                                 </div>
-                                <span class="px-2.5 py-1 rounded-md text-[10px] font-black tracking-wide uppercase ${colorOrder}">${statusOrder}</span>
+                                <a href="https://wa.me/${noWA}?text=Halo%20Kak%20${row[2]},%20saya%20Admin%20Jasa%20Angkut%20Mazaya.%20Membalas%20orderan%20nomor%20${row[0]}..." target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-colors shadow-sm w-full sm:w-auto justify-center">
+                                    <i class="bi bi-whatsapp"></i> Chat WhatsApp
+                                </a>
                             </div>
-                            <div class="mt-3 flex items-center gap-2 text-sm">
-                                <a href="https://wa.me/62${hp.replace(/^0/,'')}" target="_blank" class="text-emerald-600 font-medium hover:underline bg-emerald-50 px-2 py-1 rounded"><i class="bi bi-whatsapp"></i> ${hp}</a>
+
+                            <div class="relative pl-6 space-y-4 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+                                <div class="relative">
+                                    <div class="absolute -left-6 top-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-[10px] ring-4 ring-white shadow-sm"><i class="bi bi-geo-alt-fill"></i></div>
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Penjemputan</p>
+                                    <p class="text-xs font-bold text-slate-800 mt-0.5 leading-relaxed">${row[4]}</p>
+                                </div>
+                                <div class="relative">
+                                    <div class="absolute -left-6 top-0 w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-[10px] ring-4 ring-white shadow-sm"><i class="bi bi-geo-alt-fill"></i></div>
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Tujuan Bongkar</p>
+                                    <p class="text-xs font-bold text-slate-800 mt-0.5 leading-relaxed">${row[5]}</p>
+                                </div>
                             </div>
-                            <div class="mt-4 pt-4 border-t border-dashed border-slate-100">
-                                ${fotoHtml}
+                            
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 text-center">
+                                    <p class="text-[10px] text-slate-500 font-bold">Total Jarak</p>
+                                    <p class="text-sm font-black text-blue-600">${row[6]} Km</p>
+                                </div>
+                                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 text-center">
+                                    <p class="text-[10px] text-slate-500 font-bold">Berat Muatan</p>
+                                    <p class="text-sm font-black text-slate-800">${row[8]} Kg</p>
+                                </div>
+                                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 sm:col-span-2 text-center">
+                                    <p class="text-[10px] text-slate-500 font-bold">Dimensi Barang</p>
+                                    <p class="text-sm font-black text-slate-800">${row[9]}</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-200/50 flex flex-col gap-2">
+                                <div class="flex items-start gap-2">
+                                    <i class="bi bi-box-seam text-amber-600 mt-0.5"></i>
+                                    <div>
+                                        <p class="text-[10px] text-amber-800 font-bold uppercase">Detail Barang</p>
+                                        <p class="text-xs font-medium text-slate-800 mt-0.5">${ketUtama}</p>
+                                    </div>
+                                </div>
+                                ${ketTambahan ? `
+                                <div class="mt-1 pt-2 border-t border-amber-200/50">
+                                    <p class="text-[10px] text-slate-500 font-bold mb-1">Rincian Ekstra:</p>
+                                    <p class="text-[11px] font-mono text-slate-700 bg-white px-2 py-1 rounded border border-amber-100 inline-block">${ketTambahan}</p>
+                                </div>` : ''}
                             </div>
                         </div>
 
-                        <!-- Info Rute & Barang -->
-                        <div class="md:w-1/3 border-b md:border-b-0 md:border-r border-slate-100 pb-4 md:pb-0 md:pr-4 md:pl-2 text-sm text-slate-600 space-y-3">
-                            <div><span class="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">Rute Perjalanan</span> <p class="leading-relaxed bg-slate-50 p-2 rounded border border-slate-100">${rute}</p></div>
-                            <div><span class="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">Detail Muatan</span> <p class="font-medium">${muatan}</p></div>
-                        </div>
-
-                        <!-- Info Harga & Operasional -->
-                        <div class="md:w-1/3 md:pl-2 flex flex-col justify-between space-y-4">
-                            <div>
-                                <span class="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wider">Estimasi Pendapatan</span>
-                                <p class="text-xl font-black text-slate-800">Rp ${total}</p>
+                        <!-- Tagihan Kanan -->
+                        <div class="md:col-span-1 border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-5 flex flex-col justify-between space-y-4">
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-xs font-bold text-slate-500 mb-1 text-center md:text-left">Total Tagihan Order</p>
+                                    <div class="bg-mazaya-navy text-mazaya-yellow p-3 rounded-xl text-center shadow-lg relative overflow-hidden">
+                                        <div class="absolute -right-3 -top-3 opacity-10 text-4xl"><i class="bi bi-cash-coin"></i></div>
+                                        <p class="text-[10px] font-bold text-slate-300 mb-0.5 relative z-10">GRAND TOTAL</p>
+                                        <p class="text-xl font-black relative z-10">Rp ${totalBiaya.toLocaleString('id-ID')}</p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-[10px] text-slate-500 font-bold mb-1 text-center md:text-left">Dokumentasi Muatan</p>
+                                    ${fotoHtml}
+                                </div>
                             </div>
-                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs text-slate-500 space-y-1.5">
-                                <div class="flex justify-between"><span class="font-medium">Pembayaran:</span> <span class="font-bold ${row[14] === 'LUNAS' ? 'text-emerald-600' : 'text-red-500'}">${row[14] || 'BELUM LUNAS'}</span></div>
-                                <div class="flex justify-between"><span class="font-medium">Jarak/Waktu:</span> <span class="font-bold text-slate-700">${row[6]} Km / ${row[7]}</span></div>
+                            
+                            <div class="pt-2">
+                                <!-- Tombol Aksi Baru (Internal UI, Bukan ke Excel) -->
+                                <button onclick="Swal.fire({title:'Update Status?',text:'Fitur ini akan sinkron ke Google Sheet otomatis di tahap selanjutnya.',icon:'question',showCancelButton:true,confirmButtonText:'Tandai Selesai'})" class="w-full block text-center bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-2.5 rounded-lg border border-slate-700 shadow-md transition-all">
+                                    <i class="bi bi-check2-circle"></i> Ubah Status (Selesai/Batal)
+                                </button>
                             </div>
                         </div>
-
                     </div>
                 </div>`;
-            }
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        function renderArmada(container) {
-            const dataSheet = globalData.armada || [];
-            let html = `
-            <div class="mb-6 flex justify-between items-center">
-                <p class="text-sm text-slate-500">Status kesiapan operasional kendaraan Anda.</p>
-                <button onclick="tambahArmada()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2">
-                    <i class="bi bi-plus-lg"></i> Register Armada
-                </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">`;
-            
-            if(dataSheet.length <= 1) { html += `<div class="col-span-full p-8 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-300">Data armada belum ditambahkan.</div>`; }
-            
-            for (let i = 1; i < dataSheet.length; i++) {
-                const row = dataSheet[i];
-                if (!row[0]) continue;
                 
-                let status = row[3] || 'Ready';
-                let stColor = status === 'Ready' ? 'bg-emerald-100 text-emerald-700' : (status === 'Di Bengkel' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700');
-
-                html += `
-                <div class="bg-white rounded-xl border border-slate-200 card-shadow p-5 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-slate-50 rounded-bl-full -z-10 group-hover:bg-blue-50 transition"></div>
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="bg-slate-100 text-slate-600 w-12 h-12 rounded-lg flex items-center justify-center text-2xl border border-slate-200"><i class="bi bi-truck"></i></div>
-                        <span class="px-2 py-1 text-[10px] font-bold rounded-md ${stColor} uppercase tracking-wider">${status}</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800">${row[1]}</h3> <!-- Jenis Mobil -->
-                    <p class="text-sm font-mono font-medium text-slate-500 bg-slate-50 inline-block px-2 py-1 border border-slate-100 rounded mt-2">${row[2]}</p> <!-- Plat -->
-                </div>`;
+                container.insertAdjacentHTML('beforeend', card);
             }
-            html += `</div>`;
-            container.innerHTML = html;
         }
 
-        function renderKru(container) {
-            const dataSheet = globalData.kru || [];
-            let html = `
-            <div class="mb-6 flex justify-between items-center">
-                <p class="text-sm text-slate-500">Daftar anggota Sopir dan Helper/Kernet.</p>
-                <button onclick="tambahKru()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center gap-2">
-                    <i class="bi bi-person-plus-fill"></i> Tambah Kru
-                </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">`;
-
-            if(dataSheet.length <= 1) { html += `<div class="col-span-full p-8 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-300">Data kru belum ditambahkan.</div>`; }
-
-            for (let i = 1; i < dataSheet.length; i++) {
-                const row = dataSheet[i];
-                if (!row[0]) continue;
-
-                let posisi = row[2] || 'Sopir';
-                let icon = posisi === 'Sopir' ? 'bi-person-vcard' : 'bi-person-arms-up';
-
-                html += `
-                <div class="bg-white rounded-xl border border-slate-200 card-shadow p-4 flex items-center gap-4">
-                    <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0"><i class="bi ${icon}"></i></div>
-                    <div class="min-w-0">
-                        <h4 class="font-bold text-slate-800 truncate">${row[1]}</h4>
-                        <p class="text-xs text-slate-500 font-medium">${posisi}</p>
-                        <p class="text-xs text-slate-400 mt-1 truncate"><i class="bi bi-telephone"></i> ${row[3] || '-'}</p>
-                    </div>
-                </div>`;
+        function renderPelanggan(rows) {
+            const container = document.getElementById('pelanggan-list');
+            const emptyState = document.getElementById('pelanggan-empty');
+            const totalText = document.getElementById('total-pelanggan');
+            
+            container.innerHTML = '';
+            
+            // rows[0] is headers. We need at least 1 real data row.
+            if (!rows || rows.length <= 1) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                totalText.innerText = "0";
+                return;
             }
-            html += `</div>`;
-            container.innerHTML = html;
-        }
 
-        function tambahArmada() {
-            Swal.fire({
-                title: 'Register Armada Baru',
-                html: `
-                    <input id="swal-jenis" class="swal2-input text-sm" placeholder="Jenis (Cth: L300 Box, Engkel)">
-                    <input id="swal-plat" class="swal2-input text-sm font-mono uppercase" placeholder="Plat (Cth: P 1234 XY)">
-                    <select id="swal-status" class="swal2-select text-sm"><option value="Ready">Ready / Siap</option><option value="Di Bengkel">Di Bengkel / Rusak</option><option value="Offline">Offline / Parkir</option></select>
-                `,
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-                preConfirm: () => {
-                    return {
-                        id: 'ARM-' + Math.floor(Math.random()*9000),
-                        jenis: document.getElementById('swal-jenis').value,
-                        plat: document.getElementById('swal-plat').value.toUpperCase(),
-                        status: document.getElementById('swal-status').value
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    kirimDataBaru('addArmada', result.value);
-                }
-            });
-        }
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+            totalText.innerText = (rows.length - 1).toString();
 
-        function tambahKru() {
-            Swal.fire({
-                title: 'Tambah Anggota Kru',
-                html: `
-                    <input id="swal-nama" class="swal2-input text-sm" placeholder="Nama Lengkap">
-                    <select id="swal-posisi" class="swal2-select text-sm"><option value="Sopir">Sopir</option><option value="Helper/Kernet">Helper / Kernet</option></select>
-                    <input id="swal-hp" type="tel" class="swal2-input text-sm" placeholder="No HP/WA">
-                `,
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-                preConfirm: () => {
-                    return {
-                        id: 'KRU-' + Math.floor(Math.random()*9000),
-                        nama: document.getElementById('swal-nama').value,
-                        posisi: document.getElementById('swal-posisi').value,
-                        hp: document.getElementById('swal-hp').value,
-                        status: 'Aktif'
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    kirimDataBaru('addKru', result.value);
-                }
-            });
-        }
+            // Loop dari bawah agar yang terbaru ada di atas
+            for (let i = rows.length - 1; i > 0; i--) {
+                const row = rows[i];
+                if(!row[0] || row[0] === "") continue;
 
-        async function kirimDataBaru(actionType, payloadData) {
-            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            try {
-                // Di sini kita gunakan mode no-cors karena GAS default tidak merespon balasan dengan header CORS penuh jika hanya appendRow
-                await fetch(GAS_URL, {
-                    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({ action: actionType, payload: payloadData })
-                });
+                // Format: 0:ID, 1:Nama, 2:WA, 3:Alamat, 4:Tanggal
+                let noWA = row[2] ? row[2].toString() : '';
+                if(noWA.startsWith('0')) noWA = '62' + noWA.substring(1);
                 
-                Swal.fire({ icon: 'success', title: 'Berhasil Disimpan!', timer: 1500, showConfirmButton: false });
-                setTimeout(sinkronData, 1600); // Tarik ulang data dari server
-            } catch (err) {
-                Swal.fire('Gagal Menyimpan', 'Terjadi kesalahan sistem', 'error');
-            }
-        }
+                let tglObj = new Date(row[4]);
+                let tglFormat = tglObj instanceof Date && !isNaN(tglObj) ? 
+                    tglObj.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}) : row[4];
 
-        function renderPelanggan(container) {
-            const dataSheet = globalData.pelanggan || [];
-            let html = `
-            <div class="mb-6 flex justify-between items-center">
-                <p class="text-sm text-slate-500">Daftar riwayat kontak dan database pelanggan Anda.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">`;
+                let initial = row[1] ? row[1].charAt(0).toUpperCase() : '?';
 
-            if(dataSheet.length <= 1) { 
-                html += `<div class="col-span-full p-8 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-300">Data pelanggan belum tersedia di database.</div>`; 
-            } else {
-                // Looping data pelanggan (melewati baris 0 / judul kolom)
-                for (let i = 1; i < dataSheet.length; i++) {
-                    const row = dataSheet[i];
-                    if (!row[0] && !row[1]) continue;
-
-                    // Asumsi Kolom Excel: B(1)=Nama, C(2)=WA, D(3)=Alamat/Ket
-                    const nama = row[1] || 'Tanpa Nama';
-                    const wa = row[2] || '-';
-                    const keterangan = row[3] || 'Pelanggan Jasa Angkut';
-                    const inisial = nama.charAt(0).toUpperCase();
-
-                    html += `
-                    <div class="bg-white rounded-xl border border-slate-200 card-shadow p-5 flex flex-col justify-between hover:border-blue-300 transition duration-300">
-                        <div class="flex items-start gap-4 mb-4">
-                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0 font-bold shadow-md">
-                                ${inisial}
+                const tr = `
+                <tr class="hover:bg-indigo-50/30 transition-colors border-b border-slate-100 last:border-0">
+                    <td class="p-4 align-middle">
+                        <p class="text-xs font-bold text-slate-800">${row[0]}</p>
+                        <p class="text-[10px] text-slate-500">${tglFormat}</p>
+                    </td>
+                    <td class="p-4 align-middle">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs shrink-0">
+                                ${initial}
                             </div>
-                            <div class="min-w-0 flex-1">
-                                <h4 class="font-bold text-slate-800 truncate text-lg">${nama}</h4>
-                                <p class="text-xs text-slate-500 mt-0.5 line-clamp-2">${keterangan}</p>
-                            </div>
+                            <p class="text-sm font-bold text-slate-800 truncate max-w-[150px]">${row[1]}</p>
                         </div>
-                        <div class="border-t border-slate-100 pt-3 mt-auto">
-                            <a href="https://wa.me/62${wa.toString().replace(/^0/,'')}" target="_blank" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg text-sm font-bold transition duration-200">
-                                <i class="bi bi-whatsapp"></i> Hubungi WA
-                            </a>
-                        </div>
-                    </div>`;
-                }
+                    </td>
+                    <td class="p-4 align-middle">
+                        <p class="text-xs font-medium text-slate-600 font-mono bg-slate-100 px-2 py-1 rounded inline-block border border-slate-200">
+                            ${row[2]}
+                        </p>
+                    </td>
+                    <td class="p-4 align-middle max-w-xs">
+                        <p class="text-xs text-slate-600 truncate" title="${row[3]}">
+                            <i class="bi bi-geo-alt text-slate-400"></i> ${row[3]}
+                        </p>
+                    </td>
+                    <td class="p-4 align-middle text-center">
+                        <a href="https://wa.me/${noWA}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-500 hover:text-white transition-colors shadow-sm" title="Chat WhatsApp">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                    </td>
+                </tr>`;
+                
+                container.insertAdjacentHTML('beforeend', tr);
             }
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        function renderFinansial(container) {
-            container.innerHTML = `
-            <div class="bg-white rounded-xl border border-slate-200 card-shadow p-8 text-center max-w-2xl mx-auto mt-10">
-                <i class="bi bi-wallet2 text-6xl text-emerald-200 mb-4 block"></i>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">Laporan Finansial</h3>
-                <p class="text-slate-500 mb-6 text-sm">Fitur pencatatan operasional jalan, gaji kru, dan pemasukan bersih akan tersedia di modul ini.</p>
-                <div class="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg inline-block text-sm font-medium border border-emerald-100">Tahap Pengembangan</div>
-            </div>`;
         }
     </script>
 </body>
