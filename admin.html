@@ -345,49 +345,54 @@
                 const row = rows[i];
                 if(!row[0] || row[0] === "") continue;
 
-                // Membaca Kolom (Asumsi Format 14 Kolom Standar)
-                // 0:ID, 1:Waktu, 2:Nama, 3:WA, 4:Jemput, 5:Tujuan, 6:Jarak, 7:Estimasi, 8:Berat, 9:Dimensi, 10:Keterangan (Termasuk Rincian), 11:Foto, 12:Total Biaya, 13:Status
+                // Membaca 15 Kolom Baru
+                // 0:ID, 1:Waktu, 2:Nama, 3:WA, 4:Jemput, 5:Tujuan, 6:Jarak, 7:Estimasi, 8:Catatan, 9:Tenaga, 10:Foto, 11:Tarif, 12:BiayaLain, 13:GrandTotal, 14:Status
                 
-                let status = row[13] || 'MENUNGGU';
-                let badgeClass = "bg-yellow-100 text-yellow-800 border-yellow-200";
-                if(status === 'PROSES') badgeClass = "bg-blue-100 text-blue-800 border-blue-200";
-                else if(status === 'SELESAI') badgeClass = "bg-green-100 text-green-800 border-green-200";
-                else if(status === 'BATAL') badgeClass = "bg-red-100 text-red-800 border-red-200";
+                // PROTEKSI DATA USANG (Jika kolom kurang dari 15 karena order lama)
+                let status = row[14];
+                if (row.length < 15 || status === undefined) {
+                    status = 'Data Lama (Harus Dihapus di Excel)';
+                    row[11] = 0; row[12] = 0; row[13] = 0; // Nol-kan harga agar tidak error baca teks
+                } else if (status === '') {
+                    status = 'Menunggu Konfirmasi';
+                }
+
+                let badgeClass = "bg-slate-100 text-slate-800 border-slate-200";
+                let statusIcon = "bi-clock-history";
+                
+                // Pewarnaan Status Bertahap
+                if(status.toLowerCase().includes('menunggu')) { badgeClass = "bg-amber-100 text-amber-800 border-amber-200"; statusIcon = "bi-hourglass-split"; }
+                else if(status.toLowerCase().includes('ditugaskan')) { badgeClass = "bg-indigo-100 text-indigo-800 border-indigo-200"; statusIcon = "bi-person-check-fill"; }
+                else if(status.toLowerCase().includes('menuju')) { badgeClass = "bg-blue-100 text-blue-800 border-blue-200"; statusIcon = "bi-truck"; }
+                else if(status.toLowerCase().includes('diangkut')) { badgeClass = "bg-purple-100 text-purple-800 border-purple-200"; statusIcon = "bi-box-seam-fill"; }
+                else if(status.toLowerCase().includes('selesai')) { badgeClass = "bg-green-100 text-green-800 border-green-200"; statusIcon = "bi-check-circle-fill"; }
+                else if(status.toLowerCase().includes('batal')) { badgeClass = "bg-red-100 text-red-800 border-red-200"; statusIcon = "bi-x-circle-fill"; }
 
                 let noWA = row[3] ? row[3].toString() : '';
                 if(noWA.startsWith('0')) noWA = '62' + noWA.substring(1);
 
                 let fotoHtml = '';
-                if (row[11] && row[11].toString().startsWith('http')) {
-                    fotoHtml = `<a href="${row[11]}" target="_blank" class="block w-full text-center text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2 rounded-lg border border-indigo-200 transition-colors font-bold shadow-sm"><i class="bi bi-image"></i> Buka Foto Barang</a>`;
+                if (row[10] && row[10].toString().startsWith('http')) {
+                    fotoHtml = `<a href="${row[10]}" target="_blank" class="block w-full text-center text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2 rounded-lg border border-indigo-200 transition-colors font-bold shadow-sm"><i class="bi bi-image"></i> Buka Foto Barang</a>`;
                 } else {
                     fotoHtml = `<div class="text-[11px] text-slate-400 bg-slate-50 py-2 text-center rounded-lg border border-slate-100 border-dashed italic">Tidak ada foto / Gagal</div>`;
                 }
 
-                let totalBiaya = 0;
-                try { totalBiaya = parseInt(row[12]) || 0; } catch(e){}
-
-                // Pecah Keterangan untuk memisahkan Detail Barang dan Rincian Biaya
-                let ketUtama = row[10] || '-';
-                let ketTambahan = '';
-                if(ketUtama.includes('[')) {
-                    let parts = ketUtama.split('[');
-                    ketUtama = parts[0].trim();
-                    ketTambahan = '[' + parts[1];
-                }
+                let tarifDasar = parseInt(row[11]) || 0;
+                let biayaLain = parseInt(row[12]) || 0;
+                let grandTotal = parseInt(row[13]) || tarifDasar;
 
                 const card = `
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden card-order">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden card-order mb-4">
                     <div class="bg-slate-50 border-b border-slate-200 p-3 md:p-4 flex justify-between items-center">
                         <div class="flex items-center gap-3">
                             <span class="bg-blue-600 text-white text-[10px] font-black px-2 py-1 rounded shadow-sm">${row[0]}</span>
                             <span class="text-xs font-bold text-slate-500"><i class="bi bi-calendar-event"></i> ${row[1]}</span>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-[10px] font-black border ${badgeClass} uppercase shadow-sm">${status}</span>
+                        <span class="px-3 py-1.5 rounded-full text-[10px] font-black border ${badgeClass} shadow-sm flex items-center gap-1.5 uppercase tracking-wide"><i class="bi ${statusIcon}"></i> ${status}</span>
                     </div>
 
                     <div class="p-4 md:p-5 grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <!-- Detail Kiri -->
                         <div class="md:col-span-3 space-y-4">
                             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100 gap-3">
                                 <div class="flex items-center gap-3">
@@ -397,7 +402,7 @@
                                         <p class="font-black text-slate-800 text-sm">${row[2]}</p>
                                     </div>
                                 </div>
-                                <a href="https://wa.me/${noWA}?text=Halo%20Kak%20${row[2]},%20saya%20Admin%20Jasa%20Angkut%20Mazaya.%20Membalas%20orderan%20nomor%20${row[0]}..." target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-colors shadow-sm w-full sm:w-auto justify-center">
+                                <a href="https://wa.me/${noWA}?text=Halo%20Kak%20${row[2]},%20saya%20Admin%20Jasa%20Angkut%20Mazaya.%20Status%20pesanan%20${row[0]}%20saat%20ini:%20*${status}*." target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-colors shadow-sm w-full sm:w-auto justify-center">
                                     <i class="bi bi-whatsapp"></i> Chat WhatsApp
                                 </a>
                             </div>
@@ -421,12 +426,12 @@
                                     <p class="text-sm font-black text-blue-600">${row[6]} Km</p>
                                 </div>
                                 <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 text-center">
-                                    <p class="text-[10px] text-slate-500 font-bold">Berat Muatan</p>
-                                    <p class="text-sm font-black text-slate-800">${row[8]} Kg</p>
+                                    <p class="text-[10px] text-slate-500 font-bold">Estimasi</p>
+                                    <p class="text-sm font-black text-slate-800">${row[7]}</p>
                                 </div>
-                                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 sm:col-span-2 text-center">
-                                    <p class="text-[10px] text-slate-500 font-bold">Dimensi Barang</p>
-                                    <p class="text-sm font-black text-slate-800">${row[9]}</p>
+                                <div class="bg-blue-50/50 p-2 rounded-lg border border-blue-100 sm:col-span-2 flex flex-col justify-center px-3">
+                                    <p class="text-[10px] text-blue-600 font-bold uppercase mb-0.5">Opsi Tenaga Angkut</p>
+                                    <p class="text-xs font-black text-slate-800">${row[9]}</p>
                                 </div>
                             </div>
 
@@ -434,40 +439,32 @@
                                 <div class="flex items-start gap-2">
                                     <i class="bi bi-box-seam text-amber-600 mt-0.5"></i>
                                     <div>
-                                        <p class="text-[10px] text-amber-800 font-bold uppercase">Detail Barang</p>
-                                        <p class="text-xs font-medium text-slate-800 mt-0.5">${ketUtama}</p>
+                                        <p class="text-[10px] text-amber-800 font-bold uppercase">Catatan & Rincian Barang</p>
+                                        <p class="text-xs font-medium text-slate-800 mt-0.5 leading-relaxed">${row[8] || '-'}</p>
                                     </div>
                                 </div>
-                                ${ketTambahan ? `
-                                <div class="mt-1 pt-2 border-t border-amber-200/50">
-                                    <p class="text-[10px] text-slate-500 font-bold mb-1">Rincian Ekstra:</p>
-                                    <p class="text-[11px] font-mono text-slate-700 bg-white px-2 py-1 rounded border border-amber-100 inline-block">${ketTambahan}</p>
-                                </div>` : ''}
                             </div>
                         </div>
 
                         <!-- Tagihan Kanan -->
                         <div class="md:col-span-1 border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-5 flex flex-col justify-between space-y-4">
-                            <div class="space-y-4">
-                                <div>
-                                    <p class="text-xs font-bold text-slate-500 mb-1 text-center md:text-left">Total Tagihan Order</p>
-                                    <div class="bg-mazaya-navy text-mazaya-yellow p-3 rounded-xl text-center shadow-lg relative overflow-hidden">
-                                        <div class="absolute -right-3 -top-3 opacity-10 text-4xl"><i class="bi bi-cash-coin"></i></div>
-                                        <p class="text-[10px] font-bold text-slate-300 mb-0.5 relative z-10">GRAND TOTAL</p>
-                                        <p class="text-xl font-black relative z-10">Rp ${totalBiaya.toLocaleString('id-ID')}</p>
-                                    </div>
+                            <div class="space-y-3">
+                                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                    <div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-slate-500">Tarif Aplikasi</span><span class="text-xs font-bold text-slate-700">Rp ${tarifDasar.toLocaleString('id-ID')}</span></div>
+                                    <div class="flex justify-between items-center pb-1 border-b border-slate-200 mb-1"><span class="text-[10px] font-bold text-slate-500">Biaya Parkir/Tol</span><span class="text-xs font-bold text-red-500">+ Rp ${biayaLain.toLocaleString('id-ID')}</span></div>
+                                    <p class="text-[9px] font-bold text-blue-600 mb-0.5 uppercase tracking-wide">GRAND TOTAL</p>
+                                    <p class="text-lg font-black text-slate-800 leading-none">Rp ${grandTotal.toLocaleString('id-ID')}</p>
                                 </div>
                                 
                                 <div>
-                                    <p class="text-[10px] text-slate-500 font-bold mb-1 text-center md:text-left">Dokumentasi Muatan</p>
+                                    <p class="text-[10px] text-slate-500 font-bold mb-1 text-center md:text-left">Dokumentasi</p>
                                     ${fotoHtml}
                                 </div>
                             </div>
                             
-                            <div class="pt-2">
-                                <!-- Tombol Aksi Baru (Internal UI, Bukan ke Excel) -->
-                                <button onclick="Swal.fire({title:'Update Status?',text:'Fitur ini akan sinkron ke Google Sheet otomatis di tahap selanjutnya.',icon:'question',showCancelButton:true,confirmButtonText:'Tandai Selesai'})" class="w-full block text-center bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs py-2.5 rounded-lg border border-slate-700 shadow-md transition-all">
-                                    <i class="bi bi-check2-circle"></i> Ubah Status (Selesai/Batal)
+                            <div class="pt-2 space-y-2">
+                                <button onclick="bukaModalStatus('${row[0]}', '${status}')" class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-lg shadow-md transition-all">
+                                    <i class="bi bi-arrow-repeat"></i> Update Status
                                 </button>
                             </div>
                         </div>
@@ -544,6 +541,53 @@
                 </tr>`;
                 
                 container.insertAdjacentHTML('beforeend', tr);
+            }
+        }
+
+        // FUNGSI BARU: UPDATE STATUS INTERAKTIF (FITUR TAHAP 2 AKTIF)
+        async function bukaModalStatus(idOrder, statusSekarang) {
+            const { value: statusBaru } = await Swal.fire({
+                title: 'Update Status Pengiriman',
+                text: 'Order ID: ' + idOrder,
+                input: 'select',
+                inputOptions: {
+                    'Menunggu Konfirmasi': 'Menunggu Konfirmasi',
+                    'Driver Ditugaskan': 'Driver Ditugaskan',
+                    'Menuju Lokasi': 'Menuju Lokasi',
+                    'Barang Diangkut': 'Barang Diangkut',
+                    'Selesai': 'Selesai',
+                    'Batal': 'Batal'
+                },
+                inputValue: statusSekarang,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan Perubahan',
+                confirmButtonColor: '#2563eb',
+                cancelButtonText: 'Batal',
+                icon: 'question'
+            });
+
+            if (statusBaru && statusBaru !== statusSekarang) {
+                Swal.fire({
+                    title: 'Menyimpan...',
+                    text: 'Mengirim status ke server database.',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading() }
+                });
+
+                try {
+                    const response = await fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify({ action: 'updateStatus', payload: { id: idOrder, status: statusBaru } })
+                    });
+                    
+                    Swal.fire('Berhasil!', 'Status berhasil diperbarui ke: ' + statusBaru, 'success').then(() => {
+                        fetchData(); // Muat ulang layar secara otomatis
+                    });
+                } catch (error) {
+                    Swal.fire('Gagal', 'Terjadi kesalahan jaringan.', 'error');
+                }
             }
         }
     </script>
