@@ -14,14 +14,16 @@
         .st-tunggu { background: #fef3c7; color: #d97706; }
         .st-jalan { background: #dbeafe; color: #2563eb; }
         .st-selesai { background: #dcfce3; color: #16a34a; }
+        .swal2-input { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px !important; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
+    <!-- SIDEBAR -->
     <aside class="w-64 bg-[#0b192c] text-white flex flex-col hidden md:flex">
         <div class="p-6 border-b border-white/10">
             <h1 class="text-2xl font-black italic tracking-tight">MAZAYA<span class="text-[#ffb703]">GO</span></h1>
-            <p class="text-xs text-slate-400 mt-1">Control Panel v3.0</p>
+            <p class="text-xs text-slate-400 mt-1">Control Panel v4.0 Pro</p>
         </div>
         <nav class="flex-1 p-4 space-y-2">
             <button onclick="switchTab('pesanan')" id="btn-pesanan" class="w-full flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold transition">
@@ -30,6 +32,9 @@
             <button onclick="switchTab('pengaturan')" id="btn-pengaturan" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition">
                 <i class="bi bi-gear"></i> Pengaturan Tarif
             </button>
+            <button onclick="switchTab('database')" id="btn-database" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition">
+                <i class="bi bi-server"></i> Database Master
+            </button>
         </nav>
     </aside>
 
@@ -37,34 +42,27 @@
         
         <header class="bg-white border-b border-slate-200 p-4 md:px-6 flex justify-between items-center z-10 shadow-sm">
             <h2 class="text-xl font-black text-slate-800" id="headerTitle">Daftar Pesanan Live</h2>
-            <button onclick="muatDataPesanan()" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-100"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+            <button onclick="muatDataPesanan()" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-100 transition"><i class="bi bi-arrow-clockwise"></i> Refresh Data</button>
         </header>
 
-        <!-- TAB 1: PESANAN MASUK (LIVE DATABASE) -->
+        <!-- TAB 1: PESANAN MASUK -->
         <div id="tab-pesanan" class="flex-1 overflow-y-auto p-4 md:p-6 w-full block bg-slate-50">
-            
             <div id="loadingData" class="text-center py-10 hidden">
                 <i class="bi bi-arrow-repeat text-4xl text-blue-500 animate-spin inline-block"></i>
-                <p class="text-slate-500 mt-3 font-medium">Menyedot data dari Server...</p>
+                <p class="text-slate-500 mt-3 font-medium">Menyinkronkan Sistem...</p>
             </div>
-
-            <!-- Tempat memunculkan daftar kartu pesanan -->
-            <div id="daftarPesanan" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <!-- Kartu akan dimasukkan lewat JavaScript -->
-            </div>
-            
-            <!-- Jika kosong -->
-            <div id="pesananKosong" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center hidden">
-                <i class="bi bi-box2 text-5xl text-slate-300 mb-4 block"></i>
-                <h3 class="text-lg font-bold text-slate-700">Belum ada pesanan masuk</h3>
-                <p class="text-slate-500 text-sm">Pesanan dari aplikasi pelanggan akan muncul di sini.</p>
+            <div id="daftarPesanan" class="grid grid-cols-1 lg:grid-cols-2 gap-5"></div>
+            <div id="pesananKosong" class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center hidden max-w-lg mx-auto mt-10">
+                <i class="bi bi-inbox text-6xl text-slate-300 mb-4 block"></i>
+                <h3 class="text-xl font-black text-slate-700 mb-2">Belum ada pesanan</h3>
+                <p class="text-slate-500 text-sm">Monitor armada akan aktif ketika pelanggan membuat pesanan baru.</p>
             </div>
         </div>
 
-        <!-- TAB 2: PENGATURAN TARIF (TETAP SAMA) -->
+        <!-- TAB 2: PENGATURAN TARIF -->
         <div id="tab-pengaturan" class="flex-1 overflow-y-auto p-4 md:p-6 w-full hidden">
+            <!-- (Sama persis seperti sebelumnya) -->
             <div class="max-w-4xl mx-auto space-y-6">
-                <!-- Info Box -->
                 <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl flex gap-3 text-blue-800 shadow-sm">
                     <i class="bi bi-info-circle-fill text-xl mt-0.5 text-blue-600"></i>
                     <div>
@@ -74,16 +72,15 @@
                 </div>
 
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
-                    
                     <h3 class="font-black text-slate-800 flex items-center gap-2"><i class="bi bi-signpost-split text-blue-500 text-xl"></i> Reguler (Dalam Kota)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-2">Tarif Dasar Minimal (0 - 5 KM)</label>
-                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setDasar" value="50000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setDasar" value="50000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none focus:border-blue-400"></div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-2">Tarif Per KM Berikutnya</label>
-                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKm" value="10000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKm" value="10000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none focus:border-blue-400"></div>
                         </div>
                     </div>
 
@@ -91,11 +88,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-2">Muatan Sedang</label>
-                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKuli1" value="50000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKuli1" value="50000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none focus:border-green-400"></div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-2">Muatan Berat</label>
-                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKuli2" value="100000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKuli2" value="100000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none focus:border-green-400"></div>
                         </div>
                     </div>
 
@@ -103,18 +100,56 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-2">Biaya Sewa Mobil / Hari</label>
-                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setCarter" value="400000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setCarter" value="400000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none focus:border-amber-400"></div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 mb-2">Ongkos Sopir / Hari</label>
-                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setSopir" value="300000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setSopir" value="300000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none focus:border-amber-400"></div>
                         </div>
                     </div>
 
-                    <div class="pt-6 flex justify-end gap-3">
-                        <button onclick="simpanTarif()" class="bg-[#0b192c] hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all text-sm">
-                            <i class="bi bi-check2-circle"></i> Simpan Tarif
+                    <div class="pt-6 flex justify-end">
+                        <button onclick="simpanTarif()" class="bg-[#0b192c] hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all text-sm flex items-center gap-2">
+                            <i class="bi bi-check2-circle text-lg"></i> SIMPAN TARIF
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: DATABASE MASTER (SUPER CANGGIH - IN-APP CRUD) -->
+        <div id="tab-database" class="flex-1 overflow-y-auto p-4 md:p-6 w-full hidden bg-slate-50">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <!-- Info Box -->
+                <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl flex gap-3 text-indigo-800 shadow-sm">
+                    <i class="bi bi-cpu-fill text-2xl mt-0.5 text-indigo-600"></i>
+                    <div>
+                        <h4 class="font-black text-sm">Sistem Manajemen Database (Live)</h4>
+                        <p class="text-xs mt-1 font-medium">Kelola data Sopir dan Armada langsung dari dasbor ini tanpa perlu membuka Google Sheets. Perubahan otomatis tersimpan ke server.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Data Sopir -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[500px]">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                            <h3 class="font-black text-slate-800 text-lg flex items-center gap-2"><i class="bi bi-person-vcard text-blue-500"></i> Data Sopir</h3>
+                            <button onclick="tambahSopir()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-4 py-2 rounded-lg shadow-md shadow-blue-500/30 transition flex items-center gap-1"><i class="bi bi-plus-lg"></i> Tambah</button>
+                        </div>
+                        <div class="overflow-y-auto flex-1 pr-2 space-y-2 custom-scrollbar" id="listSopir">
+                            <!-- Data injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Data Armada -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[500px]">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                            <h3 class="font-black text-slate-800 text-lg flex items-center gap-2"><i class="bi bi-truck-front text-green-500"></i> Data Armada</h3>
+                            <button onclick="tambahArmada()" class="bg-green-600 hover:bg-green-700 text-white text-xs font-black px-4 py-2 rounded-lg shadow-md shadow-green-500/30 transition flex items-center gap-1"><i class="bi bi-plus-lg"></i> Tambah</button>
+                        </div>
+                        <div class="overflow-y-auto flex-1 pr-2 space-y-2 custom-scrollbar" id="listArmada">
+                            <!-- Data injected here -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -128,19 +163,28 @@
         // =====================================================================
         const GAS_URL = 'https://script.google.com/macros/s/AKfycby9DbVY4CqOmi-CT6oGQ41NwEXlPvvRkm4j-D3RhrPSGsuF_FzJnskGMbzshledj6ry8g/exec'; 
 
+        let globalSopir = [];
+        let globalArmada = [];
+
         function switchTab(tab) {
             document.getElementById('tab-pesanan').classList.add('hidden');
             document.getElementById('tab-pengaturan').classList.add('hidden');
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.getElementById('headerTitle').innerText = tab === 'pesanan' ? 'Daftar Pesanan Live' : 'Pengaturan Tarif';
+            document.getElementById('tab-database').classList.add('hidden');
             
-            document.getElementById('btn-pesanan').className = tab === 'pesanan' ? "w-full flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold transition" : "w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition";
-            document.getElementById('btn-pengaturan').className = tab === 'pengaturan' ? "w-full flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold transition" : "w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition";
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            
+            let titles = {'pesanan': 'Daftar Pesanan Live', 'pengaturan': 'Pengaturan Tarif', 'database': 'Pusat Database Master'};
+            document.getElementById('headerTitle').innerText = titles[tab];
+            
+            ['pesanan', 'pengaturan', 'database'].forEach(t => {
+                document.getElementById('btn-' + t).className = tab === t ? 
+                "w-full flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold transition" : 
+                "w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition";
+            });
         }
 
-        // FUNGSI 1: MENYEDOT DATA DARI GOOGLE SHEETS
         async function muatDataPesanan() {
-            if (GAS_URL === 'URL_APPS_SCRIPT_BAPAK_DI_SINI') {
+            if (GAS_URL.includes('URL_APPS_SCRIPT')) {
                 document.getElementById('pesananKosong').classList.remove('hidden');
                 return;
             }
@@ -150,144 +194,263 @@
             document.getElementById('pesananKosong').classList.add('hidden');
 
             try {
-                let response = await fetch(GAS_URL);
+                let response = await fetch(GAS_URL, { method: 'GET', mode: 'cors', redirect: 'follow' });
                 let data = await response.json();
                 
+                globalSopir = data.sopir || [];
+                globalArmada = data.armada || [];
+
                 document.getElementById('loadingData').classList.add('hidden');
 
-                if (data.pesanan && data.pesanan.length > 1) { // >1 karena baris 1 adalah Header
-                    // Mulai dari baris terakhir (Pesanan Terbaru di atas)
+                // Render Pesanan
+                if (data.pesanan && data.pesanan.length > 1) {
                     for (let i = data.pesanan.length - 1; i >= 1; i--) {
-                        let baris = data.pesanan[i];
-                        buatKartuPesanan(baris);
+                        buatKartuPesanan(data.pesanan[i]);
                     }
                 } else {
                     document.getElementById('pesananKosong').classList.remove('hidden');
                 }
+
+                // Render Database Live
+                renderDatabaseList();
+
             } catch (err) {
-                console.error("Gagal Tarik Data:", err);
+                console.error("Error:", err);
                 document.getElementById('loadingData').classList.add('hidden');
-                Swal.fire('Error', 'Gagal menyambung ke server.', 'error');
+                Swal.fire('Error', 'Gagal terhubung. Pastikan URL Apps Script benar dan Izin di-set ke Siapa Saja.', 'error');
             }
         }
 
-        // FUNGSI 2: MEMBUAT TAMPILAN KARTU PESANAN
-        function buatKartuPesanan(data) {
-            let idOrder = data[0];
-            let tgl = new Date(data[1]).toLocaleString('id-ID');
-            let nama = data[2];
-            let wa = data[3];
-            let jemput = data[4];
-            let tujuan = data[5];
-            let kargo = data[9];
-            let foto = data[10]; // Menyedot data foto dari kolom K
-            let tarif = data[13];
-            let status = data[14];
+        // ==========================================================
+        // FITUR BARU: RENDER, TAMBAH, & HAPUS DATABASE (IN-APP)
+        // ==========================================================
+        function renderDatabaseList() {
+            // Render Sopir
+            let htmlSopir = '';
+            for(let i = 1; i < globalSopir.length; i++) {
+                let nama = globalSopir[i][0];
+                let no = globalSopir[i][1] || '-';
+                if(nama) {
+                    htmlSopir += `
+                    <div class="flex justify-between items-center bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center font-bold border border-blue-100"><i class="bi bi-person-fill"></i></div>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm">${nama}</p>
+                                <p class="text-[11px] text-slate-500 font-medium"><i class="bi bi-telephone-fill text-slate-400"></i> ${no}</p>
+                            </div>
+                        </div>
+                        <button onclick="hapusData('Data_Sopir', '${nama}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 w-9 h-9 rounded-lg flex items-center justify-center transition opacity-50 group-hover:opacity-100"><i class="bi bi-trash3-fill"></i></button>
+                    </div>`;
+                }
+            }
+            document.getElementById('listSopir').innerHTML = htmlSopir || '<p class="text-sm text-slate-400 text-center py-10">Belum ada data sopir tersimpan.</p>';
 
-            // Mewarnai badge status
+            // Render Armada
+            let htmlArmada = '';
+            for(let i = 1; i < globalArmada.length; i++) {
+                let plat = globalArmada[i][0];
+                let jenis = globalArmada[i][1] || '-';
+                if(plat) {
+                    htmlArmada += `
+                    <div class="flex justify-between items-center bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm hover:border-green-300 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-green-50 text-green-500 flex items-center justify-center font-bold border border-green-100"><i class="bi bi-truck"></i></div>
+                            <div>
+                                <p class="font-black text-slate-800 text-sm tracking-wide uppercase">${plat}</p>
+                                <p class="text-[11px] text-slate-500 font-medium"><i class="bi bi-tag-fill text-slate-400"></i> ${jenis}</p>
+                            </div>
+                        </div>
+                        <button onclick="hapusData('Data_Armada', '${plat}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 w-9 h-9 rounded-lg flex items-center justify-center transition opacity-50 group-hover:opacity-100"><i class="bi bi-trash3-fill"></i></button>
+                    </div>`;
+                }
+            }
+            document.getElementById('listArmada').innerHTML = htmlArmada || '<p class="text-sm text-slate-400 text-center py-10">Belum ada data armada tersimpan.</p>';
+        }
+
+        async function tambahSopir() {
+            const { value: formValues } = await Swal.fire({
+                title: 'Tambah Sopir Baru',
+                html: '<input id="swal-input1" class="swal2-input" placeholder="Nama Lengkap Sopir"><input id="swal-input2" class="swal2-input" placeholder="No. HP / WhatsApp">',
+                focusConfirm: false, showCancelButton: true, confirmButtonText: 'Simpan', cancelButtonText: 'Batal',
+                confirmButtonColor: '#2563eb',
+                preConfirm: () => { return [ document.getElementById('swal-input1').value, document.getElementById('swal-input2').value ] }
+            });
+            if (formValues && formValues[0]) {
+                prosesKirimDataMaster('Data_Sopir', formValues);
+            }
+        }
+
+        async function tambahArmada() {
+            const { value: formValues } = await Swal.fire({
+                title: 'Tambah Armada Baru',
+                html: '<input id="swal-input1" class="swal2-input" placeholder="Plat Nomor (Misal: P 1234 XX)" style="text-transform: uppercase;"><input id="swal-input2" class="swal2-input" placeholder="Jenis Mobil (Misal: L300)">',
+                focusConfirm: false, showCancelButton: true, confirmButtonText: 'Simpan', cancelButtonText: 'Batal',
+                confirmButtonColor: '#16a34a',
+                preConfirm: () => { return [ document.getElementById('swal-input1').value.toUpperCase(), document.getElementById('swal-input2').value ] }
+            });
+            if (formValues && formValues[0]) {
+                prosesKirimDataMaster('Data_Armada', formValues);
+            }
+        }
+
+        async function prosesKirimDataMaster(sheetName, rowData) {
+            Swal.fire({ title: 'Menyimpan ke Server...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+            try {
+                let response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'tambahData', payload: { sheet: sheetName, rowData: rowData } }) });
+                let res = await response.json();
+                if(res.status === 'success') {
+                    Swal.fire({ icon: 'success', title: 'Tersimpan!', text: 'Data berhasil masuk ke sistem.', timer: 1500, showConfirmButton: false });
+                    muatDataPesanan(); 
+                }
+            } catch(e) { Swal.fire('Error', 'Terjadi kesalahan jaringan.', 'error'); }
+        }
+
+        async function hapusData(sheetName, idName) {
+            let konfirm = await Swal.fire({ title: 'Hapus Data?', text: `Anda yakin ingin menghapus ${idName} dari database?`, icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus!', confirmButtonColor: '#ef4444' });
+            if(konfirm.isConfirmed) {
+                Swal.fire({ title: 'Menghapus Data...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                try {
+                    let response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusData', payload: { sheet: sheetName, id: idName } }) });
+                    let res = await response.json();
+                    if(res.status === 'success') {
+                        Swal.fire({ icon: 'success', title: 'Terhapus!', timer: 1500, showConfirmButton: false });
+                        muatDataPesanan(); 
+                    }
+                } catch(e) { Swal.fire('Error', 'Terjadi kesalahan jaringan.', 'error'); }
+            }
+        }
+        // ==========================================================
+
+        function buatKartuPesanan(data) {
+            let idOrder = data[0], tgl = new Date(data[1]).toLocaleString('id-ID', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+            let nama = data[2], wa = data[3], jemput = data[4], tujuan = data[5];
+            let kargo = data[9], foto = data[10], tarif = data[13], status = data[14];
+            let driverTersimpan = data[15] || "", armadaTersimpan = data[16] || "";
+
             let classStatus = 'st-tunggu';
             if(status.toLowerCase().includes('jalan') || status.toLowerCase().includes('menuju')) classStatus = 'st-jalan';
             if(status.toLowerCase().includes('selesai')) classStatus = 'st-selesai';
 
-            // HTML Kartunya (Sangat Elegan)
+            let optSopir = `<option value="">-- Pilih Sopir --</option>`;
+            for(let i=1; i<globalSopir.length; i++) {
+                let namaSopir = globalSopir[i][0]; 
+                let isSelected = (namaSopir === driverTersimpan) ? 'selected' : '';
+                if(namaSopir) optSopir += `<option value="${namaSopir}" ${isSelected}>${namaSopir}</option>`;
+            }
+
+            let optArmada = `<option value="">-- Pilih Armada --</option>`;
+            for(let i=1; i<globalArmada.length; i++) {
+                let platArmada = globalArmada[i][0] + " (" + globalArmada[i][1] + ")";
+                let isSelected = (platArmada === armadaTersimpan) ? 'selected' : '';
+                if(globalArmada[i][0]) optArmada += `<option value="${platArmada}" ${isSelected}>${platArmada}</option>`;
+            }
+
             let htmlKartu = `
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                <!-- Header Kartu -->
-                <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col">
+                <div class="bg-slate-50/70 p-4 border-b border-slate-100 flex justify-between items-center">
                     <div>
-                        <span class="font-mono text-xs text-blue-600 font-black tracking-wider bg-blue-50 px-2 py-1 rounded">${idOrder}</span>
-                        <p class="text-[10px] text-slate-400 mt-1">${tgl}</p>
+                        <span class="font-mono text-xs text-indigo-700 font-black tracking-wider bg-indigo-100/50 px-2.5 py-1 rounded-md border border-indigo-200/50"><i class="bi bi-hash"></i> ${idOrder}</span>
+                        <p class="text-[10px] text-slate-500 mt-2 font-semibold tracking-wide"><i class="bi bi-calendar2-check"></i> ${tgl}</p>
                     </div>
-                    <span class="status-badge ${classStatus}" id="badge-${idOrder}">${status}</span>
+                    <span class="status-badge ${classStatus} shadow-sm" id="badge-${idOrder}">${status}</span>
                 </div>
 
-                <!-- Info Pelanggan -->
-                <div class="mb-4">
-                    <p class="text-sm font-bold text-slate-800"><i class="bi bi-person-fill text-slate-400 mr-1"></i> ${nama}</p>
-                    <p class="text-xs text-slate-500 mt-1"><i class="bi bi-whatsapp text-green-500 mr-1"></i> ${wa}</p>
-                </div>
+                <div class="p-5 flex-1">
+                    <div class="mb-5 flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-black text-slate-800 flex items-center gap-1.5"><i class="bi bi-person-circle text-slate-400"></i> ${nama}</p>
+                            <a href="https://wa.me/62${wa.replace(/^0+/, '')}" target="_blank" class="text-[11px] text-green-600 font-bold bg-green-50 hover:bg-green-100 border border-green-200 px-2 py-0.5 rounded-md transition mt-1.5 inline-block"><i class="bi bi-whatsapp"></i> Chat WhatsApp</a>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Pendapatan</p>
+                            <p class="text-sm font-black text-green-600 bg-green-50 px-2 py-0.5 rounded-md border border-green-100">${tarif}</p>
+                        </div>
+                    </div>
 
-                <!-- Rute & Koordinat -->
-                <div class="space-y-2 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                    <div class="flex items-start gap-2">
-                        <i class="bi bi-geo-alt-fill text-blue-500 text-xs mt-0.5"></i>
-                        <p class="text-[11px] text-slate-600 leading-tight"><b>Jemput:</b> ${jemput}</p>
+                    <div class="space-y-3 mb-5 bg-slate-50/50 p-3.5 rounded-xl border border-slate-200/60 shadow-inner">
+                        <div class="flex items-start gap-3">
+                            <div class="mt-0.5 w-5 h-5 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200"><i class="bi bi-geo-alt-fill text-[10px]"></i></div>
+                            <div>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Titik Jemput</p>
+                                <p class="text-xs text-slate-700 font-medium leading-snug mt-0.5">${jemput.split('|')[0]}</p>
+                            </div>
+                        </div>
+                        <div class="w-px h-4 bg-slate-300 ml-[11px] -my-2 opacity-50"></div>
+                        <div class="flex items-start gap-3">
+                            <div class="mt-0.5 w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 border border-red-200"><i class="bi bi-flag-fill text-[10px]"></i></div>
+                            <div>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Tujuan Bongkar</p>
+                                <p class="text-xs text-slate-700 font-medium leading-snug mt-0.5">${tujuan.split('|')[0]}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex items-start gap-2">
-                        <i class="bi bi-flag-fill text-red-500 text-xs mt-0.5"></i>
-                        <p class="text-[11px] text-slate-600 leading-tight"><b>Tujuan:</b> ${tujuan}</p>
-                    </div>
-                    
-                    <!-- Tombol Lihat Foto -->
-                    <div class="mt-2 pt-2 border-t border-slate-200 border-dashed">
+
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-amber-200/50"><i class="bi bi-box-seam"></i> ${kargo}</span>
                         ${foto && foto !== 'Tanpa Foto' && foto !== '' && !foto.includes('Gagal') ? 
-                        `<a href="${foto}" target="_blank" class="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-[10px] font-black hover:bg-blue-200 transition"><i class="bi bi-camera-fill"></i> Lihat Foto Barang</a>` 
-                        : `<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-400 px-3 py-1.5 rounded-lg text-[10px] font-bold"><i class="bi bi-camera-fill"></i> Tidak Ada Foto</span>`}
+                        `<a href="${foto}" target="_blank" class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-blue-100 transition border border-blue-200/50"><i class="bi bi-image"></i> Cek Foto Barang</a>` 
+                        : `<span class="inline-flex items-center gap-1.5 bg-slate-50 text-slate-400 px-3 py-1.5 rounded-lg text-[10px] font-bold border border-slate-100"><i class="bi bi-image-alt"></i> Tanpa Foto</span>`}
                     </div>
                 </div>
 
-                <!-- Info Kargo & Harga -->
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase">Kategori</p>
-                        <p class="text-xs font-bold text-slate-700">${kargo}</p>
+                <div class="bg-indigo-50/40 p-4 border-t border-indigo-100 mt-auto">
+                    <p class="text-[10px] font-black text-indigo-800 uppercase tracking-widest flex items-center gap-1.5 mb-3"><i class="bi bi-truck-front-fill text-indigo-500"></i> Kontrol Penugasan & Status</p>
+                    
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div class="relative">
+                            <i class="bi bi-person-vcard absolute left-2.5 top-2.5 text-slate-400 text-sm"></i>
+                            <select id="sopir-${idOrder}" class="w-full bg-white border border-slate-200 text-[11px] font-bold text-slate-700 rounded-lg py-2.5 pl-8 pr-2 outline-none focus:border-indigo-400 transition shadow-sm cursor-pointer">${optSopir}</select>
+                        </div>
+                        <div class="relative">
+                            <i class="bi bi-car-front absolute left-2.5 top-2.5 text-slate-400 text-sm"></i>
+                            <select id="armada-${idOrder}" class="w-full bg-white border border-slate-200 text-[11px] font-bold text-slate-700 rounded-lg py-2.5 pl-8 pr-2 outline-none focus:border-indigo-400 transition shadow-sm cursor-pointer">${optArmada}</select>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[9px] text-slate-400 font-bold uppercase">Total Tagihan</p>
-                        <p class="text-sm font-black text-green-600">${tarif}</p>
-                    </div>
-                </div>
 
-                <!-- TOMBOL PENGENDALI STATUS -->
-                <div class="border-t border-slate-100 pt-4 flex gap-2">
-                    <select id="select-${idOrder}" class="flex-1 bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 rounded-lg px-2 outline-none">
-                        <option value="Menunggu Konfirmasi" ${status === 'Menunggu Konfirmasi' ? 'selected' : ''}>Menunggu Konfirmasi</option>
-                        <option value="Driver Menuju Lokasi" ${status === 'Driver Menuju Lokasi' ? 'selected' : ''}>Driver Menuju Lokasi</option>
-                        <option value="Selesai" ${status === 'Selesai' ? 'selected' : ''}>Selesai</option>
-                    </select>
-                    <button onclick="ubahStatusLaporan('${idOrder}')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-md">Update</button>
+                    <div class="flex gap-2">
+                        <select id="select-${idOrder}" class="flex-1 bg-white border border-slate-200 text-xs font-black text-slate-700 rounded-lg px-3 py-2.5 outline-none shadow-sm focus:border-indigo-400 cursor-pointer">
+                            <option value="Menunggu Konfirmasi" ${status === 'Menunggu Konfirmasi' ? 'selected' : ''}>⏳ Menunggu Konfirmasi</option>
+                            <option value="Driver Menuju Lokasi" ${status === 'Driver Menuju Lokasi' ? 'selected' : ''}>🚀 Driver Menuju Lokasi</option>
+                            <option value="Barang Diangkut" ${status === 'Barang Diangkut' ? 'selected' : ''}>📦 Barang Diangkut</option>
+                            <option value="Selesai" ${status === 'Selesai' ? 'selected' : ''}>✅ Pesanan Selesai</option>
+                        </select>
+                        <button onclick="ubahStatusLaporan('${idOrder}')" class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg text-xs font-black hover:bg-indigo-700 shadow-md shadow-indigo-500/30 transition flex items-center gap-1.5 active:scale-95"><i class="bi bi-send-fill"></i> UPDATE</button>
+                    </div>
                 </div>
             </div>`;
 
             document.getElementById('daftarPesanan').insertAdjacentHTML('beforeend', htmlKartu);
         }
 
-        // FUNGSI 3: MENGIRIM PERINTAH RUBAH STATUS KE SERVER
         async function ubahStatusLaporan(idOrder) {
             let statusBaru = document.getElementById(`select-${idOrder}`).value;
+            let sopirBaru = document.getElementById(`sopir-${idOrder}`).value;
+            let armadaBaru = document.getElementById(`armada-${idOrder}`).value;
             
-            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+            Swal.fire({ title: 'Menyimpan Penugasan...', text: 'Terkoneksi ke Database Utama', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 
             try {
                 let response = await fetch(GAS_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'updateStatus', payload: { id: idOrder, status: statusBaru } })
+                    body: JSON.stringify({ action: 'updateStatus', payload: { id: idOrder, status: statusBaru, sopir: sopirBaru, armada: armadaBaru } })
                 });
                 
                 let result = await response.json();
                 
                 if(result.status === 'success') {
-                    Swal.fire({ icon: 'success', title: 'Status Diperbarui!', timer: 1500, showConfirmButton: false });
-                    // Merubah warna badge otomatis tanpa refresh
+                    Swal.fire({ icon: 'success', title: 'Data Diperbarui!', timer: 1500, showConfirmButton: false });
                     let badge = document.getElementById(`badge-${idOrder}`);
                     badge.innerText = statusBaru;
-                    badge.className = 'status-badge';
-                    if(statusBaru.includes('Menuju')) badge.classList.add('st-jalan');
-                    else if(statusBaru.includes('Selesai')) badge.classList.add('st-selesai');
-                    else badge.classList.add('st-tunggu');
+                    badge.className = 'status-badge ' + (statusBaru.includes('Menuju') ? 'st-jalan' : (statusBaru.includes('Selesai') ? 'st-selesai' : 'st-tunggu'));
                 }
             } catch(e) {
                 Swal.fire('Gagal', 'Terjadi kesalahan jaringan.', 'error');
             }
         }
 
-        // Logika Tarif
         function simpanTarif() {
-            const config = {
-                dasar: document.getElementById('setDasar').value, km: document.getElementById('setKm').value,
-                kuli1: document.getElementById('setKuli1').value, kuli2: document.getElementById('setKuli2').value,
-                carter: document.getElementById('setCarter').value, sopir: document.getElementById('setSopir').value
-            };
+            const config = { dasar: document.getElementById('setDasar').value, km: document.getElementById('setKm').value, kuli1: document.getElementById('setKuli1').value, kuli2: document.getElementById('setKuli2').value, carter: document.getElementById('setCarter').value, sopir: document.getElementById('setSopir').value };
             localStorage.setItem('mazaya_tarif', JSON.stringify(config));
             Swal.fire({ icon: 'success', title: 'Tarif Diperbarui!', confirmButtonColor: '#0b192c' });
         }
@@ -303,7 +466,6 @@
                 document.getElementById('setCarter').value = saved.carter || 400000;
                 document.getElementById('setSopir').value = saved.sopir || 300000;
             }
-            // Langsung muat data pesanan saat admin buka layar
             muatDataPesanan();
         }
     </script>
