@@ -3,256 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruang Kontrol - Mazaya Logistics</title>
-    
-    <!-- Dependencies -->
+    <title>MazayaGo - Admin Dashboard</title>
+    <!-- Tailwind CSS (Wajib agar tidak hancur) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
-
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
-        .bg-mazaya-navy { background-color: #0b192c; }
-        .text-mazaya-navy { color: #0b192c; }
-        .text-mazaya-yellow { color: #ffb703; }
-        .bg-mazaya-yellow { background-color: #ffb703; }
-        
-        .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.25rem; border-radius: 0.5rem; color: #94a3b8; font-weight: 600; transition: all 0.2s; cursor: pointer; }
-        .sidebar-link:hover { background-color: #1e293b; color: #ffffff; }
-        .sidebar-link.active { background-color: #3b82f6; color: #ffffff; }
-        
-        .card-order { transition: all 0.2s; }
-        .card-order:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
-        
-        /* Custom Scrollbar for table */
-        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        .tab-section { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }</style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <!-- SIDEBAR (Desktop) -->
-    <aside class="w-64 bg-mazaya-navy flex-shrink-0 hidden md:flex flex-col border-r border-slate-800 z-20">
-        <div class="p-6 border-b border-slate-800 flex items-center gap-3">
-            <div class="bg-mazaya-yellow text-mazaya-navy p-2 rounded-lg flex items-center justify-center shadow-lg">
-                <i class="bi bi-speedometer2 text-xl font-black"></i>
-            </div>
-            <div>
-                <h1 class="text-white font-black tracking-tight text-lg leading-none italic">MAZAYA</h1>
-                <p class="text-[10px] text-blue-400 font-bold uppercase tracking-widest mt-1">Sistem Logistik</p>
-            </div>
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-[#0b192c] text-white flex flex-col hidden md:flex">
+        <div class="p-6 border-b border-white/10">
+            <h1 class="text-2xl font-black italic tracking-tight">MAZAYA<span class="text-[#ffb703]">GO</span></h1>
+            <p class="text-xs text-slate-400 mt-1">Control Panel v3.0</p>
         </div>
-        
-        <nav class="flex-1 overflow-y-auto p-4 space-y-2">
-            <div onclick="switchTab('pesanan')" id="nav-pesanan" class="sidebar-link active"><i class="bi bi-inbox-fill text-lg"></i> Pesanan Masuk</div>
-            <div onclick="switchTab('pelanggan')" id="nav-pelanggan" class="sidebar-link"><i class="bi bi-people-fill text-lg"></i> Data Pelanggan</div>
-            <div onclick="switchTab('keuangan')" id="nav-keuangan" class="sidebar-link"><i class="bi bi-wallet-fill text-lg"></i> Finansial & Kas</div>
-            <div onclick="switchTab('pengaturan')" id="nav-pengaturan" class="sidebar-link"><i class="bi bi-sliders text-lg"></i> Pengaturan Tarif</div>
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="switchTab('pesanan')" class="w-full flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold transition">
+                <i class="bi bi-bell"></i> Pesanan Baru
+            </button>
+            <button onclick="switchTab('pengaturan')" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition">
+                <i class="bi bi-gear"></i> Pengaturan Tarif
+            </button>
         </nav>
-        
-        <div class="p-4 border-t border-slate-800">
-            <a href="index.html" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors border border-slate-700">
-                <i class="bi bi-box-arrow-up-right"></i> Buka Website
-            </a>
-        </div>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col h-screen overflow-hidden relative bg-slate-50">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
         
-        <!-- HEADER MOBILE & TOP BAR -->
-        <header class="bg-white border-b border-slate-200 p-4 flex items-center justify-between z-10 shadow-sm">
-            <div class="flex items-center gap-3 md:hidden">
-                <div class="bg-mazaya-navy text-white p-1.5 rounded flex items-center justify-center"><i class="bi bi-truck"></i></div>
-                <h1 class="font-black text-mazaya-navy italic">MAZAYA</h1>
-            </div>
-            
-            <div class="hidden md:block">
-                <h2 id="header-title" class="text-xl font-black text-slate-800">Daftar Pesanan Baru</h2>
-                <p id="header-subtitle" class="text-xs text-slate-500 font-medium">Pantau dan kelola orderan pelanggan secara realtime.</p>
-            </div>
-            
-            <button onclick="fetchData()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-colors border border-blue-200 shadow-sm">
-                <i class="bi bi-arrow-clockwise" id="icon-refresh"></i> <span class="hidden sm:inline">Refresh Data</span>
-            </button>
+        <!-- HEADER -->
+        <header class="bg-white border-b border-slate-200 p-4 md:px-6 flex justify-between items-center z-10 shadow-sm">
+            <h2 class="text-xl font-black text-slate-800" id="headerTitle">Pesanan Masuk</h2>
+            <button class="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-100"><i class="bi bi-box-arrow-right"></i> Keluar</button>
         </header>
 
-        <!-- TAB 1: PESANAN MASUK -->
-        <div id="tab-pesanan" class="tab-section flex-1 overflow-y-auto p-4 md:p-6 w-full block">
-            <div id="loading-state" class="flex flex-col items-center justify-center h-64 text-slate-400">
-                <i class="bi bi-arrow-repeat animate-spin text-5xl text-blue-500 mb-4"></i>
-                <p class="font-bold text-slate-600">Menghubungkan Database...</p>
-                <p class="text-xs mt-1">Mengambil data terbaru secara aman.</p>
-            </div>
-
-            <div id="pesanan-list" class="space-y-4 hidden max-w-5xl mx-auto"></div>
-        </div>
-
-        <!-- TAB 2: DATA PELANGGAN (BARU) -->
-        <div id="tab-pelanggan" class="tab-section flex-1 overflow-y-auto p-4 md:p-6 w-full hidden">
-            <div class="max-w-6xl mx-auto space-y-6">
-                <!-- Header Pelanggan -->
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-indigo-100 text-indigo-600 p-3 rounded-xl text-2xl"><i class="bi bi-person-lines-fill"></i></div>
-                        <div>
-                            <h3 class="font-black text-slate-800 text-lg">Database Pelanggan</h3>
-                            <p class="text-xs text-slate-500">Total: <span id="total-pelanggan" class="font-bold text-indigo-600">0</span> Kontak Tersimpan</p>
-                        </div>
-                    </div>
-                    <div class="w-full md:w-auto relative">
-                        <i class="bi bi-search absolute left-3 top-2.5 text-slate-400"></i>
-                        <input type="text" placeholder="Cari nama atau nomor..." class="w-full md:w-64 pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-lg bg-slate-50 outline-none focus:border-indigo-500 transition">
-                    </div>
-                </div>
-
-                <!-- Tabel Pelanggan -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto custom-scrollbar">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                    <th class="p-4">ID / Tanggal</th>
-                                    <th class="p-4">Nama Pelanggan</th>
-                                    <th class="p-4">WhatsApp Kontak</th>
-                                    <th class="p-4">Alamat Penjemputan Terakhir</th>
-                                    <th class="p-4 text-center">Aksi Cepat</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pelanggan-list" class="divide-y divide-slate-100">
-                                <!-- Data Pelanggan dirender di sini via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Empty State Pelanggan -->
-                    <div id="pelanggan-empty" class="hidden flex-col items-center justify-center py-12 text-slate-400 bg-white">
-                        <i class="bi bi-people text-5xl mb-3 text-slate-300"></i>
-                        <p class="font-bold text-slate-600">Belum Ada Pelanggan</p>
-                    </div>
-                </div>
+        <!-- TAB 1: PESANAN (Simulasi Tampilan) -->
+        <div id="tab-pesanan" class="flex-1 overflow-y-auto p-4 md:p-6 w-full block">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+                <i class="bi bi-truck text-5xl text-slate-300 mb-4 block"></i>
+                <h3 class="text-lg font-bold text-slate-700">Monitor Pesanan</h3>
+                <p class="text-slate-500 text-sm">Pesanan dari aplikasi akan muncul di sini (Tersambung ke Google Sheets).</p>
             </div>
         </div>
 
-        <!-- TAB 3: FINANSIAL & KAS -->
-        <div id="tab-keuangan" class="tab-section flex-1 overflow-y-auto p-4 md:p-6 w-full hidden">
-            <div class="max-w-5xl mx-auto space-y-6">
-                <!-- Ringkasan Keuangan -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
-                        <div class="bg-green-100 text-green-600 p-3 rounded-xl text-2xl"><i class="bi bi-cash-stack"></i></div>
-                        <div>
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Pemasukan</p>
-                            <p class="text-2xl font-black text-slate-800 mt-1">Rp 4.550.000</p>
-                            <p class="text-[10px] text-green-600 font-bold mt-1"><i class="bi bi-arrow-up-right"></i> Dari Pesanan Selesai</p>
-                        </div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4">
-                        <div class="bg-red-100 text-red-600 p-3 rounded-xl text-2xl"><i class="bi bi-graph-down-arrow"></i></div>
-                        <div>
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Pengeluaran</p>
-                            <p class="text-2xl font-black text-slate-800 mt-1">Rp 1.200.000</p>
-                            <p class="text-[10px] text-red-500 font-bold mt-1"><i class="bi bi-tools"></i> Operasional & Perawatan</p>
-                        </div>
-                    </div>
-                    <div class="bg-mazaya-navy p-5 rounded-2xl shadow-md border-b-4 border-mazaya-yellow flex items-center gap-4">
-                        <div class="bg-slate-800 text-mazaya-yellow p-3 rounded-xl text-2xl border border-slate-600"><i class="bi bi-wallet2"></i></div>
-                        <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Saldo Bersih (Profit)</p>
-                            <p class="text-2xl font-black text-white mt-1">Rp 3.350.000</p>
-                            <p class="text-[10px] text-blue-300 font-bold mt-1">Bulan Ini</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit">
-                        <h3 class="font-black text-slate-800 mb-4 border-b border-slate-100 pb-2"><i class="bi bi-receipt-cutoff text-red-500"></i> Catat Pengeluaran Baru</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Kategori Biaya</label>
-                                <select class="w-full p-2.5 text-sm border border-slate-300 rounded-lg bg-slate-50 focus:border-blue-500 outline-none">
-                                    <optgroup label="Biaya Perjalanan"><option>BBM (Solar/Bensin)</option><option>E-Toll & Parkir</option></optgroup>
-                                    <optgroup label="Gaji & Upah"><option>Gaji Sopir Utama</option><option>Gaji Kernet / Jasa Kuli</option></optgroup>
-                                    <optgroup label="Perawatan"><option>Ganti Oli Mesin</option><option>Tambal Ban / Ganti Ban</option><option>Service / Sparepart</option></optgroup>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Nominal (Rp)</label>
-                                <input type="number" placeholder="Contoh: 150000" class="w-full p-2.5 text-sm border border-slate-300 rounded-lg bg-slate-50 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-600 mb-1">Keterangan Tambahan</label>
-                                <textarea rows="2" placeholder="Ganti oli rutin bulan Agustus..." class="w-full p-2.5 text-sm border border-slate-300 rounded-lg bg-slate-50 outline-none"></textarea>
-                            </div>
-                            <button onclick="Swal.fire('Fitur Backend', 'Fitur tulis ke Google Sheets untuk modul Keuangan akan diaktifkan pada pembaruan tahap 2.', 'info')" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-lg shadow transition-colors">
-                                <i class="bi bi-save"></i> Simpan Pengeluaran
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 class="font-black text-slate-800 mb-4 border-b border-slate-100 pb-2"><i class="bi bi-clock-history text-blue-500"></i> Riwayat Transaksi Terakhir</h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100 transition">
-                                <div class="flex items-center gap-3"><div class="bg-green-100 text-green-600 w-10 h-10 rounded-full flex items-center justify-center font-black"><i class="bi bi-plus-lg"></i></div>
-                                <div><p class="text-sm font-bold text-slate-800">Order Selesai (ORD-2026)</p><p class="text-[11px] text-slate-500">Pindahan Kost - 03 Agu 2026</p></div></div>
-                                <p class="text-sm font-black text-green-600">+ Rp 150.000</p>
-                            </div>
-                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:bg-slate-100 transition">
-                                <div class="flex items-center gap-3"><div class="bg-red-100 text-red-600 w-10 h-10 rounded-full flex items-center justify-center font-black"><i class="bi bi-dash-lg"></i></div>
-                                <div><p class="text-sm font-bold text-slate-800">Ganti Oli Mesin</p><p class="text-[11px] text-slate-500">Carry Pick-Up - 02 Agu 2026</p></div></div>
-                                <p class="text-sm font-black text-red-600">- Rp 250.000</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 4: PENGATURAN TARIF -->
-        <div id="tab-pengaturan" class="tab-section flex-1 overflow-y-auto p-4 md:p-6 w-full hidden">
+        <!-- TAB 2: PENGATURAN TARIF (Tampilan Rapih & Tidak Hancur) -->
+        <div id="tab-pengaturan" class="flex-1 overflow-y-auto p-4 md:p-6 w-full hidden">
             <div class="max-w-4xl mx-auto space-y-6">
+                
                 <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl flex gap-3 text-blue-800 shadow-sm">
                     <i class="bi bi-info-circle-fill text-xl mt-0.5 text-blue-600"></i>
                     <div>
                         <h4 class="font-bold">Manajemen Tarif Dinamis</h4>
-                        <p class="text-xs mt-1">Ubah nilai di bawah ini untuk memperbarui harga kalkulator di website utama pelanggan secara otomatis.</p>
+                        <p class="text-xs mt-1">Ubah nilai di bawah ini. Aplikasi pelanggan dan Driver akan otomatis mengikuti harga baru ini tanpa perlu update aplikasi.</p>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-black text-slate-800 mb-6 flex items-center gap-2"><i class="bi bi-cash-coin text-green-500 text-xl"></i> Skema Tarif Berdasarkan Jarak</h3>
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
                     
-                    <div class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-50 border border-slate-100 rounded-xl items-center">
-                            <div><p class="font-bold text-sm text-slate-700">Tarif Jarak Dekat</p><p class="text-[11px] text-slate-500">Jarak tempuh 0 sampai 5 KM</p></div>
-                            <div><label class="text-[10px] font-bold text-slate-500">Harga Per KM (Rp)</label><input type="number" value="10000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500">Harga Minimal (Rp)</label><input type="number" value="50000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
+                    <!-- SKEMA 1: DALAM KOTA -->
+                    <h3 class="font-black text-slate-800 flex items-center gap-2"><i class="bi bi-signpost-split text-blue-500 text-xl"></i> Reguler / Dalam Kota</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Tarif Dasar Minimal (0 - 5 KM)</label>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setDasar" value="50000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
                         </div>
+                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Tarif Per KM Selanjutnya</label>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKm" value="10000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
+                        </div>
+                    </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-50 border border-slate-100 rounded-xl items-center">
-                            <div><p class="font-bold text-sm text-slate-700">Tarif Jarak Menengah</p><p class="text-[11px] text-slate-500">Jarak tempuh 6 sampai 10 KM</p></div>
-                            <div><label class="text-[10px] font-bold text-slate-500">Harga Per KM (Rp)</label><input type="number" value="12000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500">Harga Minimal (Rp)</label><input type="number" value="80000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
+                    <!-- SKEMA 2: TENAGA -->
+                    <h3 class="font-black text-slate-800 flex items-center gap-2 pt-4 border-t border-slate-100"><i class="bi bi-people text-green-500 text-xl"></i> Biaya Kuli / Tenaga Ekstra</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Muatan Sedang (1 Orang)</label>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKuli1" value="50000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
                         </div>
+                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Muatan Berat (2 Orang)</label>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKuli2" value="100000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
+                        </div>
+                    </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-50 border border-slate-100 rounded-xl items-center">
-                            <div><p class="font-bold text-sm text-slate-700">Tarif Jarak Jauh</p><p class="text-[11px] text-slate-500">Jarak tempuh 11 sampai 30 KM</p></div>
-                            <div><label class="text-[10px] font-bold text-slate-500">Harga Per KM (Rp)</label><input type="number" value="14000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
-                            <div><label class="text-[10px] font-bold text-slate-500">Harga Minimal (Rp)</label><input type="number" value="100000" class="w-full p-2 text-sm border border-slate-300 rounded bg-white"></div>
+                    <!-- SKEMA 3: CARTER LUAR KOTA -->
+                    <h3 class="font-black text-slate-800 flex items-center gap-2 pt-4 border-t border-slate-100"><i class="bi bi-car-front text-amber-500 text-xl"></i> Skema Carter (Luar Kota / Seharian)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Sewa Armada / Hari</label>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setCarter" value="400000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
                         </div>
+                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Uang Jasa Sopir / Hari</label>
+                            <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setSopir" value="300000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
+                        </div>
+                    </div>
 
-                        <div class="pt-4 flex justify-end gap-3">
-                            <button class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-6 py-2.5 rounded-lg transition-colors">Batal</button>
-                            <button onclick="Swal.fire('Fitur Tahap 2', 'Sistem Database Pengaturan Server sedang disiapkan.', 'info')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-lg shadow-md transition-colors"><i class="bi bi-check-lg"></i> Simpan Tarif</button>
-                        </div>
+                    <div class="pt-6 flex justify-end gap-3">
+                        <button onclick="simpanTarif()" class="w-full md:w-auto bg-[#0b192c] hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="bi bi-check2-circle text-lg"></i> Simpan & Terapkan Tarif Baru
+                        </button>
                     </div>
                 </div>
             </div>
@@ -261,333 +112,41 @@
     </main>
 
     <script>
-        // LINK GOOGLE APPS SCRIPT
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyFAS7hUgpxO7buBN3hrkt3Xe9A6efeDtevZbbDaSGZvgyXTVZMk7aMOyiTYD8jfEfH9g/exec';
-
-        window.onload = function() {
-            fetchData();
-        };
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-section').forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
-            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-            document.getElementById('tab-' + tabId).classList.add('block');
-            document.getElementById('nav-' + tabId).classList.add('active');
-
-            const title = document.getElementById('header-title');
-            const subtitle = document.getElementById('header-subtitle');
-            
-            if (tabId === 'pesanan') {
-                title.innerText = "Daftar Pesanan Baru";
-                subtitle.innerText = "Pantau dan kelola orderan pelanggan secara realtime.";
-                document.getElementById('icon-refresh').parentElement.classList.remove('hidden');
-            } else if (tabId === 'pelanggan') {
-                title.innerText = "Data Pelanggan Internal";
-                subtitle.innerText = "Manajemen kontak WhatsApp pelanggan yang pernah order.";
-                document.getElementById('icon-refresh').parentElement.classList.add('hidden');
-            } else if (tabId === 'keuangan') {
-                title.innerText = "Buku Kas & Operasional";
-                subtitle.innerText = "Pantau profit, catat gaji kru, BBM, dan biaya perawatan truk.";
-                document.getElementById('icon-refresh').parentElement.classList.add('hidden');
-            } else if (tabId === 'pengaturan') {
-                title.innerText = "Pengaturan Sistem";
-                subtitle.innerText = "Ubah harga tarif dan aturan batas muatan pelanggan.";
-                document.getElementById('icon-refresh').parentElement.classList.add('hidden');
-            }
+        function switchTab(tab) {
+            document.getElementById('tab-pesanan').classList.add('hidden');
+            document.getElementById('tab-pengaturan').classList.add('hidden');
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.getElementById('headerTitle').innerText = tab === 'pesanan' ? 'Pesanan Masuk' : 'Pengaturan Tarif';
         }
 
-        async function fetchData() {
-            const btnIcon = document.getElementById('icon-refresh');
-            const loading = document.getElementById('loading-state');
-            const container = document.getElementById('pesanan-list');
+        function simpanTarif() {
+            // Untuk simulasi cepat, kita simpan di localStorage. 
+            // Nanti di sistem asli, ini akan di-POST ke GAS_URL (updateTarif).
+            const config = {
+                dasar: document.getElementById('setDasar').value,
+                km: document.getElementById('setKm').value,
+                kuli1: document.getElementById('setKuli1').value,
+                kuli2: document.getElementById('setKuli2').value,
+                carter: document.getElementById('setCarter').value,
+                sopir: document.getElementById('setSopir').value
+            };
+            localStorage.setItem('mazaya_tarif', JSON.stringify(config));
             
-            btnIcon.classList.add('animate-spin');
-            if (container.children.length === 0) {
-                loading.classList.remove('hidden');
-                container.classList.add('hidden');
-            }
-
-            try {
-                const response = await fetch(GAS_URL);
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    renderPesanan(data.pesanan);
-                    renderPelanggan(data.pelanggan); // Render Pelanggan Baru!
-                } else {
-                    Swal.fire('Error', 'Gagal memuat data dari server.', 'error');
-                }
-            } catch (error) {
-                Swal.fire('Koneksi Gagal', 'Pastikan internet stabil.', 'error');
-            } finally {
-                btnIcon.classList.remove('animate-spin');
-                loading.classList.add('hidden');
-                container.classList.remove('hidden');
-            }
-        }
-
-        function renderPesanan(rows) {
-            const container = document.getElementById('pesanan-list');
-            container.innerHTML = '';
-
-            if (!rows || rows.length <= 1) {
-                container.innerHTML = `
-                    <div class="bg-white border border-slate-200 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center text-slate-400">
-                        <i class="bi bi-inbox text-5xl mb-3 text-slate-300"></i>
-                        <p class="font-bold text-slate-600">Belum Ada Pesanan</p>
-                    </div>`;
-                return;
-            }
-
-            for (let i = rows.length - 1; i > 0; i--) {
-                const row = rows[i];
-                if(!row[0] || row[0] === "") continue;
-
-                // Membaca 15 Kolom Baru
-                // 0:ID, 1:Waktu, 2:Nama, 3:WA, 4:Jemput, 5:Tujuan, 6:Jarak, 7:Estimasi, 8:Catatan, 9:Tenaga, 10:Foto, 11:Tarif, 12:BiayaLain, 13:GrandTotal, 14:Status
-                
-                // PROTEKSI DATA USANG (Jika kolom kurang dari 15 karena order lama)
-                let status = row[14];
-                if (row.length < 15 || status === undefined) {
-                    status = 'Data Lama (Harus Dihapus di Excel)';
-                    row[11] = 0; row[12] = 0; row[13] = 0; // Nol-kan harga agar tidak error baca teks
-                } else if (status === '') {
-                    status = 'Menunggu Konfirmasi';
-                }
-
-                let badgeClass = "bg-slate-100 text-slate-800 border-slate-200";
-                let statusIcon = "bi-clock-history";
-                
-                // Pewarnaan Status Bertahap
-                if(status.toLowerCase().includes('menunggu')) { badgeClass = "bg-amber-100 text-amber-800 border-amber-200"; statusIcon = "bi-hourglass-split"; }
-                else if(status.toLowerCase().includes('ditugaskan')) { badgeClass = "bg-indigo-100 text-indigo-800 border-indigo-200"; statusIcon = "bi-person-check-fill"; }
-                else if(status.toLowerCase().includes('menuju')) { badgeClass = "bg-blue-100 text-blue-800 border-blue-200"; statusIcon = "bi-truck"; }
-                else if(status.toLowerCase().includes('diangkut')) { badgeClass = "bg-purple-100 text-purple-800 border-purple-200"; statusIcon = "bi-box-seam-fill"; }
-                else if(status.toLowerCase().includes('selesai')) { badgeClass = "bg-green-100 text-green-800 border-green-200"; statusIcon = "bi-check-circle-fill"; }
-                else if(status.toLowerCase().includes('batal')) { badgeClass = "bg-red-100 text-red-800 border-red-200"; statusIcon = "bi-x-circle-fill"; }
-
-                let noWA = row[3] ? row[3].toString() : '';
-                if(noWA.startsWith('0')) noWA = '62' + noWA.substring(1);
-
-                let fotoHtml = '';
-                if (row[10] && row[10].toString().startsWith('http')) {
-                    fotoHtml = `<a href="${row[10]}" target="_blank" class="block w-full text-center text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2 rounded-lg border border-indigo-200 transition-colors font-bold shadow-sm"><i class="bi bi-image"></i> Buka Foto Barang</a>`;
-                } else {
-                    fotoHtml = `<div class="text-[11px] text-slate-400 bg-slate-50 py-2 text-center rounded-lg border border-slate-100 border-dashed italic">Tidak ada foto / Gagal</div>`;
-                }
-
-                let tarifDasar = parseInt(row[11]) || 0;
-                let biayaLain = parseInt(row[12]) || 0;
-                let grandTotal = parseInt(row[13]) || tarifDasar;
-
-                const card = `
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden card-order mb-4">
-                    <div class="bg-slate-50 border-b border-slate-200 p-3 md:p-4 flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <span class="bg-blue-600 text-white text-[10px] font-black px-2 py-1 rounded shadow-sm">${row[0]}</span>
-                            <span class="text-xs font-bold text-slate-500"><i class="bi bi-calendar-event"></i> ${row[1]}</span>
-                        </div>
-                        <span class="px-3 py-1.5 rounded-full text-[10px] font-black border ${badgeClass} shadow-sm flex items-center gap-1.5 uppercase tracking-wide"><i class="bi ${statusIcon}"></i> ${status}</span>
-                    </div>
-
-                    <div class="p-4 md:p-5 grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="md:col-span-3 space-y-4">
-                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100 gap-3">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-lg"><i class="bi bi-person"></i></div>
-                                    <div>
-                                        <p class="text-[10px] text-slate-500 font-bold uppercase">Nama Pemesan</p>
-                                        <p class="font-black text-slate-800 text-sm">${row[2]}</p>
-                                    </div>
-                                </div>
-                                <a href="https://wa.me/${noWA}?text=Halo%20Kak%20${row[2]},%20saya%20Admin%20Jasa%20Angkut%20Mazaya.%20Status%20pesanan%20${row[0]}%20saat%20ini:%20*${status}*." target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-colors shadow-sm w-full sm:w-auto justify-center">
-                                    <i class="bi bi-whatsapp"></i> Chat WhatsApp
-                                </a>
-                            </div>
-
-                            <div class="relative pl-6 space-y-4 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
-                                <div class="relative">
-                                    <div class="absolute -left-6 top-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-[10px] ring-4 ring-white shadow-sm"><i class="bi bi-geo-alt-fill"></i></div>
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Penjemputan</p>
-                                    <p class="text-xs font-bold text-slate-800 mt-0.5 leading-relaxed">${row[4]}</p>
-                                </div>
-                                <div class="relative">
-                                    <div class="absolute -left-6 top-0 w-6 h-6 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-[10px] ring-4 ring-white shadow-sm"><i class="bi bi-geo-alt-fill"></i></div>
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Tujuan Bongkar</p>
-                                    <p class="text-xs font-bold text-slate-800 mt-0.5 leading-relaxed">${row[5]}</p>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 text-center">
-                                    <p class="text-[10px] text-slate-500 font-bold">Total Jarak</p>
-                                    <p class="text-sm font-black text-blue-600">${row[6]} Km</p>
-                                </div>
-                                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 text-center">
-                                    <p class="text-[10px] text-slate-500 font-bold">Estimasi</p>
-                                    <p class="text-sm font-black text-slate-800">${row[7]}</p>
-                                </div>
-                                <div class="bg-blue-50/50 p-2 rounded-lg border border-blue-100 sm:col-span-2 flex flex-col justify-center px-3">
-                                    <p class="text-[10px] text-blue-600 font-bold uppercase mb-0.5">Opsi Tenaga Angkut</p>
-                                    <p class="text-xs font-black text-slate-800">${row[9]}</p>
-                                </div>
-                            </div>
-
-                            <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-200/50 flex flex-col gap-2">
-                                <div class="flex items-start gap-2">
-                                    <i class="bi bi-box-seam text-amber-600 mt-0.5"></i>
-                                    <div>
-                                        <p class="text-[10px] text-amber-800 font-bold uppercase">Catatan & Rincian Barang</p>
-                                        <p class="text-xs font-medium text-slate-800 mt-0.5 leading-relaxed">${row[8] || '-'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tagihan Kanan -->
-                        <div class="md:col-span-1 border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-5 flex flex-col justify-between space-y-4">
-                            <div class="space-y-3">
-                                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                    <div class="flex justify-between items-center mb-1"><span class="text-[10px] font-bold text-slate-500">Tarif Aplikasi</span><span class="text-xs font-bold text-slate-700">Rp ${tarifDasar.toLocaleString('id-ID')}</span></div>
-                                    <div class="flex justify-between items-center pb-1 border-b border-slate-200 mb-1"><span class="text-[10px] font-bold text-slate-500">Biaya Parkir/Tol</span><span class="text-xs font-bold text-red-500">+ Rp ${biayaLain.toLocaleString('id-ID')}</span></div>
-                                    <p class="text-[9px] font-bold text-blue-600 mb-0.5 uppercase tracking-wide">GRAND TOTAL</p>
-                                    <p class="text-lg font-black text-slate-800 leading-none">Rp ${grandTotal.toLocaleString('id-ID')}</p>
-                                </div>
-                                
-                                <div>
-                                    <p class="text-[10px] text-slate-500 font-bold mb-1 text-center md:text-left">Dokumentasi</p>
-                                    ${fotoHtml}
-                                </div>
-                            </div>
-                            
-                            <div class="pt-2 space-y-2">
-                                <button onclick="bukaModalStatus('${row[0]}', '${status}')" class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-lg shadow-md transition-all">
-                                    <i class="bi bi-arrow-repeat"></i> Update Status
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-                
-                container.insertAdjacentHTML('beforeend', card);
-            }
-        }
-
-        function renderPelanggan(rows) {
-            const container = document.getElementById('pelanggan-list');
-            const emptyState = document.getElementById('pelanggan-empty');
-            const totalText = document.getElementById('total-pelanggan');
-            
-            container.innerHTML = '';
-            
-            // rows[0] is headers. We need at least 1 real data row.
-            if (!rows || rows.length <= 1) {
-                emptyState.classList.remove('hidden');
-                emptyState.classList.add('flex');
-                totalText.innerText = "0";
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            emptyState.classList.remove('flex');
-            totalText.innerText = (rows.length - 1).toString();
-
-            // Loop dari bawah agar yang terbaru ada di atas
-            for (let i = rows.length - 1; i > 0; i--) {
-                const row = rows[i];
-                if(!row[0] || row[0] === "") continue;
-
-                // Format: 0:ID, 1:Nama, 2:WA, 3:Alamat, 4:Tanggal
-                let noWA = row[2] ? row[2].toString() : '';
-                if(noWA.startsWith('0')) noWA = '62' + noWA.substring(1);
-                
-                let tglObj = new Date(row[4]);
-                let tglFormat = tglObj instanceof Date && !isNaN(tglObj) ? 
-                    tglObj.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}) : row[4];
-
-                let initial = row[1] ? row[1].charAt(0).toUpperCase() : '?';
-
-                const tr = `
-                <tr class="hover:bg-indigo-50/30 transition-colors border-b border-slate-100 last:border-0">
-                    <td class="p-4 align-middle">
-                        <p class="text-xs font-bold text-slate-800">${row[0]}</p>
-                        <p class="text-[10px] text-slate-500">${tglFormat}</p>
-                    </td>
-                    <td class="p-4 align-middle">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs shrink-0">
-                                ${initial}
-                            </div>
-                            <p class="text-sm font-bold text-slate-800 truncate max-w-[150px]">${row[1]}</p>
-                        </div>
-                    </td>
-                    <td class="p-4 align-middle">
-                        <p class="text-xs font-medium text-slate-600 font-mono bg-slate-100 px-2 py-1 rounded inline-block border border-slate-200">
-                            ${row[2]}
-                        </p>
-                    </td>
-                    <td class="p-4 align-middle max-w-xs">
-                        <p class="text-xs text-slate-600 truncate" title="${row[3]}">
-                            <i class="bi bi-geo-alt text-slate-400"></i> ${row[3]}
-                        </p>
-                    </td>
-                    <td class="p-4 align-middle text-center">
-                        <a href="https://wa.me/${noWA}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-500 hover:text-white transition-colors shadow-sm" title="Chat WhatsApp">
-                            <i class="bi bi-whatsapp"></i>
-                        </a>
-                    </td>
-                </tr>`;
-                
-                container.insertAdjacentHTML('beforeend', tr);
-            }
-        }
-
-        // FUNGSI BARU: UPDATE STATUS INTERAKTIF (FITUR TAHAP 2 AKTIF)
-        async function bukaModalStatus(idOrder, statusSekarang) {
-            const { value: statusBaru } = await Swal.fire({
-                title: 'Update Status Pengiriman',
-                text: 'Order ID: ' + idOrder,
-                input: 'select',
-                inputOptions: {
-                    'Menunggu Konfirmasi': 'Menunggu Konfirmasi',
-                    'Driver Ditugaskan': 'Driver Ditugaskan',
-                    'Menuju Lokasi': 'Menuju Lokasi',
-                    'Barang Diangkut': 'Barang Diangkut',
-                    'Selesai': 'Selesai',
-                    'Batal': 'Batal'
-                },
-                inputValue: statusSekarang,
-                showCancelButton: true,
-                confirmButtonText: 'Simpan Perubahan',
-                confirmButtonColor: '#2563eb',
-                cancelButtonText: 'Batal',
-                icon: 'question'
+            Swal.fire({
+                icon: 'success', title: 'Tarif Diperbarui!',
+                text: 'Aplikasi pelanggan kini menggunakan skema harga yang baru.',
+                confirmButtonColor: '#0b192c'
             });
+        }
 
-            if (statusBaru && statusBaru !== statusSekarang) {
-                Swal.fire({
-                    title: 'Menyimpan...',
-                    text: 'Mengirim status ke server database.',
-                    allowOutsideClick: false,
-                    didOpen: () => { Swal.showLoading() }
-                });
-
-                try {
-                    const response = await fetch(GAS_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify({ action: 'updateStatus', payload: { id: idOrder, status: statusBaru } })
-                    });
-                    
-                    Swal.fire('Berhasil!', 'Status berhasil diperbarui ke: ' + statusBaru, 'success').then(() => {
-                        fetchData(); // Muat ulang layar secara otomatis
-                    });
-                } catch (error) {
-                    Swal.fire('Gagal', 'Terjadi kesalahan jaringan.', 'error');
-                }
+        // Load data saat admin buka halaman
+        window.onload = function() {
+            let saved = localStorage.getItem('mazaya_tarif');
+            if(saved) {
+                saved = JSON.parse(saved);
+                document.getElementById('setDasar').value = saved.dasar || 50000;
+                document.getElementById('setKm').value = saved.km || 10000;
+                document.getElementById('setCarter').value = saved.carter || 400000;
             }
         }
     </script>
