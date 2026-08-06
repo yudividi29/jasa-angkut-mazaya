@@ -4,380 +4,146 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MazayaGo - Jasa Angkut</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; margin: 0; overflow: hidden; }
-        .app-container { width: 100%; height: 100vh; max-width: 480px; margin: 0 auto; background-color: #ffffff; position: relative; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-        #map { height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 0; }
-        .bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; z-index: 20; background: white; border-radius: 24px 24px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; max-h: 85vh; transition: transform 0.3s ease; }
-        .bottom-sheet-scroll { overflow-y: auto; padding-bottom: 20px; }
-        .bottom-sheet-scroll::-webkit-scrollbar { display: none; }
-        .modern-input { width: 100%; border: none; background: transparent; font-weight: 600; color: #1e293b; outline: none; font-size: 0.9rem; padding: 8px 0; }
-        .modern-input::placeholder { color: #94a3b8; font-weight: 500; }
-        .sheet-collapsed { transform: translateY(calc(100% - 60px)); }
-        
-        /* Custom Map Icons */
-        .custom-icon { background: transparent; border: none; }
-        .truck-anim { transition: all 2s linear; }
-        
-        /* SweetAlert Input Style */
-        .swal2-input { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        .app-container { width: 100%; height: 100vh; max-width: 480px; margin: 0 auto; background-color: #ffffff; position: relative; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
+        #map { height: 100%; width: 100%; position: absolute; z-index: 0; }
+        .bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; z-index: 20; background: white; border-radius: 24px 24px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; max-height: 85vh; transition: transform 0.3s; }
+        .sheet-collapsed { transform: translateY(calc(100% - 50px)); }
+        .modern-input { width: 100%; border: none; background: transparent; font-weight: 600; outline: none; font-size: 0.9rem; padding: 8px 0; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- HEADER -->
     <header class="absolute top-0 left-0 right-0 z-10 p-4 pointer-events-none">
         <div class="bg-white/95 backdrop-blur-md rounded-2xl p-3 flex justify-between items-center shadow-lg border border-white/50 pointer-events-auto">
-            <!-- PINTU RAHASIA ADMIN -->
-            <div class="text-center pl-2" onclick="bukaGerbangAdmin()" style="cursor:pointer;" title="Ketuk untuk masuk Admin">
+            <div class="text-center pl-2 cursor-pointer" onclick="loginAdmin()">
                 <h2 class="font-black text-[#0b192c] italic text-lg leading-none">MAZAYA<span class="text-[#ffb703]">GO</span></h2>
             </div>
-            <div class="flex gap-2">
-                <button onclick="cekStatusPesanan()" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md hover:bg-blue-700 transition" title="Lacak Pesanan">
-                    <i class="bi bi-search font-bold text-lg"></i>
-                </button>
-            </div>
+            <button onclick="lacakPesanan()" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md">
+                <i class="bi bi-search font-bold text-lg"></i>
+            </button>
         </div>
     </header>
 
     <div id="map"></div>
     
-    <!-- KAMERA TERSEMBUNYI -->
-    <div id="cameraContainer" class="absolute inset-0 z-50 bg-black hidden flex-col">
-        <video id="videoElement" class="w-full h-full object-cover" autoplay playsinline></video>
+    <div id="camera" class="absolute inset-0 z-50 bg-black hidden flex-col">
+        <video id="vid" class="w-full h-full object-cover" autoplay playsinline></video>
         <div class="absolute bottom-10 left-0 right-0 flex justify-center gap-5">
             <button onclick="tutupKamera()" class="w-14 h-14 bg-red-500 rounded-full text-white text-2xl"><i class="bi bi-x"></i></button>
-            <button onclick="ambilFoto()" class="w-16 h-16 bg-white border-4 border-slate-300 rounded-full text-slate-800 text-3xl flex items-center justify-center shadow-xl"><i class="bi bi-camera-fill"></i></button>
+            <button onclick="jepret()" class="w-16 h-16 bg-white rounded-full text-slate-800 text-3xl flex items-center justify-center shadow-xl"><i class="bi bi-camera-fill"></i></button>
         </div>
-        <canvas id="canvasElement" class="hidden"></canvas>
+        <canvas id="canv" class="hidden"></canvas>
     </div>
 
-    <!-- FORM PESANAN -->
-    <div class="bottom-sheet" id="orderFormSheet">
-        <div class="w-full flex justify-center pt-3 pb-2 shrink-0 bg-white rounded-t-3xl relative z-30 cursor-pointer" onclick="toggleSheet()">
+    <div class="bottom-sheet" id="orderForm">
+        <div class="w-full flex justify-center pt-3 pb-2 bg-white rounded-t-3xl cursor-pointer shrink-0" onclick="document.getElementById('orderForm').classList.toggle('sheet-collapsed')">
             <div class="w-12 h-1.5 bg-slate-200 rounded-full"></div>
         </div>
 
-        <div class="px-5 pb-6 bottom-sheet-scroll relative z-20">
-            <!-- Rute -->
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative mb-4 shadow-inner">
-                <div class="absolute left-7 top-10 bottom-10 w-0.5 border-l-2 border-dashed border-slate-300"></div>
-                
-                <div class="flex items-center gap-3 mb-4 relative z-10" onclick="setModeTitik('jemput')">
-                    <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 border-2 border-white shadow-sm"><i class="bi bi-geo-alt-fill text-[10px]"></i></div>
-                    <div class="flex-1 border-b border-slate-200 pb-2 cursor-pointer">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Titik Jemput (Tap Peta)</p>
-                        <input type="text" id="alamatJemput" class="modern-input" placeholder="Pilih di peta..." readonly>
-                    </div>
+        <div class="px-5 pb-6 overflow-y-auto">
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-4">
+                <div class="flex items-center gap-3 mb-4 cursor-pointer" onclick="mode='jemput'">
+                    <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] border-2 border-white"><i class="bi bi-geo-alt-fill"></i></div>
+                    <div class="flex-1 border-b pb-2"><p class="text-[10px] font-bold text-slate-400">Jemput (Tap Peta)</p><input type="text" id="inJemput" class="modern-input" placeholder="Pilih..." readonly></div>
                 </div>
-
-                <div class="flex items-center gap-3 relative z-10" onclick="setModeTitik('tujuan')">
-                    <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 border-2 border-white shadow-sm"><i class="bi bi-flag-fill text-[10px]"></i></div>
-                    <div class="flex-1 cursor-pointer">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Tujuan Bongkar (Tap Peta)</p>
-                        <input type="text" id="alamatTujuan" class="modern-input" placeholder="Pilih di peta..." readonly>
-                    </div>
+                <div class="flex items-center gap-3 cursor-pointer" onclick="mode='tujuan'">
+                    <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-[10px] border-2 border-white"><i class="bi bi-flag-fill"></i></div>
+                    <div class="flex-1"><p class="text-[10px] font-bold text-slate-400">Tujuan (Tap Peta)</p><input type="text" id="inTujuan" class="modern-input" placeholder="Pilih..." readonly></div>
                 </div>
             </div>
 
-            <!-- Info Jarak & Tarif -->
             <div class="grid grid-cols-2 gap-3 mb-4">
-                <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-center">
-                    <p class="text-[10px] font-bold text-slate-500">Jarak Tempuh</p>
-                    <p class="text-sm font-black text-slate-800" id="infoJarak">0 Km</p>
-                </div>
-                <div class="bg-green-50 p-3 rounded-xl border border-green-100 text-center">
-                    <p class="text-[10px] font-bold text-slate-500">Total Tarif</p>
-                    <p class="text-sm font-black text-green-700" id="infoTarif">Rp 0</p>
-                </div>
+                <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-center"><p class="text-[10px] font-bold text-slate-500">Jarak</p><p class="text-sm font-black text-slate-800" id="jarakT">0 Km</p></div>
+                <div class="bg-green-50 p-3 rounded-xl border border-green-100 text-center"><p class="text-[10px] font-bold text-slate-500">Tarif</p><p class="text-sm font-black text-green-700" id="tarifT">Rp 0</p></div>
             </div>
 
-            <!-- Input Data Pelanggan -->
             <div class="space-y-3 mb-5">
-                <input type="text" id="namaPemesan" class="w-full bg-white border border-slate-200 p-3 rounded-xl text-sm font-bold outline-none focus:border-blue-400" placeholder="Nama Lengkap Anda">
-                <input type="tel" id="waPemesan" class="w-full bg-white border border-slate-200 p-3 rounded-xl text-sm font-bold outline-none focus:border-blue-400" placeholder="Nomor WhatsApp (Contoh: 0812...)">
-                
-                <select id="opsiTenaga" onchange="kalkulasiTarif()" class="w-full bg-white border border-slate-200 p-3 rounded-xl text-sm font-bold outline-none focus:border-blue-400">
-                    <option value="Tanpa Kuli">Hanya Sewa Mobil (Tanpa Kuli)</option>
-                    <option value="Muatan Sedang">Tambah Kuli (Muatan Sedang/Kosan)</option>
-                    <option value="Muatan Berat">Tambah Kuli (Muatan Berat/Rumah)</option>
-                </select>
-
-                <textarea id="catatanOrder" rows="2" class="w-full bg-white border border-slate-200 p-3 rounded-xl text-sm font-bold outline-none focus:border-blue-400 resize-none" placeholder="Catatan barang bawaan..."></textarea>
-                
-                <button onclick="bukaKamera()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl border border-slate-300 flex items-center justify-center gap-2 transition">
-                    <i class="bi bi-camera"></i> <span id="textFoto">Ambil Foto Barang (Opsional)</span>
-                </button>
+                <input type="text" id="nama" class="w-full border p-3 rounded-xl text-sm font-bold" placeholder="Nama Lengkap">
+                <input type="tel" id="wa" class="w-full border p-3 rounded-xl text-sm font-bold" placeholder="Nomor WA (08...)">
+                <select id="tenaga" onchange="hitung()" class="w-full border p-3 rounded-xl text-sm font-bold"><option value="Tanpa Kuli">Hanya Sewa Mobil</option><option value="Muatan Sedang">Tambah Kuli (Sedang)</option><option value="Muatan Berat">Tambah Kuli (Berat)</option></select>
+                <textarea id="catatan" class="w-full border p-3 rounded-xl text-sm font-bold" placeholder="Catatan barang..."></textarea>
+                <button onclick="bukaKamera()" class="w-full bg-slate-100 py-3 rounded-xl border font-bold flex justify-center items-center gap-2 text-slate-600"><i class="bi bi-camera"></i> <span id="txtFoto">Foto Barang (Opsional)</span></button>
             </div>
 
-            <button onclick="prosesOrder()" class="w-full bg-[#00B14F] text-white font-black py-4 rounded-2xl shadow-lg shadow-green-500/30 flex items-center justify-center gap-2 text-lg active:scale-95 transition-transform">
-                PESAN SEKARANG <i class="bi bi-arrow-right-circle-fill"></i>
-            </button>
+            <button onclick="pesan()" class="w-full bg-[#00B14F] text-white font-black py-4 rounded-2xl text-lg flex justify-center items-center gap-2">PESAN SEKARANG <i class="bi bi-arrow-right-circle-fill"></i></button>
         </div>
     </div>
 </div>
 
 <script>
-    // ====================================================================
-    // WAJIB GANTI: Masukkan Link Apps Script Bapak yang utuh di bawah ini
-    // ====================================================================
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbx7kih8TdO5mruSrmrnkBaCmyH156_wax5XsMv8ONRQetK_R_owiKeP-4MtjewSjLH2/exec'; 
-
-    let map, markerJemput, markerTujuan, routeLine;
-    let titikJemput = null, titikTujuan = null;
-    let modeTitik = 'jemput';
-    let jarakKm = 0;
-    let fotoBase64 = "";
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxsfSksKTUHNsbFR2wSDZRTynjyuhd_HPYOcb6-V8VbEAwWoyYOj9rdrFZAeROUa_LEGw/exec';
     
-    // Tarif Default (Bisa ditarik dari localStorage jika admin mengubahnya)
-    let tarifSys = { dasar: 50000, km: 10000, kuli1: 50000, kuli2: 100000 };
-
-    window.onload = function() {
-        // Cek jika ada tarif baru dari localStorage
-        let savedTarif = localStorage.getItem('mazaya_tarif');
-        if(savedTarif) tarifSys = JSON.parse(savedTarif);
-
-        // Init Peta
+    let map, mkJ, mkT, rute, tj = null, tt = null, mode = 'jemput', km = 0, foto64 = "";
+    
+    window.onload = () => {
         map = L.map('map', {zoomControl: false}).setView([-7.9174, 113.8220], 13);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
-
-        Swal.fire({
-            title: 'Selamat Datang!',
-            text: 'Silakan tap (ketuk) lokasi di peta untuk menentukan Titik Jemput dan Tujuan.',
-            icon: 'info',
-            confirmButtonColor: '#0b192c'
-        });
-
-        // Event Klik Peta
-        map.on('click', function(e) {
-            if(modeTitik === 'jemput') {
-                if(markerJemput) map.removeLayer(markerJemput);
-                titikJemput = e.latlng;
-                markerJemput = L.marker(titikJemput, {icon: createCustomIcon('blue', 'geo-alt-fill')}).addTo(map);
-                document.getElementById('alamatJemput').value = `q=${e.latlng.lat},${e.latlng.lng}`;
-                modeTitik = 'tujuan'; // Auto switch
-                Swal.fire({toast:true, position:'top', icon:'success', title:'Titik Jemput Diset', showConfirmButton:false, timer:1500});
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
+        map.on('click', e => {
+            if(mode === 'jemput') {
+                if(mkJ) map.removeLayer(mkJ); tj = e.latlng;
+                mkJ = L.marker(tj, {icon: L.divIcon({className:'', html:`<div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl border-2 border-white shadow"><i class="bi bi-geo-alt-fill"></i></div>`})}).addTo(map);
+                document.getElementById('inJemput').value = `q=${tj.lat},${tj.lng}`; mode = 'tujuan';
             } else {
-                if(markerTujuan) map.removeLayer(markerTujuan);
-                titikTujuan = e.latlng;
-                markerTujuan = L.marker(titikTujuan, {icon: createCustomIcon('red', 'flag-fill')}).addTo(map);
-                document.getElementById('alamatTujuan').value = `q=${e.latlng.lat},${e.latlng.lng}`;
-                Swal.fire({toast:true, position:'top', icon:'success', title:'Tujuan Diset', showConfirmButton:false, timer:1500});
+                if(mkT) map.removeLayer(mkT); tt = e.latlng;
+                mkT = L.marker(tt, {icon: L.divIcon({className:'', html:`<div class="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center text-xl border-2 border-white shadow"><i class="bi bi-flag-fill"></i></div>`})}).addTo(map);
+                document.getElementById('inTujuan').value = `q=${tt.lat},${tt.lng}`;
             }
-            hitungJarak();
+            if(tj && tt) {
+                if(rute) map.removeLayer(rute);
+                km = (tj.distanceTo(tt) / 1000) * 1.3; document.getElementById('jarakT').innerText = km.toFixed(1) + ' Km';
+                rute = L.polyline([tj, tt], {color: '#3b82f6', weight: 4}).addTo(map);
+                map.fitBounds(rute.getBounds(), {padding: [50, 50]}); hitung();
+            }
         });
     };
 
-    function setModeTitik(mode) {
-        modeTitik = mode;
-        Swal.fire({toast:true, position:'top', icon:'info', title:`Pilih Lokasi ${mode} di Peta`, showConfirmButton:false, timer:2000});
+    function hitung() {
+        if(km === 0) return; let h = 50000; if(km > 5) h += Math.ceil(km - 5) * 10000;
+        let ten = document.getElementById('tenaga').value; if(ten==='Muatan Sedang') h+=50000; if(ten==='Muatan Berat') h+=100000;
+        document.getElementById('tarifT').innerText = 'Rp ' + h.toLocaleString('id-ID');
     }
 
-    function createCustomIcon(color, iconName) {
-        return L.divIcon({ 
-            className: 'custom-icon', 
-            html: `<div class="w-10 h-10 bg-${color}-600 rounded-full flex items-center justify-center text-white text-xl border-4 border-white shadow-lg relative"><i class="bi bi-${iconName}"></i></div>`, 
-            iconSize: [40, 40], iconAnchor: [20, 20]
-        });
+    let stream;
+    async function bukaKamera() { document.getElementById('camera').classList.replace('hidden','flex'); stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); document.getElementById('vid').srcObject = stream; }
+    function tutupKamera() { document.getElementById('camera').classList.replace('flex','hidden'); if(stream) stream.getTracks().forEach(t => t.stop()); }
+    function jepret() { let v = document.getElementById('vid'), c = document.getElementById('canv'); c.width=v.videoWidth; c.height=v.videoHeight; c.getContext('2d').drawImage(v,0,0); foto64 = c.toDataURL('image/jpeg', 0.5); document.getElementById('txtFoto').innerText="Foto Disimpan"; document.getElementById('txtFoto').classList.add('text-green-600'); tutupKamera(); }
+
+    async function pesan() {
+        let py = { nama: document.getElementById('nama').value, whatsapp: document.getElementById('wa').value, alamatJemput: document.getElementById('inJemput').value, alamatTujuan: document.getElementById('inTujuan').value, jarak: document.getElementById('jarakT').innerText, estimasi: Math.ceil(km*3)+' Mnt', keterangan: document.getElementById('catatan').value, opsiTenaga: document.getElementById('tenaga').value, totalTarif: document.getElementById('tarifT').innerText.replace(/\D/g,''), fotoBase64: foto64 };
+        if(!py.nama || !py.whatsapp || !tj) return Swal.fire('Oops','Lengkapi data & Peta!','warning');
+        Swal.fire({title:'Memproses...', didOpen:()=>Swal.showLoading()});
+        await fetch(GAS_URL, {method:'POST', body:JSON.stringify({action:'saveOrder', payload:py})});
+        Swal.fire('Berhasil','Pesanan dikirim!','success'); document.getElementById('orderForm').classList.add('sheet-collapsed');
     }
 
-    // HITUNG JARAK & TARIF
-    function hitungJarak() {
-        if(titikJemput && titikTujuan) {
-            if(routeLine) map.removeLayer(routeLine);
-            let distance = titikJemput.distanceTo(titikTujuan) / 1000; 
-            jarakKm = distance * 1.3; 
-            document.getElementById('infoJarak').innerText = jarakKm.toFixed(1) + ' Km';
-            routeLine = L.polyline([titikJemput, titikTujuan], {color: '#3b82f6', weight: 4, dashArray: '10, 10'}).addTo(map);
-            map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
-            kalkulasiTarif();
-        }
-    }
-
-    function kalkulasiTarif() {
-        if(jarakKm === 0) return;
-        let harga = parseFloat(tarifSys.dasar);
-        if(jarakKm > 5) {
-            harga += (Math.ceil(jarakKm) - 5) * parseFloat(tarifSys.km);
-        }
-        let tenaga = document.getElementById('opsiTenaga').value;
-        if(tenaga === 'Muatan Sedang') harga += parseFloat(tarifSys.kuli1);
-        if(tenaga === 'Muatan Berat') harga += parseFloat(tarifSys.kuli2);
-
-        document.getElementById('infoTarif').innerText = 'Rp ' + harga.toLocaleString('id-ID');
-        document.getElementById('infoTarif').dataset.val = harga;
-    }
-
-    function toggleSheet() {
-        document.getElementById('orderFormSheet').classList.toggle('sheet-collapsed');
-    }
-
-    // KAMERA FOTO BARANG
-    const video = document.getElementById('videoElement');
-    const canvas = document.getElementById('canvasElement');
-    let streamMedia;
-
-    async function bukaKamera() {
-        document.getElementById('cameraContainer').classList.replace('hidden', 'flex');
-        try {
-            streamMedia = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            video.srcObject = streamMedia;
-        } catch(err) {
-            Swal.fire('Error', 'Gagal mengakses kamera.', 'error');
-            tutupKamera();
-        }
-    }
-
-    function tutupKamera() {
-        document.getElementById('cameraContainer').classList.replace('flex', 'hidden');
-        if(streamMedia) streamMedia.getTracks().forEach(track => track.stop());
-    }
-
-    function ambilFoto() {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
-        document.getElementById('textFoto').innerText = "Foto Berhasil Disimpan!";
-        document.getElementById('textFoto').classList.add('text-green-600');
-        tutupKamera();
-    }
-
-    // PROSES SIMPAN ORDER
-    async function prosesOrder() {
-        if(!titikJemput || !titikTujuan) return Swal.fire('Oops', 'Pilih titik jemput dan tujuan di peta.', 'warning');
-        
-        const payload = {
-            nama: document.getElementById('namaPemesan').value,
-            whatsapp: document.getElementById('waPemesan').value,
-            alamatJemput: document.getElementById('alamatJemput').value,
-            alamatTujuan: document.getElementById('alamatTujuan').value,
-            jarak: document.getElementById('infoJarak').innerText,
-            totalTarif: document.getElementById('infoTarif').innerText,
-            keterangan: document.getElementById('catatanOrder').value,
-            opsiTenaga: document.getElementById('opsiTenaga').value,
-            estimasi: Math.ceil(jarakKm * 3) + ' Menit',
-            fotoBase64: fotoBase64
-        };
-
-        if(!payload.nama || !payload.whatsapp) return Swal.fire('Oops', 'Nama dan WhatsApp wajib diisi!', 'warning');
-
-        Swal.fire({ title: 'Memproses Pesanan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
-
-        try {
-            let res = await fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'saveOrder', payload: payload })
-            }).then(r => r.json());
-
-            if(res.status === 'success') {
-                Swal.fire({
-                    icon: 'success', title: 'Berhasil!',
-                    text: 'Pesanan Anda sedang diproses. Tekan tombol Kaca Pembesar di atas untuk melacak status.',
-                    confirmButtonColor: '#00B14F'
-                });
-                toggleSheet();
-            }
-        } catch(e) {
-            Swal.fire('Error Jaringan', 'Gagal terhubung ke server. Pastikan URL Apps Script benar.', 'error');
-        }
-    }
-
-    // LACAK STATUS & ANIMASI TRUK
-    async function cekStatusPesanan() {
-        const { value: nomorWA } = await Swal.fire({ 
-            title: 'Lacak Pesanan', 
-            text: 'Masukkan nomor WhatsApp Anda:', 
-            input: 'tel', showCancelButton: true, confirmButtonText: 'Lacak', confirmButtonColor: '#00B14F' 
-        });
-        
-        if (nomorWA) {
-            Swal.fire({ title: 'Mencari Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            try {
-                let response = await fetch(GAS_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify({ action: 'cekStatus', payload: { wa: nomorWA } }) 
-                });
-                let res = await response.json();
-                
-                if(res.status === 'success') {
-                    Swal.fire({ title: 'Status Pesanan', html: res.data.html, confirmButtonText: 'Tutup', confirmButtonColor: '#0b192c' });
-                    
-                    let sText = (res.data.statusText || "").toLowerCase();
-                    if(sText.includes('jalan') || sText.includes('menuju')) {
-                        document.getElementById('orderFormSheet').classList.add('sheet-collapsed');
-                        animasiTrukJalan(res.data.jemput, res.data.tujuan);
-                    }
-                } else {
-                    Swal.fire('Tidak Ditemukan', 'Pesanan tidak ada.', 'error');
-                }
-            } catch(e) { Swal.fire('Error', 'Gagal melacak pesanan.', 'error'); }
-        }
-    }
-
-    function animasiTrukJalan(koordinatJemput, koordinatTujuan) {
-        if(!koordinatJemput || !koordinatTujuan || koordinatJemput[0] === 0) return;
-        
-        const truckIcon = L.divIcon({
-            className: 'custom-icon truck-anim',
-            html: `<div class="text-4xl drop-shadow-xl text-[#0b192c] bg-white rounded-full p-2 border-2 border-[#ffb703] relative"><i class="bi bi-truck"></i><div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div></div>`,
-            iconSize: [50, 50], iconAnchor: [25, 25]
-        });
-
-        if(routeLine) map.removeLayer(routeLine);
-        routeLine = L.polyline([koordinatJemput, koordinatTujuan], {color: '#ffb703', weight: 5}).addTo(map);
-        
-        let movingTruck = L.marker(koordinatJemput, {icon: truckIcon}).addTo(map);
-        map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
-
-        setTimeout(() => {
-            movingTruck.setLatLng(koordinatTujuan);
-            map.panTo(koordinatTujuan);
-        }, 1000);
-    }
-
-    // =================================================================
-    // PINTU RAHASIA ADMIN (LOGIN USERNAME & PIN)
-    // =================================================================
-    async function bukaGerbangAdmin() {
-        const { value: formValues } = await Swal.fire({
-            title: 'Otorisasi Admin',
-            html:
-                '<input id="swal-user" class="swal2-input" placeholder="Username">' +
-                '<input id="swal-pass" type="password" class="swal2-input" placeholder="PIN Rahasia">',
-            focusConfirm: false,
-            showCancelButton: true,
-            confirmButtonText: 'Masuk',
-            confirmButtonColor: '#0b192c',
-            preConfirm: () => {
-                return [
-                    document.getElementById('swal-user').value,
-                    document.getElementById('swal-pass').value
-                ]
-            }
-        });
-
-        if (formValues) {
-            let username = formValues[0];
-            let password = formValues[1];
-
-            // Cek Username & PIN
-            if (username === 'Mazaya' && password === 'Sukses@01') {
-                window.location.href = 'admin.html';
-            } else {
-                Swal.fire('Akses Ditolak', 'Username atau PIN salah!', 'error');
+    async function lacakPesanan() {
+        const {value: wa} = await Swal.fire({title: 'Lacak (No WA)', input: 'tel', showCancelButton: true});
+        if(wa) {
+            Swal.fire({title:'Mencari...', didOpen:()=>Swal.showLoading()});
+            let res = await fetch(GAS_URL, {method:'POST', body:JSON.stringify({action:'cekStatus', payload:{wa:wa}})}).then(r=>r.json());
+            Swal.fire({html: res.data.html});
+            if(res.data.statusText.includes('Jalan') || res.data.statusText.includes('Menuju')) {
+                document.getElementById('orderForm').classList.add('sheet-collapsed');
+                if(rute) map.removeLayer(rute); rute = L.polyline([res.data.jemput, res.data.tujuan], {color:'#ffb703', weight:5}).addTo(map);
+                let truk = L.marker(res.data.jemput, {icon: L.divIcon({className:'', html:`<div class="text-4xl text-[#0b192c] bg-white rounded-full p-2 border-2 border-[#ffb703]"><i class="bi bi-truck"></i></div>`})}).addTo(map);
+                map.fitBounds(rute.getBounds()); setTimeout(() => { truk.setLatLng(res.data.tujuan); map.panTo(res.data.tujuan); }, 1500);
             }
         }
+    }
+
+    async function loginAdmin() {
+        const {value: form} = await Swal.fire({title: 'Area Admin', html: '<input id="u" class="swal2-input" placeholder="User"><input id="p" type="password" class="swal2-input" placeholder="PIN">', preConfirm: () => [document.getElementById('u').value, document.getElementById('p').value]});
+        if(form && form[0]==='Mazaya' && form[1]==='Sukses@01') window.location.href = 'admin.html';
+        else if(form) Swal.fire('Ditolak','Data salah!','error');
     }
 </script>
 </body>
