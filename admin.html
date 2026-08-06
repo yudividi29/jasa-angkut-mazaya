@@ -4,105 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MazayaGo - Admin Dashboard</title>
-    <!-- Tailwind CSS (Wajib agar tidak hancur) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }</style>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .st-tunggu { background: #fef3c7; color: #d97706; }
+        .st-jalan { background: #dbeafe; color: #2563eb; }
+        .st-selesai { background: #dcfce3; color: #16a34a; }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <!-- SIDEBAR -->
     <aside class="w-64 bg-[#0b192c] text-white flex flex-col hidden md:flex">
         <div class="p-6 border-b border-white/10">
             <h1 class="text-2xl font-black italic tracking-tight">MAZAYA<span class="text-[#ffb703]">GO</span></h1>
             <p class="text-xs text-slate-400 mt-1">Control Panel v3.0</p>
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <button onclick="switchTab('pesanan')" class="w-full flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold transition">
-                <i class="bi bi-bell"></i> Pesanan Baru
+            <button onclick="switchTab('pesanan')" id="btn-pesanan" class="w-full flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold transition">
+                <i class="bi bi-bell"></i> Pesanan Masuk
             </button>
-            <button onclick="switchTab('pengaturan')" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition">
+            <button onclick="switchTab('pengaturan')" id="btn-pengaturan" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition">
                 <i class="bi bi-gear"></i> Pengaturan Tarif
             </button>
         </nav>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden">
         
-        <!-- HEADER -->
         <header class="bg-white border-b border-slate-200 p-4 md:px-6 flex justify-between items-center z-10 shadow-sm">
-            <h2 class="text-xl font-black text-slate-800" id="headerTitle">Pesanan Masuk</h2>
-            <button class="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-100"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+            <h2 class="text-xl font-black text-slate-800" id="headerTitle">Daftar Pesanan Live</h2>
+            <button onclick="muatDataPesanan()" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-100"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
         </header>
 
-        <!-- TAB 1: PESANAN (Simulasi Tampilan) -->
-        <div id="tab-pesanan" class="flex-1 overflow-y-auto p-4 md:p-6 w-full block">
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-                <i class="bi bi-truck text-5xl text-slate-300 mb-4 block"></i>
-                <h3 class="text-lg font-bold text-slate-700">Monitor Pesanan</h3>
-                <p class="text-slate-500 text-sm">Pesanan dari aplikasi akan muncul di sini (Tersambung ke Google Sheets).</p>
+        <!-- TAB 1: PESANAN MASUK (LIVE DATABASE) -->
+        <div id="tab-pesanan" class="flex-1 overflow-y-auto p-4 md:p-6 w-full block bg-slate-50">
+            
+            <div id="loadingData" class="text-center py-10 hidden">
+                <i class="bi bi-arrow-repeat text-4xl text-blue-500 animate-spin inline-block"></i>
+                <p class="text-slate-500 mt-3 font-medium">Menyedot data dari Server...</p>
+            </div>
+
+            <!-- Tempat memunculkan daftar kartu pesanan -->
+            <div id="daftarPesanan" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- Kartu akan dimasukkan lewat JavaScript -->
+            </div>
+            
+            <!-- Jika kosong -->
+            <div id="pesananKosong" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center hidden">
+                <i class="bi bi-box2 text-5xl text-slate-300 mb-4 block"></i>
+                <h3 class="text-lg font-bold text-slate-700">Belum ada pesanan masuk</h3>
+                <p class="text-slate-500 text-sm">Pesanan dari aplikasi pelanggan akan muncul di sini.</p>
             </div>
         </div>
 
-        <!-- TAB 2: PENGATURAN TARIF (Tampilan Rapih & Tidak Hancur) -->
+        <!-- TAB 2: PENGATURAN TARIF (TETAP SAMA) -->
         <div id="tab-pengaturan" class="flex-1 overflow-y-auto p-4 md:p-6 w-full hidden">
             <div class="max-w-4xl mx-auto space-y-6">
-                
+                <!-- Info Box -->
                 <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl flex gap-3 text-blue-800 shadow-sm">
                     <i class="bi bi-info-circle-fill text-xl mt-0.5 text-blue-600"></i>
                     <div>
                         <h4 class="font-bold">Manajemen Tarif Dinamis</h4>
-                        <p class="text-xs mt-1">Ubah nilai di bawah ini. Aplikasi pelanggan dan Driver akan otomatis mengikuti harga baru ini tanpa perlu update aplikasi.</p>
+                        <p class="text-xs mt-1">Ubah nilai di bawah ini untuk memperbarui harga kalkulator di website pelanggan secara instan.</p>
                     </div>
                 </div>
 
                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
                     
-                    <!-- SKEMA 1: DALAM KOTA -->
-                    <h3 class="font-black text-slate-800 flex items-center gap-2"><i class="bi bi-signpost-split text-blue-500 text-xl"></i> Reguler / Dalam Kota</h3>
+                    <h3 class="font-black text-slate-800 flex items-center gap-2"><i class="bi bi-signpost-split text-blue-500 text-xl"></i> Reguler (Dalam Kota)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                        <div>
                             <label class="block text-xs font-bold text-slate-600 mb-2">Tarif Dasar Minimal (0 - 5 KM)</label>
                             <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setDasar" value="50000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
                         </div>
-                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                            <label class="block text-xs font-bold text-slate-600 mb-2">Tarif Per KM Selanjutnya</label>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Tarif Per KM Berikutnya</label>
                             <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKm" value="10000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
                         </div>
                     </div>
 
-                    <!-- SKEMA 2: TENAGA -->
-                    <h3 class="font-black text-slate-800 flex items-center gap-2 pt-4 border-t border-slate-100"><i class="bi bi-people text-green-500 text-xl"></i> Biaya Kuli / Tenaga Ekstra</h3>
+                    <h3 class="font-black text-slate-800 flex items-center gap-2 pt-4 border-t border-slate-100"><i class="bi bi-box-seam text-green-500 text-xl"></i> Biaya Tambahan Kuli</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                            <label class="block text-xs font-bold text-slate-600 mb-2">Muatan Sedang (1 Orang)</label>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Muatan Sedang</label>
                             <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKuli1" value="50000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
                         </div>
-                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                            <label class="block text-xs font-bold text-slate-600 mb-2">Muatan Berat (2 Orang)</label>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Muatan Berat</label>
                             <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setKuli2" value="100000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
                         </div>
                     </div>
 
-                    <!-- SKEMA 3: CARTER LUAR KOTA -->
-                    <h3 class="font-black text-slate-800 flex items-center gap-2 pt-4 border-t border-slate-100"><i class="bi bi-car-front text-amber-500 text-xl"></i> Skema Carter (Luar Kota / Seharian)</h3>
+                    <h3 class="font-black text-slate-800 flex items-center gap-2 pt-4 border-t border-slate-100"><i class="bi bi-car-front text-amber-500 text-xl"></i> Sewa Carter (Luar Kota)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                            <label class="block text-xs font-bold text-slate-600 mb-2">Sewa Armada / Hari</label>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Biaya Sewa Mobil / Hari</label>
                             <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setCarter" value="400000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
                         </div>
-                        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                            <label class="block text-xs font-bold text-slate-600 mb-2">Uang Jasa Sopir / Hari</label>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-2">Ongkos Sopir / Hari</label>
                             <div class="flex items-center"><span class="bg-slate-200 px-3 py-2.5 rounded-l-lg font-bold text-slate-600 text-sm">Rp</span><input type="number" id="setSopir" value="300000" class="w-full p-2.5 text-sm border-y border-r border-slate-300 rounded-r-lg font-bold outline-none"></div>
                         </div>
                     </div>
 
                     <div class="pt-6 flex justify-end gap-3">
-                        <button onclick="simpanTarif()" class="w-full md:w-auto bg-[#0b192c] hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
-                            <i class="bi bi-check2-circle text-lg"></i> Simpan & Terapkan Tarif Baru
+                        <button onclick="simpanTarif()" class="bg-[#0b192c] hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all text-sm">
+                            <i class="bi bi-check2-circle"></i> Simpan Tarif
                         </button>
                     </div>
                 </div>
@@ -112,42 +123,188 @@
     </main>
 
     <script>
+        // =====================================================================
+        // WAJIB GANTI: URL Mesin Apps Script Bapak
+        // =====================================================================
+        const GAS_URL = 'AKfycbx5CWnw-rIoyG3jnvDobs-I13L-VKjbRoURrdc-tL8T3JBJ8dG6E0LPsWa31QkyHfPNtw'; 
+
         function switchTab(tab) {
             document.getElementById('tab-pesanan').classList.add('hidden');
             document.getElementById('tab-pengaturan').classList.add('hidden');
             document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.getElementById('headerTitle').innerText = tab === 'pesanan' ? 'Pesanan Masuk' : 'Pengaturan Tarif';
+            document.getElementById('headerTitle').innerText = tab === 'pesanan' ? 'Daftar Pesanan Live' : 'Pengaturan Tarif';
+            
+            document.getElementById('btn-pesanan').className = tab === 'pesanan' ? "w-full flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold transition" : "w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition";
+            document.getElementById('btn-pengaturan').className = tab === 'pengaturan' ? "w-full flex items-center gap-3 px-4 py-3 bg-white/10 text-white rounded-xl font-bold transition" : "w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 hover:text-white rounded-xl font-bold transition";
         }
 
+        // FUNGSI 1: MENYEDOT DATA DARI GOOGLE SHEETS
+        async function muatDataPesanan() {
+            if (GAS_URL === 'URL_APPS_SCRIPT_BAPAK_DI_SINI') {
+                document.getElementById('pesananKosong').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('loadingData').classList.remove('hidden');
+            document.getElementById('daftarPesanan').innerHTML = '';
+            document.getElementById('pesananKosong').classList.add('hidden');
+
+            try {
+                let response = await fetch(GAS_URL);
+                let data = await response.json();
+                
+                document.getElementById('loadingData').classList.add('hidden');
+
+                if (data.pesanan && data.pesanan.length > 1) { // >1 karena baris 1 adalah Header
+                    // Mulai dari baris terakhir (Pesanan Terbaru di atas)
+                    for (let i = data.pesanan.length - 1; i >= 1; i--) {
+                        let baris = data.pesanan[i];
+                        buatKartuPesanan(baris);
+                    }
+                } else {
+                    document.getElementById('pesananKosong').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Gagal Tarik Data:", err);
+                document.getElementById('loadingData').classList.add('hidden');
+                Swal.fire('Error', 'Gagal menyambung ke server.', 'error');
+            }
+        }
+
+        // FUNGSI 2: MEMBUAT TAMPILAN KARTU PESANAN
+        function buatKartuPesanan(data) {
+            let idOrder = data[0];
+            let tgl = new Date(data[1]).toLocaleString('id-ID');
+            let nama = data[2];
+            let wa = data[3];
+            let jemput = data[4];
+            let tujuan = data[5];
+            let kargo = data[9];
+            let foto = data[10]; // Menyedot data foto dari kolom K
+            let tarif = data[13];
+            let status = data[14];
+
+            // Mewarnai badge status
+            let classStatus = 'st-tunggu';
+            if(status.toLowerCase().includes('jalan') || status.toLowerCase().includes('menuju')) classStatus = 'st-jalan';
+            if(status.toLowerCase().includes('selesai')) classStatus = 'st-selesai';
+
+            // HTML Kartunya (Sangat Elegan)
+            let htmlKartu = `
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                <!-- Header Kartu -->
+                <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                    <div>
+                        <span class="font-mono text-xs text-blue-600 font-black tracking-wider bg-blue-50 px-2 py-1 rounded">${idOrder}</span>
+                        <p class="text-[10px] text-slate-400 mt-1">${tgl}</p>
+                    </div>
+                    <span class="status-badge ${classStatus}" id="badge-${idOrder}">${status}</span>
+                </div>
+
+                <!-- Info Pelanggan -->
+                <div class="mb-4">
+                    <p class="text-sm font-bold text-slate-800"><i class="bi bi-person-fill text-slate-400 mr-1"></i> ${nama}</p>
+                    <p class="text-xs text-slate-500 mt-1"><i class="bi bi-whatsapp text-green-500 mr-1"></i> ${wa}</p>
+                </div>
+
+                <!-- Rute & Koordinat -->
+                <div class="space-y-2 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <div class="flex items-start gap-2">
+                        <i class="bi bi-geo-alt-fill text-blue-500 text-xs mt-0.5"></i>
+                        <p class="text-[11px] text-slate-600 leading-tight"><b>Jemput:</b> ${jemput}</p>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <i class="bi bi-flag-fill text-red-500 text-xs mt-0.5"></i>
+                        <p class="text-[11px] text-slate-600 leading-tight"><b>Tujuan:</b> ${tujuan}</p>
+                    </div>
+                    
+                    <!-- Tombol Lihat Foto -->
+                    <div class="mt-2 pt-2 border-t border-slate-200 border-dashed">
+                        ${foto && foto !== 'Tanpa Foto' && foto !== '' && !foto.includes('Gagal') ? 
+                        `<a href="${foto}" target="_blank" class="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-[10px] font-black hover:bg-blue-200 transition"><i class="bi bi-camera-fill"></i> Lihat Foto Barang</a>` 
+                        : `<span class="inline-flex items-center gap-1 bg-slate-100 text-slate-400 px-3 py-1.5 rounded-lg text-[10px] font-bold"><i class="bi bi-camera-fill"></i> Tidak Ada Foto</span>`}
+                    </div>
+                </div>
+
+                <!-- Info Kargo & Harga -->
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">Kategori</p>
+                        <p class="text-xs font-bold text-slate-700">${kargo}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] text-slate-400 font-bold uppercase">Total Tagihan</p>
+                        <p class="text-sm font-black text-green-600">${tarif}</p>
+                    </div>
+                </div>
+
+                <!-- TOMBOL PENGENDALI STATUS -->
+                <div class="border-t border-slate-100 pt-4 flex gap-2">
+                    <select id="select-${idOrder}" class="flex-1 bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 rounded-lg px-2 outline-none">
+                        <option value="Menunggu Konfirmasi" ${status === 'Menunggu Konfirmasi' ? 'selected' : ''}>Menunggu Konfirmasi</option>
+                        <option value="Driver Menuju Lokasi" ${status === 'Driver Menuju Lokasi' ? 'selected' : ''}>Driver Menuju Lokasi</option>
+                        <option value="Selesai" ${status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                    </select>
+                    <button onclick="ubahStatusLaporan('${idOrder}')" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-md">Update</button>
+                </div>
+            </div>`;
+
+            document.getElementById('daftarPesanan').insertAdjacentHTML('beforeend', htmlKartu);
+        }
+
+        // FUNGSI 3: MENGIRIM PERINTAH RUBAH STATUS KE SERVER
+        async function ubahStatusLaporan(idOrder) {
+            let statusBaru = document.getElementById(`select-${idOrder}`).value;
+            
+            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+
+            try {
+                let response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'updateStatus', payload: { id: idOrder, status: statusBaru } })
+                });
+                
+                let result = await response.json();
+                
+                if(result.status === 'success') {
+                    Swal.fire({ icon: 'success', title: 'Status Diperbarui!', timer: 1500, showConfirmButton: false });
+                    // Merubah warna badge otomatis tanpa refresh
+                    let badge = document.getElementById(`badge-${idOrder}`);
+                    badge.innerText = statusBaru;
+                    badge.className = 'status-badge';
+                    if(statusBaru.includes('Menuju')) badge.classList.add('st-jalan');
+                    else if(statusBaru.includes('Selesai')) badge.classList.add('st-selesai');
+                    else badge.classList.add('st-tunggu');
+                }
+            } catch(e) {
+                Swal.fire('Gagal', 'Terjadi kesalahan jaringan.', 'error');
+            }
+        }
+
+        // Logika Tarif
         function simpanTarif() {
-            // Untuk simulasi cepat, kita simpan di localStorage. 
-            // Nanti di sistem asli, ini akan di-POST ke GAS_URL (updateTarif).
             const config = {
-                dasar: document.getElementById('setDasar').value,
-                km: document.getElementById('setKm').value,
-                kuli1: document.getElementById('setKuli1').value,
-                kuli2: document.getElementById('setKuli2').value,
-                carter: document.getElementById('setCarter').value,
-                sopir: document.getElementById('setSopir').value
+                dasar: document.getElementById('setDasar').value, km: document.getElementById('setKm').value,
+                kuli1: document.getElementById('setKuli1').value, kuli2: document.getElementById('setKuli2').value,
+                carter: document.getElementById('setCarter').value, sopir: document.getElementById('setSopir').value
             };
             localStorage.setItem('mazaya_tarif', JSON.stringify(config));
-            
-            Swal.fire({
-                icon: 'success', title: 'Tarif Diperbarui!',
-                text: 'Aplikasi pelanggan kini menggunakan skema harga yang baru.',
-                confirmButtonColor: '#0b192c'
-            });
+            Swal.fire({ icon: 'success', title: 'Tarif Diperbarui!', confirmButtonColor: '#0b192c' });
         }
 
-        // Load data saat admin buka halaman
         window.onload = function() {
             let saved = localStorage.getItem('mazaya_tarif');
             if(saved) {
                 saved = JSON.parse(saved);
                 document.getElementById('setDasar').value = saved.dasar || 50000;
                 document.getElementById('setKm').value = saved.km || 10000;
+                document.getElementById('setKuli1').value = saved.kuli1 || 50000;
+                document.getElementById('setKuli2').value = saved.kuli2 || 100000;
                 document.getElementById('setCarter').value = saved.carter || 400000;
+                document.getElementById('setSopir').value = saved.sopir || 300000;
             }
+            // Langsung muat data pesanan saat admin buka layar
+            muatDataPesanan();
         }
     </script>
 </body>
