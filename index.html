@@ -27,11 +27,15 @@
         /* Custom Map Icons */
         .custom-icon { background: transparent; border: none; }
         .truck-anim { transition: all 2s linear; }
+        
+        /* SweetAlert Input Style */
+        .swal2-input { font-family: 'Plus Jakarta Sans', sans-serif !important; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
+    <!-- HEADER -->
     <header class="absolute top-0 left-0 right-0 z-10 p-4 pointer-events-none">
         <div class="bg-white/95 backdrop-blur-md rounded-2xl p-3 flex justify-between items-center shadow-lg border border-white/50 pointer-events-auto">
             <!-- PINTU RAHASIA ADMIN -->
@@ -48,7 +52,7 @@
 
     <div id="map"></div>
     
-    <!-- Elemen Video Tersembunyi untuk Kamera -->
+    <!-- KAMERA TERSEMBUNYI -->
     <div id="cameraContainer" class="absolute inset-0 z-50 bg-black hidden flex-col">
         <video id="videoElement" class="w-full h-full object-cover" autoplay playsinline></video>
         <div class="absolute bottom-10 left-0 right-0 flex justify-center gap-5">
@@ -58,6 +62,7 @@
         <canvas id="canvasElement" class="hidden"></canvas>
     </div>
 
+    <!-- FORM PESANAN -->
     <div class="bottom-sheet" id="orderFormSheet">
         <div class="w-full flex justify-center pt-3 pb-2 shrink-0 bg-white rounded-t-3xl relative z-30 cursor-pointer" onclick="toggleSheet()">
             <div class="w-12 h-1.5 bg-slate-200 rounded-full"></div>
@@ -85,6 +90,7 @@
                 </div>
             </div>
 
+            <!-- Info Jarak & Tarif -->
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 text-center">
                     <p class="text-[10px] font-bold text-slate-500">Jarak Tempuh</p>
@@ -96,6 +102,7 @@
                 </div>
             </div>
 
+            <!-- Input Data Pelanggan -->
             <div class="space-y-3 mb-5">
                 <input type="text" id="namaPemesan" class="w-full bg-white border border-slate-200 p-3 rounded-xl text-sm font-bold outline-none focus:border-blue-400" placeholder="Nama Lengkap Anda">
                 <input type="tel" id="waPemesan" class="w-full bg-white border border-slate-200 p-3 rounded-xl text-sm font-bold outline-none focus:border-blue-400" placeholder="Nomor WhatsApp (Contoh: 0812...)">
@@ -132,15 +139,18 @@
     let jarakKm = 0;
     let fotoBase64 = "";
     
-    // Tarif Default (Bisa ditarik dari localStorage jika ada)
+    // Tarif Default (Bisa ditarik dari localStorage jika admin mengubahnya)
     let tarifSys = { dasar: 50000, km: 10000, kuli1: 50000, kuli2: 100000 };
 
     window.onload = function() {
-        // Init Peta Jember
+        // Cek jika ada tarif baru dari localStorage
+        let savedTarif = localStorage.getItem('mazaya_tarif');
+        if(savedTarif) tarifSys = JSON.parse(savedTarif);
+
+        // Init Peta
         map = L.map('map', {zoomControl: false}).setView([-7.9174, 113.8220], 13);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
 
-        // Notifikasi Cara Pakai
         Swal.fire({
             title: 'Selamat Datang!',
             text: 'Silakan tap (ketuk) lokasi di peta untuk menentukan Titik Jemput dan Tujuan.',
@@ -181,35 +191,28 @@
         });
     }
 
+    // HITUNG JARAK & TARIF
     function hitungJarak() {
         if(titikJemput && titikTujuan) {
             if(routeLine) map.removeLayer(routeLine);
-            
-            // Jarak Udara (Meter ke KM)
             let distance = titikJemput.distanceTo(titikTujuan) / 1000; 
-            jarakKm = distance * 1.3; // Kalikan 1.3 estimasi jalan berkelok
-            
+            jarakKm = distance * 1.3; 
             document.getElementById('infoJarak').innerText = jarakKm.toFixed(1) + ' Km';
-            
-            // Gambar Garis
             routeLine = L.polyline([titikJemput, titikTujuan], {color: '#3b82f6', weight: 4, dashArray: '10, 10'}).addTo(map);
             map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
-            
             kalkulasiTarif();
         }
     }
 
     function kalkulasiTarif() {
         if(jarakKm === 0) return;
-        
-        let harga = tarifSys.dasar;
+        let harga = parseFloat(tarifSys.dasar);
         if(jarakKm > 5) {
-            harga += (Math.ceil(jarakKm) - 5) * tarifSys.km;
+            harga += (Math.ceil(jarakKm) - 5) * parseFloat(tarifSys.km);
         }
-
         let tenaga = document.getElementById('opsiTenaga').value;
-        if(tenaga === 'Muatan Sedang') harga += tarifSys.kuli1;
-        if(tenaga === 'Muatan Berat') harga += tarifSys.kuli2;
+        if(tenaga === 'Muatan Sedang') harga += parseFloat(tarifSys.kuli1);
+        if(tenaga === 'Muatan Berat') harga += parseFloat(tarifSys.kuli2);
 
         document.getElementById('infoTarif').innerText = 'Rp ' + harga.toLocaleString('id-ID');
         document.getElementById('infoTarif').dataset.val = harga;
@@ -219,6 +222,7 @@
         document.getElementById('orderFormSheet').classList.toggle('sheet-collapsed');
     }
 
+    // KAMERA FOTO BARANG
     const video = document.getElementById('videoElement');
     const canvas = document.getElementById('canvasElement');
     let streamMedia;
@@ -243,12 +247,13 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
-        fotoBase64 = canvas.toDataURL('image/jpeg', 0.5); // Kompresi
+        fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
         document.getElementById('textFoto').innerText = "Foto Berhasil Disimpan!";
         document.getElementById('textFoto').classList.add('text-green-600');
         tutupKamera();
     }
 
+    // PROSES SIMPAN ORDER
     async function prosesOrder() {
         if(!titikJemput || !titikTujuan) return Swal.fire('Oops', 'Pilih titik jemput dan tujuan di peta.', 'warning');
         
@@ -281,13 +286,14 @@
                     text: 'Pesanan Anda sedang diproses. Tekan tombol Kaca Pembesar di atas untuk melacak status.',
                     confirmButtonColor: '#00B14F'
                 });
-                toggleSheet(); // Sembunyikan form
+                toggleSheet();
             }
         } catch(e) {
             Swal.fire('Error Jaringan', 'Gagal terhubung ke server. Pastikan URL Apps Script benar.', 'error');
         }
     }
 
+    // LACAK STATUS & ANIMASI TRUK
     async function cekStatusPesanan() {
         const { value: nomorWA } = await Swal.fire({ 
             title: 'Lacak Pesanan', 
@@ -307,10 +313,9 @@
                 if(res.status === 'success') {
                     Swal.fire({ title: 'Status Pesanan', html: res.data.html, confirmButtonText: 'Tutup', confirmButtonColor: '#0b192c' });
                     
-                    // JIKA STATUS JALAN -> MUNCULKAN ANIMASI TRUK
                     let sText = (res.data.statusText || "").toLowerCase();
                     if(sText.includes('jalan') || sText.includes('menuju')) {
-                        document.getElementById('orderFormSheet').classList.add('sheet-collapsed'); // Sembunyikan form
+                        document.getElementById('orderFormSheet').classList.add('sheet-collapsed');
                         animasiTrukJalan(res.data.jemput, res.data.tujuan);
                     }
                 } else {
@@ -323,41 +328,55 @@
     function animasiTrukJalan(koordinatJemput, koordinatTujuan) {
         if(!koordinatJemput || !koordinatTujuan || koordinatJemput[0] === 0) return;
         
-        // Buat Ikon Truk
         const truckIcon = L.divIcon({
             className: 'custom-icon truck-anim',
             html: `<div class="text-4xl drop-shadow-xl text-[#0b192c] bg-white rounded-full p-2 border-2 border-[#ffb703] relative"><i class="bi bi-truck"></i><div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div></div>`,
             iconSize: [50, 50], iconAnchor: [25, 25]
         });
 
-        // Gambar Rute Asli Pelanggan di peta
         if(routeLine) map.removeLayer(routeLine);
         routeLine = L.polyline([koordinatJemput, koordinatTujuan], {color: '#ffb703', weight: 5}).addTo(map);
         
         let movingTruck = L.marker(koordinatJemput, {icon: truckIcon}).addTo(map);
         map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
 
-        // Animasi Sederhana dari Jemput ke Tujuan
         setTimeout(() => {
             movingTruck.setLatLng(koordinatTujuan);
             map.panTo(koordinatTujuan);
         }, 1000);
     }
 
+    // =================================================================
+    // PINTU RAHASIA ADMIN (LOGIN USERNAME & PIN)
+    // =================================================================
     async function bukaGerbangAdmin() {
-        const { value: password } = await Swal.fire({
-            title: 'Ruang Admin',
-            text: 'Masukkan PIN Rahasia:',
-            input: 'password',
-            inputPlaceholder: 'PIN...',
+        const { value: formValues } = await Swal.fire({
+            title: 'Otorisasi Admin',
+            html:
+                '<input id="swal-user" class="swal2-input" placeholder="Username">' +
+                '<input id="swal-pass" type="password" class="swal2-input" placeholder="PIN Rahasia">',
+            focusConfirm: false,
             showCancelButton: true,
-            confirmButtonColor: '#0b192c'
+            confirmButtonText: 'Masuk',
+            confirmButtonColor: '#0b192c',
+            preConfirm: () => {
+                return [
+                    document.getElementById('swal-user').value,
+                    document.getElementById('swal-pass').value
+                ]
+            }
         });
 
-        if (password === '12345') { // PIN DEFAULT
-            window.location.href = 'admin.html';
-        } else if (password) {
-            Swal.fire('Ditolak', 'PIN Salah!', 'error');
+        if (formValues) {
+            let username = formValues[0];
+            let password = formValues[1];
+
+            // Cek Username & PIN
+            if (username === 'Mazaya' && password === 'Sukses@01') {
+                window.location.href = 'admin.html';
+            } else {
+                Swal.fire('Akses Ditolak', 'Username atau PIN salah!', 'error');
+            }
         }
     }
 </script>
